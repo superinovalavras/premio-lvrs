@@ -8,7 +8,7 @@ import { useVoto } from "@/components/voto-context";
 import { estadoVotacao } from "@/lib/janela";
 
 const REGRAS = [
-  { icone: UserCheck, titulo: "16 anos ou mais", texto: "Idade mínima conferida pela data de nascimento." },
+  { icone: UserCheck, titulo: "18 anos ou mais", texto: "Idade mínima conferida pela data de nascimento." },
   { icone: MapPin, titulo: "Vínculo com Lavras", texto: "Quem reside, estuda ou trabalha na cidade." },
   { icone: Fingerprint, titulo: "1 voto por CPF", texto: "Sem cadastro nem senha. O CPF vira um código irreversível." },
   { icone: EyeOff, titulo: "Placar sigiloso", texto: "Nenhuma parcial é divulgada. O resultado sai na cerimônia." },

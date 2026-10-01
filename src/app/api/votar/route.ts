@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { votoSchema, idadeEm } from "@/lib/voto";
+import { votoSchema, idadeEm, IDADE_MINIMA } from "@/lib/voto";
 import { VOTACAO_ABRE, VOTACAO_FECHA } from "@/lib/data";
 import { hashCpf } from "@/lib/server/cpf-hash";
 import { verificarTurnstile } from "@/lib/server/turnstile";
@@ -13,7 +13,7 @@ function erro(status: number, mensagem: string) {
 const MENSAGENS: Record<string, [number, string]> = {
   fora_do_prazo: [403, "A votação popular acontece de 06 a 11/11/2026."],
   finalista_invalido: [400, "Finalista inválido."],
-  idade_minima: [400, "É preciso ter pelo menos 16 anos para votar."],
+  idade_minima: [400, `É preciso ter pelo menos ${IDADE_MINIMA} anos para votar.`],
   cpf_ja_votou: [409, "Este CPF já registrou um voto. Cada CPF vota uma única vez."],
 };
 

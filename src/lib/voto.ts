@@ -1,7 +1,7 @@
 // Regras do eleitor — usadas no formulário (feedback imediato) e revalidadas no servidor.
 import { z } from "zod";
 
-export const IDADE_MINIMA = 16;
+export const IDADE_MINIMA = 18;
 export const VINCULOS = ["reside", "estuda", "trabalha"] as const;
 export type Vinculo = (typeof VINCULOS)[number];
 
