@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+/*
+  Identidade LVRS+ (Pacto Lavras pela Inovação) — valores do PDF da UONA.
+  Fonte da verdade: ../marca/README.md. Não inventar cores fora desta lista.
+
+  As cores vivas são verticais do Pacto, não decoração:
+    amarelo = Pacto (padrão, é o destaque do prêmio)
+    verde   = Sistema Regional de Inovação / superfícies
+    azul    = Tech
+    vermelho= Food
+    agro    = #003D40 na marca; em tela escura usa-se #009CA3 (contraste 4,66:1)
+*/
+:root {
+  --fundo: #012928;    /* verde profundo — fundo principal */
+  --chrome: #001b1a;   /* faixa mais escura, igual à vitrine */
+  --verde: #0d8049;    /* verde LVRS — superfícies, cards, blocos */
+  --amarelo: #ffcd00;  /* amarelo LVRS — destaque, botões, arcos */
+  --vermelho: #d34046; /* Food */
+  --azul: #5282ff;     /* Tech */
+  --agro: #009ca3;     /* Agro para tela */
+  --branco: #ffffff;
+}
+
+@theme inline {
+  --color-fundo: var(--fundo);
+  --color-chrome: var(--chrome);
+  --color-verde: var(--verde);
+  --color-amarelo: var(--amarelo);
+  --color-vermelho: var(--vermelho);
+  --color-azul: var(--azul);
+  --color-agro: var(--agro);
+  --font-sans: var(--font-poppins);
+  --font-script: var(--font-kaushan);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+html.lenis {
+  scroll-behavior: auto;
+}
+
+body {
+  background: var(--fundo);
+  color: var(--branco);
+}
+
+::selection {
+  background: var(--amarelo);
+  color: var(--fundo);
+}
+
+/*
+  Palavra de ênfase: script itálico amarelo no meio da frase, como no manual
+  ("O futuro que desejamos construímos hoje"). O brilho que passa é a única
+  animação do título — fica dentro do amarelo, não vira degradê de outras cores.
+*/
+.enfase {
+  font-family: var(--font-kaushan);
+  font-weight: 400;
+  font-size: 1.08em;
+  padding: 0 0.06em;
+  background-image: linear-gradient(
+    100deg,
+    var(--amarelo) 0%,
+    var(--amarelo) 40%,
+    #fff3b0 50%,
+    var(--amarelo) 60%,
+    var(--amarelo) 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: brilho 5s ease-in-out infinite;
+}
+@keyframes brilho {
+  0% {
+    background-position: 100% 0;
+  }
+  60%,
+  100% {
+    background-position: -50% 0;
+  }
+}
+
+/* Holofote amarelo que segue o mouse nos cards do bento (--mx/--my via JS) */
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    380px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in oklab, var(--amarelo) 16%, transparent),
+    transparent 45%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
+  pointer-events: none;
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
