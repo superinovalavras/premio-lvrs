@@ -1,6 +1,7 @@
 import "server-only";
 import { FINALISTAS_EXEMPLO, type Finalista } from "@/lib/data";
 import { supabasePublico } from "./supabase";
+import { MODO_TESTE } from "./ambiente";
 
 export type ResultadoFinalistas = { finalistas: Finalista[]; exemplo: boolean };
 
@@ -19,6 +20,8 @@ export async function carregarFinalistas(): Promise<ResultadoFinalistas> {
     .from("public_finalists")
     .select("id, name, summary, image_url")
     .eq("category_id", cat.id)
+    // site oficial nunca mostra finalista de teste; o ambiente de teste só mostra os de teste
+    .eq("is_test", MODO_TESTE)
     .order("sort_order");
 
   if (error || !data?.length) return { finalistas: FINALISTAS_EXEMPLO, exemplo: true };

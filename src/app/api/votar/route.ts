@@ -4,6 +4,7 @@ import { VOTACAO_ABRE, VOTACAO_FECHA } from "@/lib/data";
 import { hashCpf } from "@/lib/server/cpf-hash";
 import { verificarTurnstile } from "@/lib/server/turnstile";
 import { supabaseServico } from "@/lib/server/supabase";
+import { MODO_TESTE } from "@/lib/server/ambiente";
 
 // Respostas nunca carregam contagem, posição ou percentual — regra de sigilo do regulamento.
 function erro(status: number, mensagem: string) {
@@ -19,7 +20,8 @@ const MENSAGENS: Record<string, [number, string]> = {
 
 export async function POST(req: NextRequest) {
   const agora = new Date();
-  const preview = process.env.VOTACAO_FORCAR_ABERTA === "1" && process.env.NODE_ENV !== "production";
+  const preview =
+    MODO_TESTE || (process.env.VOTACAO_FORCAR_ABERTA === "1" && process.env.NODE_ENV !== "production");
   if (!preview && (agora < VOTACAO_ABRE || agora > VOTACAO_FECHA)) {
     return erro(...MENSAGENS.fora_do_prazo);
   }

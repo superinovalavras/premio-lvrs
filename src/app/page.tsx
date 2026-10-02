@@ -8,6 +8,7 @@ import { Votacao } from "@/components/sections/votacao";
 import { Cronograma } from "@/components/sections/cronograma";
 import { Transparencia } from "@/components/sections/transparencia";
 import { carregarFinalistas } from "@/lib/server/finalistas";
+import { FaixaTeste } from "@/components/faixa-teste";
 
 // Finalistas vêm do Supabase; revalida a cada 5 min para refletir o cadastro sem novo deploy.
 export const revalidate = 300;
@@ -27,6 +28,7 @@ export default async function Home() {
         <Transparencia />
       </main>
       <Footer />
+      <FaixaTeste />
     </VotoProvider>
   );
 }
