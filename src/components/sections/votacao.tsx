@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Arcos, Mais, TagVertical } from "@/components/marca";
 import { useVoto } from "@/components/voto-context";
 import { estadoVotacao } from "@/lib/janela";
+import { useParametros } from "@/components/parametros-context";
+import { dia, hora, periodo } from "@/lib/datas";
 
 const REGRAS = [
   { icone: UserCheck, titulo: "18 anos ou mais", texto: "Idade mínima conferida pela data de nascimento." },
@@ -17,7 +19,8 @@ const REGRAS = [
 // Bloco verde chapado com arcos amarelos no canto — a peça "O futuro que desejamos" do manual.
 export function Votacao() {
   const { abrir } = useVoto();
-  const estado = estadoVotacao();
+  const { votacaoAbre, votacaoFecha } = useParametros();
+  const estado = estadoVotacao(votacaoAbre, votacaoFecha);
 
   return (
     <section id="votacao" className="relative py-24 sm:py-32">
@@ -28,7 +31,7 @@ export function Votacao() {
           <div className="grid gap-12 lg:grid-cols-[1.15fr_1fr] lg:items-center">
             <div>
               <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.25em] text-amarelo">
-                <Mais className="size-3.5" /> Votação popular · 06 a 11/11
+                <Mais className="size-3.5" /> Votação popular · {periodo(votacaoAbre, votacaoFecha)}
               </p>
               <h2 className="mt-4 text-4xl font-medium leading-[1.12] tracking-tight sm:text-5xl">
                 Sua <span className="enfase">voz</span> escolhe a Agro e/ou Food e/ou Tech do Ano
@@ -48,8 +51,8 @@ export function Votacao() {
                   {estado === "aberta" ? "Votar Agora" : "Conhecer a votação"}
                 </Button>
                 <span className="text-sm text-white/75">
-                  {estado === "antes" && "Abre em 06/11/2026, à 0h"}
-                  {estado === "aberta" && "Aberta até 11/11/2026, às 23h59"}
+                  {estado === "antes" && `Abre em ${dia(votacaoAbre)}, à ${hora(votacaoAbre)}`}
+                  {estado === "aberta" && `Aberta até ${dia(votacaoFecha)}, às ${hora(votacaoFecha)}`}
                   {estado === "encerrada" && "Votação encerrada"}
                 </span>
               </div>

@@ -6,7 +6,9 @@ import { ArrowDown, Vote } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Arcos, Mais } from "@/components/marca";
 import { useVoto } from "@/components/voto-context";
-import { CERIMONIA, PUBLICOS } from "@/lib/data";
+import { PUBLICOS } from "@/lib/data";
+import { useParametros } from "@/components/parametros-context";
+import { extenso, hora } from "@/lib/datas";
 
 function restante(alvo: Date) {
   const ms = Math.max(0, alvo.getTime() - Date.now());
@@ -42,18 +44,20 @@ function Digito({ valor, rotulo }: { valor: number | null; rotulo: string }) {
 }
 
 function Contagem() {
+  const { galaEm, galaLocal } = useParametros();
   const [t, setT] = useState<ReturnType<typeof restante> | null>(null);
   useEffect(() => {
-    const tick = () => setT(restante(CERIMONIA));
+    const tick = () => setT(restante(new Date(galaEm)));
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [galaEm]);
 
   return (
     <div>
       <p className="mb-3 text-xs font-medium uppercase tracking-[0.22em] text-amarelo">
-        Cerimônia de Gala · 17 de novembro de 2026
+        Cerimônia de Gala · {extenso(galaEm)} · {hora(galaEm)}
+        {galaLocal && ` · ${galaLocal}`}
       </p>
       <div
         className="flex gap-2 sm:gap-3"

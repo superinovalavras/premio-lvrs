@@ -8,11 +8,11 @@ import { ehAdmin, exigirUsuario } from "@/lib/server/sessao";
 import { carregarEntidadeDoUsuario } from "@/lib/server/entidades-dados";
 import { STATUS, calcularPendencias, formatarData, incisoPorId } from "@/lib/entidades";
 import { cn } from "@/lib/utils";
+import { carregarParametros } from "@/lib/server/parametros";
+import { dia, hora, periodo } from "@/lib/datas";
 
 export const metadata: Metadata = { title: "Minha instituição · Prêmio Lavras de Inovação 2026" };
 
-const INDICACOES_ABREM = new Date("2026-10-12T00:00:00-03:00");
-const INDICACOES_FECHAM = new Date("2026-10-23T23:59:59-03:00");
 
 const ICONE = {
   rascunho: CircleDashed,
@@ -34,13 +34,16 @@ export default async function PainelEntidade() {
   const st = STATUS[e.status];
   const Icone = ICONE[e.status];
   const pend = calcularPendencias(e, dados.representantes, dados.documentos);
+  const par = await carregarParametros();
+  const INDICACOES_ABREM = new Date(par.indicacoesAbrem);
+  const INDICACOES_FECHAM = new Date(par.indicacoesFecham);
   const agora = new Date();
   const dias = Math.ceil((INDICACOES_ABREM.getTime() - agora.getTime()) / 86_400_000);
 
   const etapas = [
     { rotulo: "Cadastro preenchido", feito: e.status !== "rascunho" },
     { rotulo: "Análise da Secretaria", feito: e.status === "deferido" || e.status === "indeferido" },
-    { rotulo: "Indicações (12 a 23/10)", feito: false },
+    { rotulo: `Indicações (${periodo(par.indicacoesAbrem, par.indicacoesFecham)})`, feito: false },
   ];
 
   return (
@@ -135,7 +138,9 @@ export default async function PainelEntidade() {
               <p className="mt-2 text-3xl font-semibold">
                 {agora < INDICACOES_ABREM ? `Abre em ${dias} ${dias === 1 ? "dia" : "dias"}` : agora <= INDICACOES_FECHAM ? "Aberto" : "Encerrado"}
               </p>
-              <p className="mt-1 text-sm text-white/85">12/10/2026, à 0h, até 23/10/2026, às 23h59</p>
+              <p className="mt-1 text-sm text-white/85">
+                {dia(par.indicacoesAbrem)}, à {hora(par.indicacoesAbrem)}, até {dia(par.indicacoesFecham)}, às {hora(par.indicacoesFecham)}
+              </p>
             </div>
             <Cartao className="p-6">
               <h3 className="font-semibold">Como funciona</h3>

@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { votoSchema, idadeEm, IDADE_MINIMA } from "@/lib/voto";
-import { VOTACAO_ABRE, VOTACAO_FECHA } from "@/lib/data";
+import { carregarParametros } from "@/lib/server/parametros";
 import { hashCpf } from "@/lib/server/cpf-hash";
 import { verificarTurnstile } from "@/lib/server/turnstile";
 import { supabaseServico } from "@/lib/server/supabase";
@@ -12,7 +12,7 @@ function erro(status: number, mensagem: string) {
 }
 
 const MENSAGENS: Record<string, [number, string]> = {
-  fora_do_prazo: [403, "A votação popular acontece de 06 a 11/11/2026."],
+  fora_do_prazo: [403, "A votação popular está fora do período de votação."],
   finalista_invalido: [400, "Finalista inválido."],
   idade_minima: [400, `É preciso ter pelo menos ${IDADE_MINIMA} anos para votar.`],
   cpf_ja_votou: [409, "Este CPF já registrou um voto. Cada CPF vota uma única vez."],
@@ -22,7 +22,8 @@ export async function POST(req: NextRequest) {
   const agora = new Date();
   const preview =
     MODO_TESTE || (process.env.VOTACAO_FORCAR_ABERTA === "1" && process.env.NODE_ENV !== "production");
-  if (!preview && (agora < VOTACAO_ABRE || agora > VOTACAO_FECHA)) {
+  const { votacaoAbre, votacaoFecha } = await carregarParametros();
+  if (!preview && (agora < new Date(votacaoAbre) || agora > new Date(votacaoFecha))) {
     return erro(...MENSAGENS.fora_do_prazo);
   }
 

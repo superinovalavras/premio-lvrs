@@ -7,6 +7,8 @@ import { enviarEmail, URL_SITE } from "./email";
 import { carregarEntidade } from "./entidades-dados";
 import { credencialProvisoria, exigirAdmin, servico } from "./sessao";
 import { INCISOS, cnpjValido, incisoPorId } from "@/lib/entidades";
+import { carregarParametros } from "./parametros";
+import { dia, hora } from "@/lib/datas";
 import { somenteDigitos } from "@/lib/voto";
 
 export type Resultado = { ok: true; msg?: string } | { ok: false; erro: string };
@@ -50,13 +52,14 @@ export async function decidir(entidadeId: string, fd: FormData): Promise<Resulta
   if (para) {
     const base = { para, entidadeId, tipo: `decisao_${status}` };
     if (status === "deferido") {
+      const par = await carregarParametros();
       await enviarEmail({
         ...base,
         assunto: "Cadastro deferido — você já pode indicar",
         titulo: "Cadastro deferido",
         paragrafos: [
           `O cadastro de ${nome} foi deferido pela Secretaria Executiva do Prêmio Lavras de Inovação 2026.`,
-          "O formulário de indicação fica disponível de 12/10/2026, à 0h, até 23/10/2026, às 23h59.",
+          `O formulário de indicação fica disponível de ${dia(par.indicacoesAbrem)}, à ${hora(par.indicacoesAbrem)}, até ${dia(par.indicacoesFecham)}, às ${hora(par.indicacoesFecham)}.`,
         ],
         botao: { texto: "Acessar o formulário de indicação", url: `${URL_SITE}/entidade` },
       });

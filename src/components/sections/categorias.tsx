@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Award, Crown, Trophy, Vote } from "lucide-react";
-import { CATEGORIAS, TIPO_LABEL, type Categoria, type TipoCategoria } from "@/lib/data";
+import { TIPO_LABEL, type Categoria, type TipoCategoria } from "@/lib/data";
+import { useParametros } from "@/components/parametros-context";
 import { cn } from "@/lib/utils";
 import { Titulo } from "@/components/titulo";
 import { Arcos, TagVertical } from "@/components/marca";
@@ -20,8 +21,8 @@ const FILTROS: { id: Filtro; label: string }[] = [
 
 const ICONE_TIPO = { competitive: Trophy, special: Award, honorary: Crown };
 
-function contar(f: Filtro) {
-  return f === "todas" ? CATEGORIAS.length : CATEGORIAS.filter((c) => c.tipo === f).length;
+function contar(lista: Categoria[], f: Filtro) {
+  return f === "todas" ? lista.length : lista.filter((c) => c.tipo === f).length;
 }
 
 function Card({ c, indice }: { c: Categoria; indice: number }) {
@@ -120,6 +121,7 @@ function Card({ c, indice }: { c: Categoria; indice: number }) {
 
 export function Categorias() {
   const [filtro, setFiltro] = useState<Filtro>("todas");
+  const { categorias: CATEGORIAS } = useParametros();
   const lista = filtro === "todas" ? CATEGORIAS : CATEGORIAS.filter((c) => c.tipo === filtro);
 
   return (
@@ -151,7 +153,7 @@ export function Categorias() {
                 />
               )}
               <span className="relative">
-                {f.label} <span className="opacity-60">({contar(f.id)})</span>
+                {f.label} <span className="opacity-60">({contar(CATEGORIAS, f.id)})</span>
               </span>
             </button>
           ))}

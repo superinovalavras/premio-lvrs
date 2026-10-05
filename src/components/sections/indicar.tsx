@@ -5,11 +5,13 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Titulo } from "@/components/titulo";
 import { buttonVariants } from "@/components/ui/button";
+import { useParametros } from "@/components/parametros-context";
+import { periodo } from "@/lib/datas";
 
-const PASSOS = [
+const passos = (janela: string) => [
   { n: "1", t: "Peça o cadastro", d: "A instituição informa o enquadramento no art. 2º-B da Lei nº 3.813/2011 e anexa os documentos." },
   { n: "2", t: "Análise da Secretaria", d: "A Secretaria Executiva defere ou indefere com motivação, em até 1 dia útil." },
-  { n: "3", t: "Indique de 12 a 23/10", d: "Até 2 indicações por categoria e 6 no total, com evidências da realização." },
+  { n: "3", t: `Indique de ${janela}`, d: "Até 2 indicações por categoria e 6 no total, com evidências da realização." },
 ];
 
 const QUEM = [
@@ -23,13 +25,16 @@ const QUEM = [
 
 // Linha que se acende passo a passo — efeito próprio desta seção.
 export function Indicar() {
+  const { indicacoesAbrem, indicacoesFecham } = useParametros();
+  const janela = periodo(indicacoesAbrem, indicacoesFecham);
+  const PASSOS = passos(janela);
   return (
     <section id="indicar" className="relative py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-start">
           <div>
             <Titulo
-              selo="Indicações · 12 a 23/10"
+              selo={`Indicações · ${janela}`}
               titulo={
                 <>
                   Sua instituição pode <span className="enfase">indicar</span>

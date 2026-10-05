@@ -10,14 +10,17 @@ import { Cronograma } from "@/components/sections/cronograma";
 import { Transparencia } from "@/components/sections/transparencia";
 import { carregarFinalistas } from "@/lib/server/finalistas";
 import { FaixaTeste } from "@/components/faixa-teste";
+import { ParametrosProvider } from "@/components/parametros-context";
+import { carregarParametros } from "@/lib/server/parametros";
 
 // Finalistas vêm do Supabase; revalida a cada 5 min para refletir o cadastro sem novo deploy.
 export const revalidate = 300;
 
 export default async function Home() {
-  const { finalistas, exemplo } = await carregarFinalistas();
+  const [{ finalistas, exemplo }, parametros] = await Promise.all([carregarFinalistas(), carregarParametros()]);
 
   return (
+    <ParametrosProvider valor={parametros}>
     <VotoProvider finalistas={finalistas} exemplo={exemplo}>
       <Header />
       <main>
@@ -32,5 +35,6 @@ export default async function Home() {
       <Footer />
       <FaixaTeste />
     </VotoProvider>
+    </ParametrosProvider>
   );
 }

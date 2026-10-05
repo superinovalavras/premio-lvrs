@@ -7,6 +7,8 @@ import { ArrowLeft, ArrowRight, Check, Loader2, Lock, ShieldCheck, X } from "luc
 import { Button } from "@/components/ui/button";
 import { Mais } from "@/components/marca";
 import { estadoVotacao } from "@/lib/janela";
+import { useParametros } from "@/components/parametros-context";
+import { dia, diaCurto, hora } from "@/lib/datas";
 import type { Finalista } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import {
@@ -186,7 +188,8 @@ export function VotoModal({
   const [concluido, setConcluido] = useState(false);
   const painel = useRef<HTMLDivElement>(null);
 
-  const estado = estadoVotacao();
+  const { votacaoAbre, votacaoFecha, galaEm } = useParametros();
+  const estado = estadoVotacao(votacaoAbre, votacaoFecha);
   // Em preview local os finalistas de exemplo destravam o fluxo (a API recusa sem Supabase).
   const bloqueado = estado !== "aberta" || (exemplo && process.env.NEXT_PUBLIC_VOTACAO_PREVIEW !== "1");
 
@@ -383,10 +386,10 @@ export function VotoModal({
                             <Lock className="mt-0.5 size-4 shrink-0 text-amarelo" />
                             <p className="text-white/85">
                               {estado === "encerrada"
-                                ? "A votação popular foi encerrada em 11/11/2026. O resultado será revelado na cerimônia de 17/11."
+                                ? `A votação popular foi encerrada em ${dia(votacaoFecha)}. O resultado será revelado na cerimônia de ${diaCurto(galaEm)}.`
                                 : exemplo
-                                  ? "Os finalistas ainda não foram divulgados. A votação abre em 06/11/2026 e vai até 11/11/2026."
-                                  : "A votação abre em 06/11/2026, à 0h, e vai até 11/11/2026, às 23h59 (horário de Brasília)."}
+                                  ? `Os finalistas ainda não foram divulgados. A votação abre em ${dia(votacaoAbre)} e vai até ${dia(votacaoFecha)}.`
+                                  : `A votação abre em ${dia(votacaoAbre)}, à ${hora(votacaoAbre)}, e vai até ${dia(votacaoFecha)}, às ${hora(votacaoFecha)} (horário de Brasília).`}
                             </p>
                           </div>
                         )}

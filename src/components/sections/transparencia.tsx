@@ -3,9 +3,10 @@
 import { motion } from "framer-motion";
 import { Clock, Download, FileText, LockKeyhole } from "lucide-react";
 import { Titulo } from "@/components/titulo";
-import { DOCUMENTOS } from "@/lib/data";
+import { useParametros } from "@/components/parametros-context";
+import { dia } from "@/lib/datas";
 
-const PRIVACIDADE = [
+const privacidade = (gala: string) => [
   {
     titulo: "Para que usamos o CPF",
     texto:
@@ -24,11 +25,13 @@ const PRIVACIDADE = [
   {
     titulo: "Sigilo do resultado",
     texto:
-      "Não há placar parcial nem percentuais. Os vencedores só são conhecidos no anúncio oficial da cerimônia, em 17/11/2026.",
+      `Não há placar parcial nem percentuais. Os vencedores só são conhecidos no anúncio oficial da cerimônia, em ${dia(gala)}.`,
   },
 ];
 
 export function Transparencia() {
+  const { documentos: DOCUMENTOS, galaEm } = useParametros();
+  const PRIVACIDADE = privacidade(galaEm);
   return (
     <section id="transparencia" className="relative py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">

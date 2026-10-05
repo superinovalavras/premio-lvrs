@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import { criarConta } from "@/lib/server/acoes-conta";
 import { Aviso, Campo, btnPrim, inputCls } from "@/components/area/ui";
 
-const PASSOS = ["Crie o acesso do representante", "Preencha o cadastro e anexe os documentos", "A Secretaria analisa em até 1 dia útil", "Deferido, você indica de 12 a 23/10"];
+const PASSOS = ["Crie o acesso do representante", "Preencha o cadastro e anexe os documentos", "A Secretaria analisa em até 1 dia útil", "Deferido, você indica no período de indicações"];
 
 export function FormCadastro() {
   const [estado, acao, pendente] = useActionState(criarConta, undefined);

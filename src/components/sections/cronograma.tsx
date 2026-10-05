@@ -5,11 +5,12 @@ import { motion, useScroll, useSpring } from "framer-motion";
 import { CalendarDays } from "lucide-react";
 import { Mais } from "@/components/marca";
 import { Titulo } from "@/components/titulo";
-import { CRONOGRAMA } from "@/lib/data";
+import { useParametros } from "@/components/parametros-context";
 import { cn } from "@/lib/utils";
 
 // Linha do tempo que se desenha conforme a rolagem.
 export function Cronograma() {
+  const { cronograma: CRONOGRAMA } = useParametros();
   const ref = useRef<HTMLOListElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 75%", "end 55%"] });
   const escala = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
