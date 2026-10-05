@@ -20,6 +20,9 @@
   --azul: #5282ff;     /* Tech */
   --agro: #009ca3;     /* Agro para tela */
   --branco: #ffffff;
+  /* área clara (entidades): conteúdo em papel branco, topo verde-profundo */
+  --papel: #ffffff;
+  --nevoa: #f3f6f5;
 }
 
 @theme inline {
@@ -30,6 +33,8 @@
   --color-vermelho: var(--vermelho);
   --color-azul: var(--azul);
   --color-agro: var(--agro);
+  --color-papel: var(--papel);
+  --color-nevoa: var(--nevoa);
   --font-sans: var(--font-poppins);
   --font-script: var(--font-kaushan);
 }

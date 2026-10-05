@@ -10,6 +10,7 @@ import { useVoto } from "./voto-context";
 const LINKS = [
   { href: "#eixos", label: "Eixos" },
   { href: "#categorias", label: "Categorias" },
+  { href: "#indicar", label: "Indicar" },
   { href: "#votacao", label: "Votação" },
   { href: "#cronograma", label: "Cronograma" },
   { href: "#transparencia", label: "Transparência" },

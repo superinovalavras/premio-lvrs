@@ -160,8 +160,18 @@ export type Etapa = {
 
 // Só as duas datas em destaque estão confirmadas. As demais: preencher com o regulamento.
 export const CRONOGRAMA: Etapa[] = [
-  { titulo: "Inscrições", data: "A confirmar", texto: "Candidaturas nas categorias competitivas e especial." },
-  { titulo: "Avaliação técnica", data: "A confirmar", texto: "O COCITIEIS avalia as candidaturas e define os finalistas." },
+  {
+    titulo: "Cadastro das instituições indicadoras",
+    data: "Aberto até 23/10/2026",
+    texto: "Instituições de Lavras pedem habilitação para indicar. A Secretaria Executiva analisa em até 1 dia útil.",
+  },
+  {
+    titulo: "Indicações",
+    data: "12 a 23/10/2026",
+    texto: "Instituições habilitadas indicam até 2 nomes por categoria e 6 no total.",
+    destaque: true,
+  },
+  { titulo: "Avaliação técnica", data: "A confirmar", texto: "O COCITIEIS avalia as indicações e define os finalistas." },
   { titulo: "Divulgação dos finalistas", data: "A confirmar", texto: "Os três finalistas de cada categoria são anunciados." },
   {
     titulo: "Votação Popular",

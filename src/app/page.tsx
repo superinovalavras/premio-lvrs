@@ -5,6 +5,7 @@ import { Hero } from "@/components/sections/hero";
 import { Eixos } from "@/components/sections/eixos";
 import { Categorias } from "@/components/sections/categorias";
 import { Votacao } from "@/components/sections/votacao";
+import { Indicar } from "@/components/sections/indicar";
 import { Cronograma } from "@/components/sections/cronograma";
 import { Transparencia } from "@/components/sections/transparencia";
 import { carregarFinalistas } from "@/lib/server/finalistas";
@@ -23,6 +24,7 @@ export default async function Home() {
         <Hero />
         <Eixos />
         <Categorias />
+        <Indicar />
         <Votacao />
         <Cronograma />
         <Transparencia />

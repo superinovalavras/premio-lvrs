@@ -1,5 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- SVGs da marca com raster embutido, iguais aos da vitrine */
 import Image from "next/image";
+import Link from "next/link";
+import { LockKeyhole } from "lucide-react";
 import { Arcos } from "./marca";
 
 export function Footer() {
@@ -28,7 +30,15 @@ export function Footer() {
           <img src="/marca/logo-lvrs.svg" alt="LVRS+ Pacto Lavras pela Inovação" className="h-12 object-contain lg:h-14" />
           <img src="/marca/logo-vale-ipes.svg" alt="Vale dos Ipês" className="h-14 object-contain lg:h-16" />
         </div>
-        <p className="mt-10 text-center text-xs text-white/70">
+        <div className="mt-10 flex flex-col items-center gap-3 text-center text-xs text-white/70 sm:flex-row sm:justify-between sm:text-left">
+          <Link href="/privacidade" className="hover:text-amarelo">
+            Aviso de Privacidade
+          </Link>
+          <Link href="/entrar" className="inline-flex items-center gap-1.5 text-white/60 hover:text-amarelo">
+            <LockKeyhole className="size-3.5" /> Área restrita
+          </Link>
+        </div>
+        <p className="mt-6 text-center text-xs text-white/70">
           Prêmio Lavras de Inovação 2026 · Superintendência de Inovação de Lavras · Lavras, Capital do Futuro do
           Alimento
         </p>
