@@ -66,7 +66,8 @@ export async function criarConta(_: EstadoForm, fd: FormData): Promise<EstadoFor
     user_metadata: { nome },
   });
   if (error || !criado.user) {
-    console.error("criarConta", error?.status, error?.code, error?.message);
+    // Só status e código: a mensagem pode conter o cabeçalho com a chave.
+    console.error("criarConta", error?.status, error?.code);
     const jaExiste = /already|registered|exists/i.test(error?.message ?? "");
     return {
       erro: jaExiste

@@ -119,7 +119,8 @@ async function criarPreCadastro(linha: LinhaPre, admin: { id: string; email?: st
     ...credencialProvisoria(),
   });
   if (error || !criado.user) {
-    console.error("preCadastro", error?.status, error?.code, error?.message);
+    // Só status e código: a mensagem pode conter o cabeçalho com a chave.
+    console.error("preCadastro", error?.status, error?.code);
     return {
       ok: false as const,
       erro: /already|registered|exists/i.test(error?.message ?? "") ? "E-mail já cadastrado." : "Falha ao criar acesso.",
