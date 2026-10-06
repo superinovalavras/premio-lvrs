@@ -12,21 +12,17 @@ export type Topico = { id: string; titulo: string; telas: Tela[] };
 const W = 1366;
 const H = 860;
 
-// Posição de cada marcador: afastado do alvo e sem encostar nos outros marcadores.
+// Cada marcador fica na mesma altura do alvo, ao lado (seta horizontal);
+// se encostar em outro marcador, desce ou sobe um pouco.
 function posicionar(pontos: Ponto[]) {
   const pinos: { tx: number; ty: number; px: number; py: number }[] = [];
   for (const p of pontos) {
     const tx = (p.x / 100) * W;
     const ty = (p.y / 100) * H;
-    const dx = tx < 260 ? 150 : -150;
-    let dy = ty < 200 ? 110 : -110;
-    let px = Math.min(W - 40, Math.max(40, tx + dx));
-    let py = Math.min(H - 40, Math.max(40, ty + dy));
-    for (let tentativa = 0; tentativa < 12 && pinos.some((o) => Math.hypot(o.px - px, o.py - py) < 70); tentativa++) {
-      dy += dy > 0 ? 60 : -60;
-      if (ty + dy < 40 || ty + dy > H - 40) dy = -dy;
-      py = Math.min(H - 40, Math.max(40, ty + dy));
-      px = Math.min(W - 40, Math.max(40, tx + dx - tentativa * 15 * Math.sign(dx)));
+    const px = tx > 320 ? tx - 190 : tx + 190;
+    let py = ty;
+    for (let k = 1; k < 10 && pinos.some((o) => Math.hypot(o.px - px, o.py - py) < 64); k++) {
+      py = Math.min(H - 34, Math.max(34, ty + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 64));
     }
     pinos.push({ tx, ty, px, py });
   }
