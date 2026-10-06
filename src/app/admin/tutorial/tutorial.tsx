@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-export type Ponto = { x: number; y: number; legenda: string };
+export type Ponto = { x: number; y: number; w?: number; h?: number; legenda: string };
 export type Tela = { imagem: string; pontos: Ponto[] };
 export type Topico = { id: string; titulo: string; telas: Tela[] };
 
@@ -12,19 +12,22 @@ export type Topico = { id: string; titulo: string; telas: Tela[] };
 const W = 1366;
 const H = 860;
 
-// Cada marcador fica na mesma altura do alvo, ao lado (seta horizontal);
-// se encostar em outro marcador, desce ou sobe um pouco.
+// Cada alvo ganha um contorno amarelo; o marcador fica ao lado, na mesma altura, e a seta
+// para na borda do contorno (sem cobrir o texto). Se encostar em outro marcador, desloca.
 function posicionar(pontos: Ponto[]) {
-  const pinos: { tx: number; ty: number; px: number; py: number }[] = [];
+  const pinos: { cx: number; cy: number; bw: number; bh: number; px: number; py: number; esquerda: boolean }[] = [];
   for (const p of pontos) {
-    const tx = (p.x / 100) * W;
-    const ty = (p.y / 100) * H;
-    const px = tx > 320 ? tx - 190 : tx + 190;
-    let py = ty;
+    const cx = (p.x / 100) * W;
+    const cy = (p.y / 100) * H;
+    const bw = Math.max(44, ((p.w ?? 3) / 100) * W + 12);
+    const bh = Math.max(36, ((p.h ?? 4) / 100) * H + 10);
+    const esquerda = cx - bw / 2 > 140; // há espaço à esquerda do alvo?
+    const px = esquerda ? cx - bw / 2 - 90 : cx + bw / 2 + 90;
+    let py = cy;
     for (let k = 1; k < 10 && pinos.some((o) => Math.hypot(o.px - px, o.py - py) < 64); k++) {
-      py = Math.min(H - 34, Math.max(34, ty + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 64));
+      py = Math.min(H - 34, Math.max(34, cy + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 64));
     }
-    pinos.push({ tx, ty, px, py });
+    pinos.push({ cx, cy, bw, bh, px, py, esquerda });
   }
   return pinos;
 }
@@ -33,22 +36,20 @@ function Marcadores({ pontos, inicio }: { pontos: Ponto[]; inicio: number }) {
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="pointer-events-none absolute inset-0 size-full" aria-hidden>
       <defs>
-        <marker id="ponta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <marker id="ponta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M0 0 10 5 0 10z" fill="#ffcd00" />
         </marker>
       </defs>
-      {posicionar(pontos).map(({ tx, ty, px, py }, i) => {
-        const ang = Math.atan2(ty - py, tx - px);
-        const sx = px + Math.cos(ang) * 28;
-        const sy = py + Math.sin(ang) * 28;
-        const ex = tx - Math.cos(ang) * 30;
-        const ey = ty - Math.sin(ang) * 30;
+      {posicionar(pontos).map(({ cx, cy, bw, bh, px, py, esquerda }, i) => {
+        const bordaX = esquerda ? cx - bw / 2 - 6 : cx + bw / 2 + 6;
+        const bordaY = Math.min(cy + bh / 2, Math.max(cy - bh / 2, py));
+        const sx = px + (esquerda ? 27 : -27);
         return (
           <g key={i}>
-            <circle cx={tx} cy={ty} r="26" fill="none" stroke="#ffcd00" strokeWidth="4" className="tut-pulso" />
-            <line x1={sx} y1={sy} x2={ex} y2={ey} stroke="#ffcd00" strokeWidth="5" strokeLinecap="round" markerEnd="url(#ponta)" />
-            <circle cx={px} cy={py} r="26" fill="#ffcd00" stroke="#012928" strokeWidth="4" />
-            <text x={px} y={py + 10} textAnchor="middle" fontSize="28" fontWeight="700" fill="#012928" fontFamily="Poppins, sans-serif">
+            <rect x={cx - bw / 2} y={cy - bh / 2} width={bw} height={bh} rx="12" fill="none" stroke="#ffcd00" strokeWidth="4" className="tut-pulso" />
+            <line x1={sx} y1={py} x2={bordaX} y2={bordaY} stroke="#ffcd00" strokeWidth="5" strokeLinecap="round" markerEnd="url(#ponta)" />
+            <circle cx={px} cy={py} r="25" fill="#ffcd00" stroke="#012928" strokeWidth="4" />
+            <text x={px} y={py + 10} textAnchor="middle" fontSize="27" fontWeight="700" fill="#012928" fontFamily="Poppins, sans-serif">
               {inicio + i}
             </text>
           </g>
