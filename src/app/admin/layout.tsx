@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BarChart3, Building2, CalendarDays, FileSpreadsheet, FileText, Home, LayoutGrid, LogOut, Medal, Trophy, UserPlus } from "lucide-react";
+import { BarChart3, BookOpen, Building2, CalendarDays, FileSpreadsheet, FileText, Home, LayoutGrid, LogOut, Medal, Trophy, UserPlus } from "lucide-react";
 import { exigirAdmin, servico } from "@/lib/server/sessao";
 import { sair } from "@/lib/server/acoes-conta";
 import { NavAdmin } from "./nav";
@@ -13,6 +13,7 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
     .eq("status", "em_analise");
 
   const itens = [
+    { href: "/admin/tutorial", rotulo: "Tutorial", icone: <BookOpen className="size-[18px]" /> },
     { grupo: "Prêmio" },
     { href: "/admin/premio", rotulo: "Datas e cronograma", icone: <CalendarDays className="size-[18px]" /> },
     { href: "/admin/finalistas", rotulo: "Finalistas", icone: <Medal className="size-[18px]" /> },

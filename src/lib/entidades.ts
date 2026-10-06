@@ -334,12 +334,15 @@ export function calcularPendencias(
     for (const i of dados.error.issues) if (i.path[0] !== "inciso") p.push({ passo: 2, texto: i.message });
   }
 
+  // Campos vazios viram "" para a mensagem sair em português (null dá erro genérico do zod).
+  const semNulos = (r?: RepresentanteRow) =>
+    Object.fromEntries(Object.entries(r ?? {}).map(([k, v]) => [k, v ?? ""]));
   const titular = reps.find((r) => r.papel === "titular");
-  const rt = representanteSchema.safeParse({ ...titular });
+  const rt = representanteSchema.safeParse(semNulos(titular));
   if (!rt.success) p.push({ passo: 3, texto: `Representante: ${rt.error.issues[0].message}` });
   const suplente = reps.find((r) => r.papel === "suplente");
   if (suplente) {
-    const rs = representanteSchema.safeParse({ ...suplente });
+    const rs = representanteSchema.safeParse(semNulos(suplente));
     if (!rs.success) p.push({ passo: 3, texto: `Suplente: ${rs.error.issues[0].message}` });
   }
 

@@ -1,0 +1,256 @@
+[
+  {
+    "id": "votacao",
+    "titulo": "Abrir a votação",
+    "telas": [
+      {
+        "imagem": "/tutorial/01-datas.png",
+        "pontos": [
+          {
+            "x": 9.04,
+            "y": 17.59,
+            "legenda": "Entre em Datas e cronograma"
+          },
+          {
+            "x": 59.08,
+            "y": 45.12,
+            "legenda": "Quando a votação abre"
+          },
+          {
+            "x": 59.08,
+            "y": 54.74,
+            "legenda": "Quando encerra"
+          },
+          {
+            "x": 25.15,
+            "y": 64.06,
+            "legenda": "Salve — o site muda na hora"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "finalistas",
+    "titulo": "Cadastrar finalistas",
+    "telas": [
+      {
+        "imagem": "/tutorial/02-finalistas.png",
+        "pontos": [
+          {
+            "x": 9.04,
+            "y": 22.51,
+            "legenda": "Entre em Finalistas"
+          },
+          {
+            "x": 90.72,
+            "y": 29.81,
+            "legenda": "Adicione cada finalista"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/03-finalista-gaveta.png",
+        "pontos": [
+          {
+            "x": 83.07,
+            "y": 12.95,
+            "legenda": "Logo"
+          },
+          {
+            "x": 83.2,
+            "y": 27.88,
+            "legenda": "Nome"
+          },
+          {
+            "x": 83.2,
+            "y": 42.15,
+            "legenda": "Resumo da solução"
+          },
+          {
+            "x": 70.93,
+            "y": 76.72,
+            "legenda": "Salve"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "site",
+    "titulo": "Ver e votar no site",
+    "telas": [
+      {
+        "imagem": "/tutorial/04-site.png",
+        "pontos": [
+          {
+            "x": 50,
+            "y": 65.1,
+            "legenda": "Contagem até a gala (sua data)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "zerar",
+    "titulo": "Zerar votos de teste",
+    "telas": [
+      {
+        "imagem": "/tutorial/05-zerar.png",
+        "pontos": [
+          {
+            "x": 29.65,
+            "y": 87.39,
+            "legenda": "Digite ZERAR"
+          },
+          {
+            "x": 42.25,
+            "y": 87.39,
+            "legenda": "Apaga todos os votos"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cronograma",
+    "titulo": "Linha do tempo do site",
+    "telas": [
+      {
+        "imagem": "/tutorial/06-cronograma.png",
+        "pontos": [
+          {
+            "x": 39.17,
+            "y": 33.17,
+            "legenda": "Nome da etapa"
+          },
+          {
+            "x": 66.05,
+            "y": 33.17,
+            "legenda": "Texto da data (só exibição)"
+          },
+          {
+            "x": 28.43,
+            "y": 24.32,
+            "legenda": "Nova etapa"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "documentos",
+    "titulo": "Publicar documentos",
+    "telas": [
+      {
+        "imagem": "/tutorial/07-documentos.png",
+        "pontos": [
+          {
+            "x": 87.67,
+            "y": 32.26,
+            "legenda": "Envie o PDF — vira download no site"
+          },
+          {
+            "x": 27.18,
+            "y": 71.85,
+            "legenda": "Outro documento"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "categorias",
+    "titulo": "Textos das categorias",
+    "telas": [
+      {
+        "imagem": "/tutorial/08-categorias.png",
+        "pontos": [
+          {
+            "x": 91.81,
+            "y": 32.26,
+            "legenda": "Edite nome e descrição"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "instituicoes",
+    "titulo": "Analisar instituições",
+    "telas": [
+      {
+        "imagem": "/tutorial/09-instituicoes.png",
+        "pontos": [
+          {
+            "x": 9.04,
+            "y": 41.78,
+            "legenda": "Pedidos de cadastro"
+          },
+          {
+            "x": 92.56,
+            "y": 48.45,
+            "legenda": "Abra o pedido"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/10-analise.png",
+        "pontos": [
+          {
+            "x": 83.46,
+            "y": 61.21,
+            "legenda": "Decida: deferir, pedir ajuste ou indeferir"
+          },
+          {
+            "x": 83.46,
+            "y": 89.52,
+            "legenda": "Confirme"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pre",
+    "titulo": "Pré-cadastrar instituições",
+    "telas": [
+      {
+        "imagem": "/tutorial/11-pre.png",
+        "pontos": [
+          {
+            "x": 9.04,
+            "y": 46.69,
+            "legenda": "Uma instituição"
+          },
+          {
+            "x": 54.9,
+            "y": 58.55,
+            "legenda": "E-mail = login (senha 123456)"
+          },
+          {
+            "x": 26.66,
+            "y": 74.58,
+            "legenda": "Crie e copie a mensagem"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/12-importar.png",
+        "pontos": [
+          {
+            "x": 29.68,
+            "y": 41.38,
+            "legenda": "Baixe o modelo"
+          },
+          {
+            "x": 67.43,
+            "y": 36.85,
+            "legenda": "Envie preenchido e confira"
+          }
+        ]
+      }
+    ]
+  }
+]
