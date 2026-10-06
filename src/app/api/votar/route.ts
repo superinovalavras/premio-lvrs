@@ -48,6 +48,10 @@ export async function POST(req: NextRequest) {
   const sb = supabaseServico();
   if (!sb) return erro(503, "A votação ainda não está disponível.");
 
+  // Site oficial só aceita finalista oficial; o link de teste só aceita finalista de teste.
+  const { data: fin } = await sb.from("finalists").select("is_test").eq("id", v.finalistaId).maybeSingle();
+  if (!fin || fin.is_test !== MODO_TESTE) return erro(...MENSAGENS.finalista_invalido);
+
   let cpfHash: string;
   try {
     cpfHash = hashCpf(v.cpf);

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ExternalLink, KeyRound, Loader2 } from "lucide-react";
-import { decidir, redefinirSenha } from "@/lib/server/acoes-admin";
+import { decidir, excluirEntidade, redefinirSenha } from "@/lib/server/acoes-admin";
 import { abrirDocumento } from "@/lib/server/acoes-entidade";
 import { CartaoAdmin, btnAmarelo, btnContorno, btnPerigo, inputEscuro } from "@/components/admin/ui";
 import type { StatusEntidade } from "@/lib/entidades";
@@ -145,6 +145,33 @@ export function RedefinirSenha({ id }: { id: string }) {
         <KeyRound className="size-4" /> Gerar senha provisória
       </button>
       {msg && <p className="mt-2 text-[13px] text-white/80">{msg}</p>}
+    </div>
+  );
+}
+
+export function ExcluirCadastro({ id }: { id: string }) {
+  const router = useRouter();
+  const [texto, setTexto] = useState("");
+  const [msg, setMsg] = useState<string | null>(null);
+  const [pendente, iniciar] = useTransition();
+  return (
+    <div className="mt-3 grid gap-2">
+      <input value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Digite EXCLUIR" className={inputEscuro} />
+      <button
+        type="button"
+        className={btnPerigo}
+        disabled={pendente || texto.trim().toUpperCase() !== "EXCLUIR"}
+        onClick={() =>
+          iniciar(async () => {
+            const r = await excluirEntidade(id, texto);
+            if (!r.ok) return setMsg(r.erro);
+            router.push("/admin/entidades");
+          })
+        }
+      >
+        {pendente && <Loader2 className="size-4 animate-spin" />} Excluir cadastro
+      </button>
+      {msg && <p className="text-[13px] text-[#ff8a8f]">{msg}</p>}
     </div>
   );
 }

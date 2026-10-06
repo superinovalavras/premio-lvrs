@@ -128,7 +128,8 @@ export function EditorCronograma({ etapas: iniciais }: { etapas: Etapa[] }) {
         <div>
           <h2 className="font-semibold">Linha do tempo do site</h2>
           <p className="mt-1 text-[13px] text-white/60">
-            Texto livre na data (ex.: “A confirmar”, “12 a 23/10/2026”). Etapas em destaque aparecem em verde.
+            Só o texto da linha do tempo do site — não abre nem fecha nada. Os prazos de verdade são os campos de datas
+            acima. Etapas em destaque aparecem em verde.
           </p>
         </div>
         <button

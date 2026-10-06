@@ -262,3 +262,18 @@ export async function removerFinalista(id: string): Promise<Resultado> {
 function urlLogo(caminho: string) {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/publico/${caminho}`;
 }
+
+// Votos dados no ensaio (finalistas de teste). Precisam sumir antes da votação oficial:
+// o CPF que votou no teste ficaria bloqueado para votar de verdade.
+export async function apagarVotosTeste(): Promise<Resultado> {
+  const admin = await exigirAdmin();
+  const sb = servico();
+  const { data: testes } = await sb.from("finalists").select("id").eq("is_test", true);
+  const ids = (testes ?? []).map((f) => f.id);
+  if (!ids.length) return { ok: true, msg: "Não há finalistas de teste." };
+  const { count } = await sb.from("votes").select("id", { count: "exact", head: true }).in("finalist_id", ids);
+  const { error } = await sb.from("votes").delete().in("finalist_id", ids);
+  if (error) return { ok: false, erro: "Não foi possível apagar os votos de teste." };
+  await auditar(admin, "votos_teste_apagados", { tipo: "premio", id: "votacao" }, { quantidade: count ?? 0 });
+  return { ok: true, msg: `${count ?? 0} voto(s) de teste apagado(s).` };
+}

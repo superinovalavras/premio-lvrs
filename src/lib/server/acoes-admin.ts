@@ -195,3 +195,29 @@ export async function redefinirSenha(entidadeId: string): Promise<Resultado> {
   await auditar(admin, "senha_redefinida", { tipo: "entidade", id: entidadeId });
   return { ok: true, msg: "Senha provisória 123456 ativa por 48 horas. Avise o representante." };
 }
+
+// Exclui o cadastro inteiro (útil para limpar testes): documentos, dados e a conta de acesso.
+// A auditoria guarda o registro da exclusão.
+export async function excluirEntidade(entidadeId: string, confirmacao: string): Promise<Resultado> {
+  const admin = await exigirAdmin();
+  const dados = await carregarEntidade(entidadeId);
+  if (!dados) return { ok: false, erro: "Cadastro não encontrado." };
+  const nome = dados.entidade.razao_social ?? "";
+  if (confirmacao.trim().toUpperCase() !== "EXCLUIR") return { ok: false, erro: "Digite EXCLUIR para confirmar." };
+  const sb = servico();
+  const caminhos = dados.documentos.map((d) => d.storage_path).filter(Boolean) as string[];
+  if (caminhos.length) await sb.storage.from("entidades").remove(caminhos);
+  const { error } = await sb.from("entidades").delete().eq("id", entidadeId);
+  if (error) return { ok: false, erro: "Não foi possível excluir." };
+  if (dados.entidade.user_id && !(await ehAdminId(dados.entidade.user_id))) {
+    await sb.auth.admin.deleteUser(dados.entidade.user_id);
+  }
+  await auditar(admin, "entidade_excluida", { tipo: "entidade", id: entidadeId }, { nome, email: dados.titular?.email });
+  revalidatePath("/admin", "layout");
+  return { ok: true, msg: "Cadastro excluído." };
+}
+
+async function ehAdminId(userId: string) {
+  const { data } = await servico().from("admins").select("user_id").eq("user_id", userId).maybeSingle();
+  return !!data;
+}

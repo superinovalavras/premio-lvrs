@@ -15,7 +15,7 @@ import {
   tipoCriterio,
 } from "@/lib/entidades";
 import { mascaraCelular, mascaraCpf } from "@/lib/voto";
-import { BotaoDocumento, PainelDecisao, RedefinirSenha } from "./acoes";
+import { BotaoDocumento, ExcluirCadastro, PainelDecisao, RedefinirSenha } from "./acoes";
 
 export const metadata: Metadata = { title: "Análise de cadastro · Painel do Prêmio" };
 
@@ -197,6 +197,14 @@ export default async function AnaliseEntidade({ params }: PageProps<"/admin/enti
               Se o representante perdeu a senha, gere a provisória 123456 (vale 48 horas, troca obrigatória).
             </p>
             <RedefinirSenha id={e.id} />
+          </CartaoAdmin>
+          <CartaoAdmin className="border-vermelho/40">
+            <h2 className="font-semibold">Excluir cadastro</h2>
+            <p className="mt-1 text-[13px] text-white/65">
+              Para limpar testes ou pedidos duplicados. Apaga dados, documentos e o acesso do representante; o
+              histórico guarda o registro da exclusão.
+            </p>
+            <ExcluirCadastro id={e.id} />
           </CartaoAdmin>
           <Link href="/admin/entidades" className={btnContorno}>
             Voltar à lista

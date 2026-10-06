@@ -4,7 +4,7 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ImageUp, Loader2, Plus, Trash2, X } from "lucide-react";
-import { removerFinalista, salvarFinalista } from "@/lib/server/acoes-parametros";
+import { apagarVotosTeste, removerFinalista, salvarFinalista } from "@/lib/server/acoes-parametros";
 import { enviarArquivoPublico } from "@/components/admin/upload";
 import { CartaoAdmin, btnAmarelo, btnContorno, btnPerigo, inputEscuro } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
@@ -22,7 +22,7 @@ function Logo({ f, grande }: { f: Pick<F, "nome" | "imagem">; grande?: boolean }
   );
 }
 
-export function Finalistas({ lista }: { lista: F[] }) {
+export function Finalistas({ lista, votosTeste }: { lista: F[]; votosTeste: number }) {
   const [editando, setEditando] = useState<F | null>(null);
   const oficiais = lista.filter((f) => !f.teste);
   const testes = lista.filter((f) => f.teste);
@@ -66,6 +66,8 @@ export function Finalistas({ lista }: { lista: F[] }) {
           </CartaoAdmin>
         ))}
       </div>
+
+      {testes.length > 0 && <VotosTeste n={votosTeste} />}
 
       {editando && <Gaveta inicial={editando} fechar={() => setEditando(null)} />}
     </>
@@ -178,5 +180,36 @@ function Gaveta({ inicial, fechar }: { inicial: F; fechar: () => void }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function VotosTeste({ n }: { n: number }) {
+  const router = useRouter();
+  const [msg, setMsg] = useState<string | null>(null);
+  const [pendente, iniciar] = useTransition();
+  return (
+    <CartaoAdmin className="mt-6 border-dashed bg-chrome">
+      <h2 className="font-semibold">Votos de teste: {n}</h2>
+      <p className="mt-1 text-[13px] text-white/65">
+        Os votos dados nos finalistas de teste ocupam o CPF de quem votou. Apague antes da votação oficial para que
+        essas pessoas possam votar de verdade.
+      </p>
+      <button
+        type="button"
+        className={cn(btnContorno, "mt-3")}
+        disabled={pendente || n === 0}
+        onClick={() =>
+          confirm("Apagar todos os votos de teste?") &&
+          iniciar(async () => {
+            const r = await apagarVotosTeste();
+            setMsg(r.ok ? (r.msg ?? "Pronto.") : r.erro);
+            router.refresh();
+          })
+        }
+      >
+        {pendente && <Loader2 className="size-4 animate-spin" />} Apagar votos de teste
+      </button>
+      {msg && <p className="mt-2 text-sm text-white/80">{msg}</p>}
+    </CartaoAdmin>
   );
 }
