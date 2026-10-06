@@ -16,23 +16,10 @@ function Rotulo({ children }: { children: React.ReactNode }) {
   return <span className="mb-1.5 block text-[12.5px] font-medium text-white/85">{children}</span>;
 }
 
-export function FormDatas({
-  valores,
-  votacaoComecou,
-  indicacoesComecaram,
-}: {
-  valores: Record<string, string>;
-  votacaoComecou: boolean;
-  indicacoesComecaram: boolean;
-}) {
+export function FormDatas({ valores }: { valores: Record<string, string> }) {
   const router = useRouter();
   const [msg, setMsg] = useState<{ ok: boolean; texto: string } | null>(null);
   const [pendente, iniciar] = useTransition();
-  const [mexeu, setMexeu] = useState<Set<string>>(new Set());
-  const exigeMotivo =
-    (votacaoComecou && (mexeu.has("votacao_abre") || mexeu.has("votacao_fecha"))) ||
-    (indicacoesComecaram && (mexeu.has("indicacoes_abrem") || mexeu.has("indicacoes_fecham")));
-
   const campo = (nome: string, rotulo: string, tipo = "datetime-local") => (
     <label>
       <Rotulo>{rotulo}</Rotulo>
@@ -40,7 +27,6 @@ export function FormDatas({
         type={tipo}
         name={nome}
         defaultValue={valores[nome]}
-        onChange={() => setMexeu((s) => new Set(s).add(nome))}
         required={tipo !== "text"}
         className={inputEscuro}
       />
@@ -53,10 +39,7 @@ export function FormDatas({
         iniciar(async () => {
           const r = await salvarDatas(fd);
           setMsg(r.ok ? { ok: true, texto: r.msg ?? "Salvo." } : { ok: false, texto: r.erro });
-          if (r.ok) {
-            setMexeu(new Set());
-            router.refresh();
-          }
+          if (r.ok) router.refresh();
         })
       }
       className="grid gap-4 lg:grid-cols-3"
@@ -85,15 +68,6 @@ export function FormDatas({
           {campo("gala_local", "Local (opcional)", "text")}
         </div>
       </CartaoAdmin>
-
-      {exigeMotivo && (
-        <CartaoAdmin className="border-amarelo/60 lg:col-span-3">
-          <label>
-            <Rotulo>Este período já começou. Motivo da alteração (obrigatório, fica no histórico)</Rotulo>
-            <textarea name="motivo" required minLength={10} rows={3} className={inputEscuro} />
-          </label>
-        </CartaoAdmin>
-      )}
 
       <div className="flex flex-wrap items-center gap-4 lg:col-span-3">
         <button className={btnAmarelo} disabled={pendente}>

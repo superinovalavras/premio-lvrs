@@ -27,7 +27,6 @@ export async function salvarDatas(fd: FormData): Promise<Resultado> {
   const indFecha = deBrasilia(txt(fd, "indicacoes_fecham"), true);
   const gala = deBrasilia(txt(fd, "gala_em"));
   const local = txt(fd, "gala_local", 200) || null;
-  const motivo = txt(fd, "motivo", 1000);
 
   if (!votAbre || !votFecha || !indAbre || !indFecha || !gala) return { ok: false, erro: "Preencha todas as datas." };
   if (votFecha <= votAbre) return { ok: false, erro: "A votação precisa encerrar depois de abrir." };
@@ -37,27 +36,16 @@ export async function salvarDatas(fd: FormData): Promise<Resultado> {
   const { data: atual } = await sb.from("vote_window").select("opens_at, closes_at").maybeSingle();
   const { data: par } = await sb.from("parametros").select("*").maybeSingle();
 
-  // Depois que um período começou, mudar suas datas é prorrogação/alteração formal: exige motivo.
-  const agora = new Date();
-  const votacaoComecou = atual && new Date(atual.opens_at) <= agora;
-  const indicacoesComecaram = par && new Date(par.indicacoes_abrem) <= agora;
-  const mudouVotacao = atual && (atual.opens_at !== votAbre || atual.closes_at !== votFecha);
-  const mudouIndicacoes = par && (par.indicacoes_abrem !== indAbre || par.indicacoes_fecham !== indFecha);
-  if (((votacaoComecou && mudouVotacao) || (indicacoesComecaram && mudouIndicacoes)) && motivo.length < 10) {
-    return { ok: false, erro: "Um período já começou: escreva o motivo da alteração (fica no histórico)." };
-  }
-
   const r1 = await sb.from("vote_window").update({ opens_at: votAbre, closes_at: votFecha }).eq("id", true);
   const r2 = await sb
     .from("parametros")
-    .update({ gala_em: gala, gala_local: local, indicacoes_abrem: indAbre, indicacoes_fecham: indFecha, atualizado_em: agora.toISOString() })
+    .update({ gala_em: gala, gala_local: local, indicacoes_abrem: indAbre, indicacoes_fecham: indFecha, atualizado_em: new Date().toISOString() })
     .eq("id", true);
   if (r1.error || r2.error) return { ok: false, erro: "Não foi possível salvar as datas." };
 
   await auditar(admin, "datas_alteradas", { tipo: "premio", id: "datas" }, {
     antes: { votacao: atual, gala: par?.gala_em, indicacoes: par && [par.indicacoes_abrem, par.indicacoes_fecham] },
     depois: { votacao: [votAbre, votFecha], gala, indicacoes: [indAbre, indFecha] },
-    ...(motivo ? { motivo } : {}),
   });
   atualizarSite();
   return { ok: true, msg: "Datas salvas. O site já mostra as novas datas." };
@@ -276,4 +264,16 @@ export async function apagarVotosTeste(): Promise<Resultado> {
   if (error) return { ok: false, erro: "Não foi possível apagar os votos de teste." };
   await auditar(admin, "votos_teste_apagados", { tipo: "premio", id: "votacao" }, { quantidade: count ?? 0 });
   return { ok: true, msg: `${count ?? 0} voto(s) de teste apagado(s).` };
+}
+
+// Apaga todos os votos (para testar a votação antes da data oficial). Exige digitar ZERAR.
+export async function zerarVotacao(confirmacao: string): Promise<Resultado> {
+  const admin = await exigirAdmin();
+  if (confirmacao.trim().toUpperCase() !== "ZERAR") return { ok: false, erro: "Digite ZERAR para confirmar." };
+  const sb = servico();
+  const { count } = await sb.from("votes").select("id", { count: "exact", head: true });
+  const { error } = await sb.from("votes").delete().not("id", "is", null);
+  if (error) return { ok: false, erro: "Não foi possível zerar a votação." };
+  await auditar(admin, "votacao_zerada", { tipo: "premio", id: "votacao" }, { votos_apagados: count ?? 0 });
+  return { ok: true, msg: `${count ?? 0} voto(s) apagado(s). A votação está zerada.` };
 }

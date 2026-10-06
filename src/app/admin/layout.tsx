@@ -53,7 +53,15 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
           </form>
         </div>
       </aside>
-      <main className="min-w-0 px-4 py-7 sm:px-9 sm:pb-16">{children}</main>
+      <main className="min-w-0 px-4 py-7 sm:px-9 sm:pb-16">
+        {!process.env.TURNSTILE_SECRET_KEY && (
+          <p className="mb-6 rounded-2xl border border-amarelo/60 bg-amarelo/10 px-4 py-3 text-sm">
+            <b className="font-semibold text-amarelo">Anti-robô desligado.</b> A votação funciona, mas sem proteção contra
+            robôs. Configure o Cloudflare Turnstile antes da votação oficial.
+          </p>
+        )}
+        {children}
+      </main>
     </div>
   );
 }

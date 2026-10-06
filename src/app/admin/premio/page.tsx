@@ -7,7 +7,6 @@ export const metadata: Metadata = { title: "Datas e cronograma · Painel do Prê
 
 export default async function Premio() {
   const p = await carregarParametros();
-  const agora = new Date();
   return (
     <>
       <TopoAdmin
@@ -28,8 +27,6 @@ export default async function Premio() {
           gala_em: paraBrasilia(p.galaEm),
           gala_local: p.galaLocal ?? "",
         }}
-        votacaoComecou={new Date(p.votacaoAbre) <= agora}
-        indicacoesComecaram={new Date(p.indicacoesAbrem) <= agora}
       />
       <EditorCronograma etapas={p.cronograma} />
     </>

@@ -57,13 +57,6 @@ export function Turnstile({ onToken }: { onToken: (t: string | null) => void }) 
     };
   }, [onToken]);
 
-  if (!TURNSTILE_SITE_KEY) {
-    return (
-      <p className="rounded-xl border border-dashed border-amarelo/40 p-3 text-xs text-amarelo/80">
-        Verificação anti-robô desativada (NEXT_PUBLIC_TURNSTILE_SITE_KEY não configurada) — só aceitável em
-        desenvolvimento.
-      </p>
-    );
-  }
+  if (!TURNSTILE_SITE_KEY) return null; // sem configuração: o painel do master avisa
   return <div ref={ref} className="min-h-[65px]" />;
 }

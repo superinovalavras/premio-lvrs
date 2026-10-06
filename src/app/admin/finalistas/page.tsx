@@ -13,10 +13,7 @@ export default async function PaginaFinalistas() {
     .select("id, name, summary, image_url, technical_score, is_test, sort_order")
     .order("is_test")
     .order("sort_order");
-  const idsTeste = (data ?? []).filter((f) => f.is_test).map((f) => f.id);
-  const { count: votosTeste } = idsTeste.length
-    ? await sb.from("votes").select("id", { count: "exact", head: true }).in("finalist_id", idsTeste)
-    : { count: 0 };
+  const { count: votos } = await sb.from("votes").select("id", { count: "exact", head: true });
 
   return (
     <>
@@ -26,7 +23,7 @@ export default async function PaginaFinalistas() {
         sub="Os finalistas da votação popular. A nota técnica do COCITIEIS fica só aqui — nunca aparece no site — e pode ser lançada a qualquer momento até a apuração."
       />
       <Finalistas
-        votosTeste={votosTeste ?? 0}
+        votos={votos ?? 0}
         lista={(data ?? []).map((f) => ({
           id: f.id,
           nome: f.name,

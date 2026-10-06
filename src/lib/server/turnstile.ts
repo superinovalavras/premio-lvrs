@@ -3,8 +3,9 @@ import "server-only";
 export async function verificarTurnstile(token: string | undefined, ip: string | null) {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) {
-    // Sem chave só é aceitável em desenvolvimento local.
-    return process.env.NODE_ENV !== "production";
+    // Anti-robô ainda não configurado: o voto passa, e o painel do master mostra o alerta.
+    // Configurar NEXT_PUBLIC_TURNSTILE_SITE_KEY e TURNSTILE_SECRET_KEY antes da votação oficial.
+    return true;
   }
   if (!token) return false;
 
