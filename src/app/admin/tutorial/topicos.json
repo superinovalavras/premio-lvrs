@@ -8,7 +8,7 @@
         "pontos": [
           {
             "x": 9.04,
-            "y": 17.59,
+            "y": 22.51,
             "legenda": "Entre em Datas e cronograma"
           },
           {
@@ -39,7 +39,7 @@
         "pontos": [
           {
             "x": 9.04,
-            "y": 22.51,
+            "y": 27.42,
             "legenda": "Entre em Finalistas"
           },
           {
@@ -84,6 +84,11 @@
         "imagem": "/tutorial/04-site.png",
         "pontos": [
           {
+            "x": 11.89,
+            "y": 78.29,
+            "legenda": "Qualquer pessoa vota por aqui"
+          },
+          {
             "x": 50,
             "y": 65.1,
             "legenda": "Contagem até a gala (sua data)"
@@ -101,12 +106,12 @@
         "pontos": [
           {
             "x": 29.65,
-            "y": 87.39,
+            "y": 56.52,
             "legenda": "Digite ZERAR"
           },
           {
             "x": 42.25,
-            "y": 87.39,
+            "y": 56.52,
             "legenda": "Apaga todos os votos"
           }
         ]
@@ -133,7 +138,7 @@
           {
             "x": 28.43,
             "y": 24.32,
-            "legenda": "Nova etapa"
+            "legenda": "Nova etapa · salve no fim da lista"
           }
         ]
       }
@@ -185,7 +190,7 @@
         "pontos": [
           {
             "x": 9.04,
-            "y": 41.78,
+            "y": 46.69,
             "legenda": "Pedidos de cadastro"
           },
           {
@@ -200,12 +205,12 @@
         "pontos": [
           {
             "x": 83.46,
-            "y": 61.21,
+            "y": 58.94,
             "legenda": "Decida: deferir, pedir ajuste ou indeferir"
           },
           {
             "x": 83.46,
-            "y": 89.52,
+            "y": 87.25,
             "legenda": "Confirme"
           }
         ]
@@ -221,7 +226,7 @@
         "pontos": [
           {
             "x": 9.04,
-            "y": 46.69,
+            "y": 51.61,
             "legenda": "Uma instituição"
           },
           {
