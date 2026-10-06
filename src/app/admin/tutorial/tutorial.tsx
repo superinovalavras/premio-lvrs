@@ -12,6 +12,27 @@ export type Topico = { id: string; titulo: string; telas: Tela[] };
 const W = 1366;
 const H = 860;
 
+// Posição de cada marcador: afastado do alvo e sem encostar nos outros marcadores.
+function posicionar(pontos: Ponto[]) {
+  const pinos: { tx: number; ty: number; px: number; py: number }[] = [];
+  for (const p of pontos) {
+    const tx = (p.x / 100) * W;
+    const ty = (p.y / 100) * H;
+    const dx = tx < 260 ? 150 : -150;
+    let dy = ty < 200 ? 110 : -110;
+    let px = Math.min(W - 40, Math.max(40, tx + dx));
+    let py = Math.min(H - 40, Math.max(40, ty + dy));
+    for (let tentativa = 0; tentativa < 12 && pinos.some((o) => Math.hypot(o.px - px, o.py - py) < 70); tentativa++) {
+      dy += dy > 0 ? 60 : -60;
+      if (ty + dy < 40 || ty + dy > H - 40) dy = -dy;
+      py = Math.min(H - 40, Math.max(40, ty + dy));
+      px = Math.min(W - 40, Math.max(40, tx + dx - tentativa * 15 * Math.sign(dx)));
+    }
+    pinos.push({ tx, ty, px, py });
+  }
+  return pinos;
+}
+
 function Marcadores({ pontos, inicio }: { pontos: Ponto[]; inicio: number }) {
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="pointer-events-none absolute inset-0 size-full" aria-hidden>
@@ -20,14 +41,7 @@ function Marcadores({ pontos, inicio }: { pontos: Ponto[]; inicio: number }) {
           <path d="M0 0 10 5 0 10z" fill="#ffcd00" />
         </marker>
       </defs>
-      {pontos.map((p, i) => {
-        const tx = (p.x / 100) * W;
-        const ty = (p.y / 100) * H;
-        // o marcador fica afastado do alvo, para não cobrir o botão
-        const dx = tx < 260 ? 150 : -150;
-        const dy = ty < 200 ? 110 : -110;
-        const px = Math.min(W - 40, Math.max(40, tx + dx));
-        const py = Math.min(H - 40, Math.max(40, ty + dy));
+      {posicionar(pontos).map(({ tx, ty, px, py }, i) => {
         const ang = Math.atan2(ty - py, tx - px);
         const sx = px + Math.cos(ang) * 28;
         const sy = py + Math.sin(ang) * 28;
