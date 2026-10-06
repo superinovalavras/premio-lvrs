@@ -1,12 +1,13 @@
 import "server-only";
 import { FINALISTAS_EXEMPLO, type Finalista } from "@/lib/data";
-import { supabasePublico } from "./supabase";
+import { supabaseServico } from "./supabase";
 import { MODO_TESTE } from "./ambiente";
 
 export type ResultadoFinalistas = { finalistas: Finalista[]; exemplo: boolean };
 
 export async function carregarFinalistas(): Promise<ResultadoFinalistas> {
-  const sb = supabasePublico();
+  // Lido pelo servidor; nenhuma consulta pública aos finalistas (aviso de segurança do Supabase).
+  const sb = supabaseServico();
   if (!sb) return { finalistas: FINALISTAS_EXEMPLO, exemplo: true };
 
   const { data: cat } = await sb
@@ -17,7 +18,7 @@ export async function carregarFinalistas(): Promise<ResultadoFinalistas> {
   if (!cat) return { finalistas: FINALISTAS_EXEMPLO, exemplo: true };
 
   const { data, error } = await sb
-    .from("public_finalists")
+    .from("finalists")
     .select("id, name, summary, image_url")
     .eq("category_id", cat.id)
     // site oficial nunca mostra finalista de teste; o ambiente de teste só mostra os de teste
