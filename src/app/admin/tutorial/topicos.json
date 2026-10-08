@@ -108,14 +108,16 @@
             "y": 78.29,
             "w": 13.96,
             "h": 6.51,
-            "legenda": "Qualquer pessoa vota por aqui"
+            "legenda": "Qualquer pessoa vota por aqui",
+            "lado": "baixo"
           },
           {
-            "x": 50,
+            "x": 19.5,
             "y": 65.1,
-            "w": 38.07,
+            "w": 29.2,
             "h": 10.57,
-            "legenda": "Contagem até a gala (sua data)"
+            "legenda": "Contagem até a gala (sua data)",
+            "lado": "direita"
           }
         ]
       }

@@ -4,7 +4,8 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-export type Ponto = { x: number; y: number; w?: number; h?: number; legenda: string };
+export type Lado = "esquerda" | "direita" | "cima" | "baixo";
+export type Ponto = { x: number; y: number; w?: number; h?: number; legenda: string; lado?: Lado };
 export type Tela = { imagem: string; pontos: Ponto[] };
 export type Topico = { id: string; titulo: string; telas: Tela[] };
 
@@ -12,22 +13,33 @@ export type Topico = { id: string; titulo: string; telas: Tela[] };
 const W = 1366;
 const H = 860;
 
-// Cada alvo ganha um contorno amarelo; o marcador fica ao lado, na mesma altura, e a seta
-// para na borda do contorno (sem cobrir o texto). Se encostar em outro marcador, desloca.
-function posicionar(pontos: Ponto[]) {
-  const pinos: { cx: number; cy: number; bw: number; bh: number; px: number; py: number; esquerda: boolean }[] = [];
+// Cada alvo ganha um contorno amarelo; o marcador fica do lado indicado (ou à esquerda, se couber)
+// e a seta para na borda do contorno, sem cobrir o texto. Se encostar em outro marcador, desloca.
+type Pino = { cx: number; cy: number; bw: number; bh: number; px: number; py: number; lado: Lado };
+
+function posicionar(pontos: Ponto[]): Pino[] {
+  const pinos: Pino[] = [];
   for (const p of pontos) {
     const cx = (p.x / 100) * W;
     const cy = (p.y / 100) * H;
     const bw = Math.max(44, ((p.w ?? 3) / 100) * W + 12);
     const bh = Math.max(36, ((p.h ?? 4) / 100) * H + 10);
-    const esquerda = cx - bw / 2 > 140; // há espaço à esquerda do alvo?
-    const px = esquerda ? cx - bw / 2 - 90 : cx + bw / 2 + 90;
+    const lado: Lado = p.lado ?? (cx - bw / 2 > 140 ? "esquerda" : "direita");
+    let px = cx;
     let py = cy;
+    if (lado === "esquerda") px = cx - bw / 2 - 90;
+    if (lado === "direita") px = cx + bw / 2 + 90;
+    if (lado === "cima") py = cy - bh / 2 - 80;
+    if (lado === "baixo") py = cy + bh / 2 + 80;
+    px = Math.min(W - 34, Math.max(34, px));
+    py = Math.min(H - 34, Math.max(34, py));
+    const horizontal = lado === "esquerda" || lado === "direita";
     for (let k = 1; k < 10 && pinos.some((o) => Math.hypot(o.px - px, o.py - py) < 64); k++) {
-      py = Math.min(H - 34, Math.max(34, cy + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 64));
+      const passo = (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 64;
+      if (horizontal) py = Math.min(H - 34, Math.max(34, cy + passo));
+      else px = Math.min(W - 34, Math.max(34, cx + passo));
     }
-    pinos.push({ cx, cy, bw, bh, px, py, esquerda });
+    pinos.push({ cx, cy, bw, bh, px, py, lado });
   }
   return pinos;
 }
@@ -40,14 +52,19 @@ function Marcadores({ pontos, inicio }: { pontos: Ponto[]; inicio: number }) {
           <path d="M0 0 10 5 0 10z" fill="#ffcd00" />
         </marker>
       </defs>
-      {posicionar(pontos).map(({ cx, cy, bw, bh, px, py, esquerda }, i) => {
-        const bordaX = esquerda ? cx - bw / 2 - 6 : cx + bw / 2 + 6;
-        const bordaY = Math.min(cy + bh / 2, Math.max(cy - bh / 2, py));
-        const sx = px + (esquerda ? 27 : -27);
+      {posicionar(pontos).map(({ cx, cy, bw, bh, px, py, lado }, i) => {
+        // ponto de chegada na borda do contorno, do lado do marcador
+        const fimX =
+          lado === "esquerda" ? cx - bw / 2 - 6 : lado === "direita" ? cx + bw / 2 + 6 : Math.min(cx + bw / 2, Math.max(cx - bw / 2, px));
+        const fimY =
+          lado === "cima" ? cy - bh / 2 - 6 : lado === "baixo" ? cy + bh / 2 + 6 : Math.min(cy + bh / 2, Math.max(cy - bh / 2, py));
+        const ang = Math.atan2(fimY - py, fimX - px);
+        const sx = px + Math.cos(ang) * 27;
+        const sy = py + Math.sin(ang) * 27;
         return (
           <g key={i}>
             <rect x={cx - bw / 2} y={cy - bh / 2} width={bw} height={bh} rx="12" fill="none" stroke="#ffcd00" strokeWidth="4" className="tut-pulso" />
-            <line x1={sx} y1={py} x2={bordaX} y2={bordaY} stroke="#ffcd00" strokeWidth="5" strokeLinecap="round" markerEnd="url(#ponta)" />
+            <line x1={sx} y1={sy} x2={fimX} y2={fimY} stroke="#ffcd00" strokeWidth="5" strokeLinecap="round" markerEnd="url(#ponta)" />
             <circle cx={px} cy={py} r="25" fill="#ffcd00" stroke="#012928" strokeWidth="4" />
             <text x={px} y={py + 10} textAnchor="middle" fontSize="27" fontWeight="700" fill="#012928" fontFamily="Poppins, sans-serif">
               {inicio + i}
