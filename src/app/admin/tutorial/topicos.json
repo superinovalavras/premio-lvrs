@@ -112,9 +112,9 @@
             "lado": "baixo"
           },
           {
-            "x": 19.5,
+            "x": 19.64,
             "y": 65.1,
-            "w": 29.2,
+            "w": 29.47,
             "h": 10.57,
             "legenda": "Contagem até a gala (sua data)",
             "lado": "direita"
@@ -142,7 +142,8 @@
             "y": 56.52,
             "w": 9.4,
             "h": 5.35,
-            "legenda": "Apaga todos os votos"
+            "legenda": "Apaga todos os votos",
+            "lado": "baixo"
           }
         ]
       }
@@ -167,7 +168,8 @@
             "y": 33.17,
             "w": 20.8,
             "h": 5.35,
-            "legenda": "Texto da data (só exibição)"
+            "legenda": "Texto da data (só exibição)",
+            "lado": "cima"
           },
           {
             "x": 28.43,
@@ -286,7 +288,8 @@
             "y": 58.55,
             "w": 20.94,
             "h": 5.35,
-            "legenda": "E-mail = login (senha 123456)"
+            "legenda": "E-mail = login (senha 123456)",
+            "lado": "baixo"
           },
           {
             "x": 26.66,
