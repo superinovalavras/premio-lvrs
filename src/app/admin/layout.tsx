@@ -4,6 +4,7 @@ import { BarChart3, BookOpen, Building2, CalendarDays, ClipboardCheck, FileSprea
 import { exigirAdmin, servico } from "@/lib/server/sessao";
 import { sair } from "@/lib/server/acoes-conta";
 import { NavAdmin } from "./nav";
+import { AvisoPendencias } from "./aviso-pendencias";
 
 export default async function LayoutAdmin({ children }: { children: React.ReactNode }) {
   const admin = await exigirAdmin();
@@ -65,6 +66,7 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
         )}
         {children}
       </main>
+      <AvisoPendencias />
     </div>
   );
 }
