@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export type Lado = "esquerda" | "direita" | "cima" | "baixo";
 export type Ponto = { x: number; y: number; w?: number; h?: number; legenda: string; lado?: Lado };
 export type Tela = { imagem: string; pontos: Ponto[] };
-export type Topico = { id: string; titulo: string; telas: Tela[] };
+export type Topico = { id: string; titulo: string; aviso?: string; telas: Tela[] };
 
 // Prints em 1366×860. As setas usam o mesmo sistema de coordenadas, então acompanham o tamanho da imagem.
 const W = 1366;
@@ -110,6 +110,9 @@ export function Tutorial({ topicos }: { topicos: Topico[] }) {
       </nav>
 
       <div className="grid gap-6">
+        {t.aviso && (
+          <p className="rounded-2xl border border-amarelo/60 bg-amarelo/10 px-4 py-3 text-sm text-white/90">{t.aviso}</p>
+        )}
         {t.telas.map((tela, j) => {
           const inicio = inicios[j];
           return (

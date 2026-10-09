@@ -13,6 +13,12 @@ const PADRAO = {
   honoraria: { abre: "2026-11-06T00:00", fecha: "2026-11-12T23:59" },
 };
 
+// "AAAA-MM-DDTHH:mm" no horário de Brasília (UTC-3), de agora até daqui a `horas`.
+function agoraMais(horas: number) {
+  const local = (ms: number) => new Date(ms - 3 * 3600_000).toISOString().slice(0, 16);
+  return { abre: local(Date.now()), fecha: local(Date.now() + horas * 3600_000) };
+}
+
 export function NovaRodada({ categoriaId, honoraria }: { categoriaId: string; honoraria: boolean }) {
   const router = useRouter();
   const [aberto, setAberto] = useState(false);
@@ -55,7 +61,7 @@ export function NovaRodada({ categoriaId, honoraria }: { categoriaId: string; ho
               onChange={(e) => {
                 const t = e.target.value as "pre_selecao" | "final";
                 setTipo(t);
-                setDatas(PADRAO[t]);
+                setDatas(teste ? agoraMais(24) : PADRAO[t]);
               }}
               className={inputEscuro}
             >
@@ -74,10 +80,19 @@ export function NovaRodada({ categoriaId, honoraria }: { categoriaId: string; ho
         </label>
       </div>
       <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-white/15 p-3 text-sm">
-        <input type="checkbox" checked={teste} onChange={(e) => setTeste(e.target.checked)} className="mt-0.5 accent-[#ffcd00]" />
+        <input
+          type="checkbox"
+          checked={teste}
+          onChange={(e) => {
+            setTeste(e.target.checked);
+            // Teste abre agora e fica 24 h; oficial volta às datas do art. 8º-A.
+            setDatas(e.target.checked ? agoraMais(24) : PADRAO[tipo]);
+          }}
+          className="mt-0.5 accent-[#ffcd00]"
+        />
         <span>
           Rodada de teste
-          <span className="block text-[12px] text-white/55">Usa só concorrentes de teste e só aparece para avaliadores de teste. Pode ser excluída depois.</span>
+          <span className="block text-[12px] text-white/55">Usa só concorrentes de teste e só aparece para avaliadores de teste. Abre agora e fica 24 horas. Pode ser excluída depois.</span>
         </span>
       </label>
       {erro && <p className="mt-4 rounded-xl border border-vermelho bg-vermelho/15 p-3 text-sm">{erro}</p>}

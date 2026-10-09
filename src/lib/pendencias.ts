@@ -8,12 +8,6 @@ export type Pendencia = { titulo: string; regulamento: string; site: string; dec
 
 export const PENDENCIAS_REGULAMENTO: Pendencia[] = [
   {
-    titulo: "Idade mínima no voto popular",
-    regulamento: "16 anos ou mais (art. 19, § 1º).",
-    site: "Exige 18 anos.",
-    decidir: "16 ou 18 anos? Se for 18, o regulamento precisa ser corrigido.",
-  },
-  {
     titulo: "Peso do voto popular",
     regulamento:
       "O art. 19 fala em 80% técnica e 20% popular, mas o título da matriz Agro/Food/Tech no Anexo I diz “70% da nota final”, e a providência nº 3 fala em 70/30.",
@@ -24,7 +18,8 @@ export const PENDENCIAS_REGULAMENTO: Pendencia[] = [
     titulo: "Versão do regulamento",
     regulamento: "O PDF recebido está marcado como “Minuta técnica para discussão”. O art. 8º-A, I manda publicar até 09/10.",
     site: "Mostra o regulamento como “Em breve”.",
-    decidir: "É a versão final para publicar? Revisar também o art. 28, que tem parágrafos e um “Parágrafo único” ao mesmo tempo.",
+    decidir:
+      "É a versão final para publicar? Antes, trocar “dezesseis anos” por “dezoito anos” no art. 19, § 1º (decisão de 09/10) e revisar o art. 28, que tem parágrafos e um “Parágrafo único” ao mesmo tempo.",
   },
   {
     titulo: "Conselheiro pode indicar?",
