@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BarChart3, BookOpen, Building2, CalendarDays, FileSpreadsheet, FileText, Home, LayoutGrid, LogOut, Medal, Trophy, UserPlus } from "lucide-react";
+import { BarChart3, BookOpen, Building2, CalendarDays, ClipboardCheck, FileSpreadsheet, FileText, Home, LayoutGrid, LogOut, Medal, UserPlus, Users } from "lucide-react";
 import { exigirAdmin, servico } from "@/lib/server/sessao";
 import { sair } from "@/lib/server/acoes-conta";
 import { NavAdmin } from "./nav";
@@ -23,9 +23,11 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
     { href: "/admin/entidades", rotulo: "Instituições", icone: <Building2 className="size-[18px]" />, badge: count ?? 0 },
     { href: "/admin/entidades/nova", rotulo: "Pré-cadastrar", icone: <UserPlus className="size-[18px]" /> },
     { href: "/admin/entidades/importar", rotulo: "Importar planilha", icone: <FileSpreadsheet className="size-[18px]" /> },
+    { grupo: "Avaliação do Conselho" },
+    { href: "/admin/avaliacao", rotulo: "Categorias e rodadas", icone: <ClipboardCheck className="size-[18px]" /> },
+    { href: "/admin/avaliadores", rotulo: "Avaliadores", icone: <Users className="size-[18px]" /> },
     { grupo: "Em breve" },
     { rotulo: "Votação ao vivo", icone: <BarChart3 className="size-[18px]" /> },
-    { rotulo: "Apuração", icone: <Trophy className="size-[18px]" /> },
   ];
 
   return (

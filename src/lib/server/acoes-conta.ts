@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { auditar } from "./auditoria";
 import {
-  ehAdmin,
+  destinoDoUsuario,
   ipDaRequisicao,
   precisaTrocarSenha,
   SENHA_PROVISORIA,
@@ -19,9 +19,6 @@ import { DECLARACOES } from "@/lib/entidades";
 export type EstadoForm = { erro?: string; campos?: Record<string, string> } | undefined;
 
 
-async function destinoPosLogin(userId: string) {
-  return (await ehAdmin(userId)) ? "/admin" : "/entidade";
-}
 
 export async function entrar(_: EstadoForm, fd: FormData): Promise<EstadoForm> {
   const email = String(fd.get("email") ?? "").trim().toLowerCase();
@@ -38,7 +35,7 @@ export async function entrar(_: EstadoForm, fd: FormData): Promise<EstadoForm> {
   }
   await auditar(data.user, "login", { tipo: "usuario", id: data.user.id });
   if (precisaTrocarSenha(data.user)) redirect("/trocar-senha");
-  redirect(await destinoPosLogin(data.user.id));
+  redirect(await destinoDoUsuario(data.user.id));
 }
 
 const contaSchema = z
@@ -127,7 +124,7 @@ export async function trocarSenha(_: EstadoForm, fd: FormData): Promise<EstadoFo
   const sb = await supabaseSessao();
   await sb.auth.signInWithPassword({ email: user.email!, password: senha });
   await auditar(user, "senha_trocada", { tipo: "usuario", id: user.id });
-  redirect(await destinoPosLogin(user.id));
+  redirect(await destinoDoUsuario(user.id));
 }
 
 export async function sair() {

@@ -55,6 +55,24 @@ Nota final = 80% técnica + 20% popular normalizada. **Normalização adotada: v
 mais votado × 100** — confirmar com o texto do regulamento. Trava: se o 1º técnico abre 10 pontos
 ou mais sobre o 2º, ele fica em 1º independentemente do voto popular.
 
+## Avaliação do Conselho (COCITIEIS)
+
+Regulamento, arts. 11, 13, 15 a 23 e Anexos I e III. Migração `supabase/migrations/0008_avaliacao_conselho.sql`.
+
+| O quê | Onde |
+|---|---|
+| Matrizes, pesos, escala, impedimentos, Anexo III | `src/lib/avaliacao.ts` |
+| Convites (link pessoal, uso único, 7 dias; só o hash fica no banco) | `src/lib/server/acoes-avaliadores.ts`, `/convite/[token]` |
+| Ficha, declaração de impedimento, voto nominal | `src/lib/server/acoes-avaliacao.ts`, `/avaliacao` |
+| Concorrentes, rodadas, invalidação, promoção a finalista | `src/lib/server/acoes-avaliacao-admin.ts`, `/admin/avaliacao` |
+| Apuração (média, 80/20, trava dos 10 pontos, desempate, mínimo de 5) | `src/lib/server/apuracao.ts` |
+
+- **Concorrentes** moram em `finalists`, com `etapa` = `indicado` (pré-seleção) ou `finalista`. O site só mostra finalistas.
+- **Rodada** congela a lista de concorrentes na abertura. Tipos: `pre_selecao`, `final`, `honoraria` (1ª ou 2ª rodada).
+- **Ficha enviada não muda** (trigger no banco); só pode ser invalidada, com motivo.
+- **Teste**: avaliador, concorrente e rodada de teste só enxergam uns aos outros. Rodada de teste pode ser excluída.
+- O resultado só aparece no painel depois que a rodada encerra; o avaliador nunca vê notas dos outros.
+
 ## Pendências de conteúdo
 
 - Finalistas (cadastrar em `finalists` com `technical_score` e `image_url`).

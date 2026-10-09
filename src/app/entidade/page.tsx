@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 import { CalendarClock, CheckCircle2, CircleDashed, FileWarning, Hourglass, XCircle } from "lucide-react";
 import { CabecalhoArea, ConteudoArea } from "@/components/area/cabecalho";
 import { Aviso, Cartao, btnPrim } from "@/components/area/ui";
-import { ehAdmin, exigirUsuario } from "@/lib/server/sessao";
+import { destinoDoUsuario, exigirUsuario } from "@/lib/server/sessao";
+import { sair } from "@/lib/server/acoes-conta";
+import { TelaDividida } from "@/components/area/tela-dividida";
 import { carregarEntidadeDoUsuario } from "@/lib/server/entidades-dados";
 import { STATUS, calcularPendencias, formatarData, incisoPorId } from "@/lib/entidades";
 import { cn } from "@/lib/utils";
@@ -26,8 +28,17 @@ export default async function PainelEntidade() {
   const user = await exigirUsuario();
   const dados = await carregarEntidadeDoUsuario(user.id);
   if (!dados) {
-    if (await ehAdmin(user.id)) redirect("/admin");
-    redirect("/entrar");
+    const destino = await destinoDoUsuario(user.id);
+    if (destino !== "/entidade") redirect(destino);
+    // Conta sem instituição e sem outro perfil (ex.: avaliador desativado): avisa em vez de voltar ao login em ciclo.
+    return (
+      <TelaDividida selo="Área restrita" titulo={<>Acesso <span className="enfase">indisponível</span></>} texto="Esta conta não tem cadastro de instituição nem acesso de avaliador ativo.">
+        <Aviso>Fale com a Secretaria do Prêmio para revisar o seu acesso.</Aviso>
+        <form action={sair} className="mt-6">
+          <button className={btnPrim}>Sair</button>
+        </form>
+      </TelaDividida>
+    );
   }
   const { entidade: e, titular } = dados;
   const nome = titular?.nome ?? (user.user_metadata?.nome as string) ?? user.email ?? "";

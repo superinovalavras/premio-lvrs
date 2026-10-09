@@ -25,5 +25,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/entrar", "/cadastro", "/trocar-senha", "/sair", "/entidade/:path*", "/admin/:path*"],
+  matcher: ["/entrar", "/cadastro", "/trocar-senha", "/sair", "/entidade/:path*", "/admin/:path*", "/avaliacao/:path*", "/convite/:path*"],
 };

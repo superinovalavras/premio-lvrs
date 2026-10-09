@@ -78,6 +78,30 @@ export async function exigirAdmin() {
   return u;
 }
 
+// Conselheiro avaliador (convite aceito). Se a migração 0008 ainda não rodou, a consulta falha e volta null.
+export async function avaliadorDoUsuario(userId: string) {
+  const { data } = await servico()
+    .from("avaliadores")
+    .select("id, nome, email, papel, instituicao, ativo, is_test")
+    .eq("user_id", userId)
+    .maybeSingle();
+  return data;
+}
+
+// Para onde cada perfil vai depois de entrar.
+export async function destinoDoUsuario(userId: string) {
+  if (await ehAdmin(userId)) return "/admin";
+  if ((await avaliadorDoUsuario(userId))?.ativo) return "/avaliacao";
+  return "/entidade";
+}
+
+export async function exigirAvaliador() {
+  const u = await exigirUsuario();
+  const av = await avaliadorDoUsuario(u.id);
+  if (!av?.ativo) redirect(await destinoDoUsuario(u.id));
+  return { user: u, avaliador: av };
+}
+
 export async function ipDaRequisicao() {
   const h = await headers();
   return h.get("x-forwarded-for")?.split(",")[0]?.trim() ?? h.get("x-real-ip") ?? null;

@@ -4,17 +4,21 @@ import { LogOut } from "lucide-react";
 import { Arcos, Mais } from "@/components/marca";
 import { sair } from "@/lib/server/acoes-conta";
 
-// Topo verde-profundo da área da instituição, com a chamada da página.
+// Topo verde-profundo das áreas com login (instituição e conselho), com a chamada da página.
 export function CabecalhoArea({
   nome,
   selo,
   titulo,
   texto,
+  area = "Área da instituição",
+  inicio = "/entidade",
 }: {
   nome: string;
   selo: string;
   titulo: React.ReactNode;
   texto?: React.ReactNode;
+  area?: string;
+  inicio?: string;
 }) {
   const iniciais = nome
     .split(/\s+/)
@@ -26,10 +30,10 @@ export function CabecalhoArea({
     <header className="relative isolate overflow-hidden bg-fundo text-white">
       <Arcos className="-right-24 -top-24 -z-10 hidden size-96 sm:block" />
       <div className="mx-auto flex max-w-[1080px] items-center gap-4 px-4 py-4 sm:px-6">
-        <Link href="/entidade" className="flex items-center gap-3.5">
+        <Link href={inicio} className="flex items-center gap-3.5">
           <Image src="/marca/lvrs-pacto.png" alt="LVRS+" width={900} height={520} className="h-8 w-auto" />
           <span className="hidden border-l border-white/20 pl-3.5 text-[10px] uppercase leading-snug tracking-[0.2em] text-white/80 sm:block">
-            Área da instituição
+            {area}
             <br />
             Prêmio Lavras <b className="font-semibold text-amarelo">2026</b>
           </span>
