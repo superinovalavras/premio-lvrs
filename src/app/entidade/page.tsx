@@ -12,6 +12,7 @@ import { STATUS, calcularPendencias, formatarData, incisoPorId } from "@/lib/ent
 import { cn } from "@/lib/utils";
 import { carregarParametros } from "@/lib/server/parametros";
 import { dia, hora, periodo } from "@/lib/datas";
+import { PainelIndicacoes } from "./indicacoes-painel";
 
 export const metadata: Metadata = { title: "Minha instituição · Prêmio Lavras de Inovação 2026" };
 
@@ -163,6 +164,7 @@ export default async function PainelEntidade() {
             </Cartao>
           </div>
         </div>
+        {e.status === "deferido" && <PainelIndicacoes entidadeId={e.id} />}
       </ConteudoArea>
     </>
   );

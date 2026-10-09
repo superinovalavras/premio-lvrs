@@ -80,8 +80,7 @@ export const PENDENCIAS_REGULAMENTO: Pendencia[] = [
 ];
 
 export const PENDENCIAS_TECNICAS: string[] = [
-  "Datas de teste no ar: o site mostra a cerimônia em 08/10 e a votação encerrada. Corrigir em Datas e cronograma: indicações de 12/10, 0h, a 23/10, 23h59; votação popular de 06/11, 0h, a 11/11, 23h59; cerimônia em 17/11.",
-  "Formulário de indicação: as indicações abrem em 12/10, e o formulário ainda não existe.",
+  "Indicações: o formulário está no ar; falta rodar a migração 0009 no Supabase e deferir as instituições antes de 12/10.",
   "E-mails automáticos (deferimento e indeferimento de cadastro) ainda não saem: falta configurar o envio.",
   "Avaliadores: convidar os conselheiros e suplentes em Avaliação do Conselho → Avaliadores.",
 ];

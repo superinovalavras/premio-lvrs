@@ -55,6 +55,24 @@ Nota final = 80% técnica + 20% popular normalizada. **Normalização adotada: v
 mais votado × 100** — confirmar com o texto do regulamento. Trava: se o 1º técnico abre 10 pontos
 ou mais sobre o 2º, ele fica em 1º independentemente do voto popular.
 
+## Indicações
+
+Especificação, itens 2 e 3 (Anexo II; arts. 6º a 10 e 37). Migração `supabase/migrations/0009_indicacoes.sql`.
+
+| O quê | Onde |
+|---|---|
+| Campos, limites, pendências, idade do Jovem Inovador, Anexo IV | `src/lib/indicacoes.ts` |
+| Salvar passos, arquivos, envio com as travas do item 3.1, reabrir | `src/lib/server/acoes-indicacao.ts` |
+| Formulário da instituição (6 passos) | `/entidade/indicacoes/[id]` |
+| Lista por categoria e detalhe para a Secretaria | `/admin/indicacoes` |
+
+- Só instituição **deferida**, dentro do prazo de *Datas e cronograma* (relógio do servidor).
+- Travas no envio: 2 por categoria e 6 no total (contam as enviadas), autoindicação por CPF/CNPJ,
+  Jovem Inovador de 15 a 29 anos no fim do prazo, Anexo IV para menor de 18, campos do art. 9º.
+- Envio guarda o carimbo do primeiro envio (ordem de chegada), uma versão completa e o aceite do Anexo II.
+  "Editar" reabre como rascunho; a ordem continua a do primeiro envio.
+- Arquivos no bucket privado `entidades`, pasta `<entidade>/indicacoes/<indicação>/`.
+
 ## Avaliação do Conselho (COCITIEIS)
 
 Regulamento, arts. 11, 13, 15 a 23 e Anexos I e III. Migração `supabase/migrations/0008_avaliacao_conselho.sql`.

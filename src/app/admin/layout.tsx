@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BarChart3, BookOpen, Building2, CalendarDays, ClipboardCheck, FileSpreadsheet, FileText, Home, LayoutGrid, LogOut, Medal, UserPlus, Users } from "lucide-react";
+import { BarChart3, BookOpen, Building2, CalendarDays, ClipboardCheck, FileSpreadsheet, FileText, Home, Inbox, LayoutGrid, LogOut, Medal, UserPlus, Users } from "lucide-react";
 import { exigirAdmin, servico } from "@/lib/server/sessao";
 import { sair } from "@/lib/server/acoes-conta";
 import { NavAdmin } from "./nav";
@@ -22,6 +22,7 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
     { href: "/admin/documentos", rotulo: "Documentos", icone: <FileText className="size-[18px]" /> },
     { grupo: "Indicadores" },
     { href: "/admin/entidades", rotulo: "Instituições", icone: <Building2 className="size-[18px]" />, badge: count ?? 0 },
+    { href: "/admin/indicacoes", rotulo: "Indicações", icone: <Inbox className="size-[18px]" /> },
     { href: "/admin/entidades/nova", rotulo: "Pré-cadastrar", icone: <UserPlus className="size-[18px]" /> },
     { href: "/admin/entidades/importar", rotulo: "Importar planilha", icone: <FileSpreadsheet className="size-[18px]" /> },
     { grupo: "Avaliação do Conselho" },
