@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 import { motion } from "framer-motion";
-import { EyeOff, Fingerprint, MapPin, ShieldCheck, UserCheck, Vote } from "lucide-react";
+import { CircleHelp, EyeOff, Fingerprint, MapPin, ShieldCheck, UserCheck, Vote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Arcos, Mais, TagVertical } from "@/components/marca";
 import { useVoto } from "@/components/voto-context";
@@ -52,14 +52,17 @@ export function Votacao() {
                   <Vote className="size-5" />
                   {estado === "aberta" ? "Votar Agora" : "Conhecer a votação"}
                 </Button>
+                <Link
+                  href="/como-votar"
+                  className="inline-flex h-14 items-center gap-2 rounded-xl bg-fundo px-6 text-base font-semibold text-amarelo transition hover:-translate-y-0.5"
+                >
+                  <CircleHelp className="size-5" /> Como votar?
+                </Link>
                 <span className="text-sm text-white/75">
                   {estado === "antes" && `Abre em ${dia(votacaoAbre)}, à ${hora(votacaoAbre)}`}
                   {estado === "aberta" && `Aberta até ${dia(votacaoFecha)}, às ${hora(votacaoFecha)}`}
                   {estado === "encerrada" && "Votação encerrada"}
                 </span>
-                <Link href="/como-votar" className="text-sm font-medium text-white underline underline-offset-4 hover:text-amarelo">
-                  Como votar? Veja o passo a passo
-                </Link>
               </div>
               <p className="mt-6 flex max-w-lg gap-2 text-sm text-white/75">
                 <ShieldCheck className="size-4 shrink-0 text-amarelo" />

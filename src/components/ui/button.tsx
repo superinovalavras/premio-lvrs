@@ -12,6 +12,8 @@ export const buttonVariants = cva(
           "bg-amarelo text-fundo hover:-translate-y-0.5 hover:shadow-[0_10px_40px_-6px_color-mix(in_oklab,var(--amarelo)_70%,transparent)]",
         verde: "bg-verde text-white hover:-translate-y-0.5 hover:bg-[#0f8f52]",
         outline: "border-2 border-white/25 text-white hover:border-amarelo hover:text-amarelo",
+        // "Como votar?": contorno amarelo, vira amarelo cheio no hover
+        ajuda: "border-2 border-amarelo text-amarelo hover:-translate-y-0.5 hover:bg-amarelo hover:text-fundo",
         ghost: "text-white/80 hover:bg-white/10 hover:text-white",
       },
       size: {

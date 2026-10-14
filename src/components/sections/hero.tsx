@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowDown, Vote } from "lucide-react";
+import { ArrowDown, CircleHelp, Vote } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Arcos, Mais } from "@/components/marca";
 import { useVoto } from "@/components/voto-context";
@@ -132,12 +132,12 @@ export function Hero() {
           <Button size="lg" onClick={abrir}>
             <Vote className="size-5" /> Votar Agora
           </Button>
+          <Link href="/como-votar" className={buttonVariants({ variant: "ajuda", size: "lg" })}>
+            <CircleHelp className="size-5" /> Como votar?
+          </Link>
           <a href="#categorias" className={buttonVariants({ variant: "outline", size: "lg" })}>
             Ver Categorias <ArrowDown className="size-4" />
           </a>
-          <Link href="/como-votar" className="self-center text-sm font-medium text-white/75 underline underline-offset-4 hover:text-amarelo">
-            Como votar?
-          </Link>
         </motion.div>
 
         <motion.ul
