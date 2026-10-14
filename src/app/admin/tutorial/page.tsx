@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { TopoAdmin } from "@/components/admin/ui";
-import { Tutorial, type Topico } from "./tutorial";
+import { Tutorial, type Topico } from "@/components/tutorial-visual";
 import topicos from "./topicos.json";
 
 export const metadata: Metadata = { title: "Tutorial · Painel do Prêmio" };

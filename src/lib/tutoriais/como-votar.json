@@ -1,0 +1,188 @@
+[
+  {
+    "id": "abrir",
+    "titulo": "Abra a votação",
+    "telas": [
+      {
+        "imagem": "/tutorial/v1-site.png",
+        "pontos": [
+          {
+            "x": 11.89,
+            "y": 78.29,
+            "w": 13.96,
+            "h": 6.51,
+            "legenda": "Clique em Votar Agora",
+            "lado": "baixo"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "conhecer",
+    "titulo": "Conheça os finalistas",
+    "telas": [
+      {
+        "imagem": "/tutorial/v2-finalistas.png",
+        "pontos": [
+          {
+            "x": 50,
+            "y": 57.16,
+            "w": 38.07,
+            "h": 18.6,
+            "legenda": "Leia sobre cada finalista",
+            "lado": "esquerda"
+          },
+          {
+            "x": 66.74,
+            "y": 85.77,
+            "w": 11.47,
+            "h": 5.12,
+            "legenda": "Quero votar",
+            "lado": "cima"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "escolher",
+    "titulo": "Escolha o seu finalista",
+    "telas": [
+      {
+        "imagem": "/tutorial/v3-escolha.png",
+        "pontos": [
+          {
+            "x": 50,
+            "y": 44.84,
+            "w": 38.07,
+            "h": 9.53,
+            "legenda": "Escolha um",
+            "lado": "esquerda"
+          },
+          {
+            "x": 67.21,
+            "y": 78.79,
+            "w": 10.54,
+            "h": 5.12,
+            "legenda": "Continuar",
+            "lado": "cima"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dados",
+    "titulo": "Preencha seus dados",
+    "telas": [
+      {
+        "imagem": "/tutorial/v4-dados.png",
+        "pontos": [
+          {
+            "x": 50,
+            "y": 42.86,
+            "w": 38.07,
+            "h": 5.81,
+            "legenda": "Nome completo",
+            "lado": "esquerda"
+          },
+          {
+            "x": 38.47,
+            "y": 64.26,
+            "w": 21.89,
+            "h": 5.81,
+            "legenda": "Nascimento (18 anos ou mais)",
+            "lado": "esquerda"
+          },
+          {
+            "x": 61.53,
+            "y": 64.26,
+            "w": 21.89,
+            "h": 5.81,
+            "legenda": "CPF (1 voto por CPF)",
+            "lado": "direita"
+          },
+          {
+            "x": 67.21,
+            "y": 76.82,
+            "w": 10.54,
+            "h": 5.12,
+            "legenda": "Continuar",
+            "lado": "cima"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vinculo",
+    "titulo": "Confirme o vínculo com Lavras",
+    "telas": [
+      {
+        "imagem": "/tutorial/v5-vinculo.png",
+        "pontos": [
+          {
+            "x": 34.82,
+            "y": 43.44,
+            "w": 14.59,
+            "h": 8.6,
+            "legenda": "Mora, estuda ou trabalha em Lavras",
+            "lado": "esquerda"
+          },
+          {
+            "x": 50,
+            "y": 54.37,
+            "w": 38.07,
+            "h": 8.6,
+            "legenda": "Declaração",
+            "lado": "esquerda"
+          },
+          {
+            "x": 50,
+            "y": 66.47,
+            "w": 38.07,
+            "h": 10.93,
+            "legenda": "Privacidade",
+            "lado": "esquerda"
+          },
+          {
+            "x": 67.21,
+            "y": 79.26,
+            "w": 10.54,
+            "h": 5.12,
+            "legenda": "Continuar",
+            "lado": "cima"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "confirmar",
+    "titulo": "Confirme o voto",
+    "telas": [
+      {
+        "imagem": "/tutorial/v6-confirmar.png",
+        "pontos": [
+          {
+            "x": 35.19,
+            "y": 42.86,
+            "w": 12.85,
+            "h": 6.51,
+            "legenda": "Confira o seu voto",
+            "lado": "esquerda"
+          },
+          {
+            "x": 65.88,
+            "y": 76.12,
+            "w": 13.19,
+            "h": 5.12,
+            "legenda": "Confirme. Pronto: aparece “Voto registrado”",
+            "lado": "cima"
+          }
+        ]
+      }
+    ]
+  }
+]

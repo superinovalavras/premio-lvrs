@@ -146,6 +146,9 @@ export default async function PainelAvaliador() {
                 <li>· Você pode salvar e voltar. Depois de enviada, a ficha não muda mais.</li>
                 <li>· Ninguém vê as notas dos outros conselheiros nem resultados parciais.</li>
               </ul>
+              <Link href="/avaliacao/como-avaliar" className={cn(btnSec, "mt-4 w-full")}>
+                Passo a passo com imagens
+              </Link>
             </Cartao>
             <Cartao className="p-6">
               <h3 className="font-semibold">Escala de pontuação</h3>

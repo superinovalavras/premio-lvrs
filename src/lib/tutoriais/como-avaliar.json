@@ -1,0 +1,187 @@
+[
+  {
+    "id": "convite",
+    "titulo": "Primeiro acesso pelo convite",
+    "telas": [
+      {
+        "imagem": "/tutorial/17-convite.png",
+        "pontos": [
+          {
+            "x": 75.61,
+            "y": 44.14,
+            "w": 29.28,
+            "h": 5.81,
+            "legenda": "Crie a sua senha"
+          },
+          {
+            "x": 75.61,
+            "y": 76.06,
+            "w": 29.28,
+            "h": 4.65,
+            "legenda": "Aceite a declaração (Anexo III)"
+          },
+          {
+            "x": 75.61,
+            "y": 89.88,
+            "w": 29.28,
+            "h": 5.32,
+            "legenda": "Entre"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rodadas",
+    "titulo": "Suas rodadas",
+    "telas": [
+      {
+        "imagem": "/tutorial/a2-rodadas.png",
+        "pontos": [
+          {
+            "x": 57.37,
+            "y": 37.83,
+            "w": 6.78,
+            "h": 5.32,
+            "legenda": "Rodada aberta: clique em Avaliar",
+            "lado": "baixo"
+          },
+          {
+            "x": 76.06,
+            "y": 71.75,
+            "w": 19.18,
+            "h": 4.88,
+            "legenda": "Este passo a passo",
+            "lado": "esquerda"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "declaracao",
+    "titulo": "Declare se tem impedimento",
+    "telas": [
+      {
+        "imagem": "/tutorial/a3-declaracao.png",
+        "pontos": [
+          {
+            "x": 31.95,
+            "y": 70.24,
+            "w": 35.21,
+            "h": 9.53,
+            "legenda": "Sem impedimento? Marque aqui",
+            "lado": "cima"
+          },
+          {
+            "x": 68.05,
+            "y": 70.24,
+            "w": 35.21,
+            "h": 9.53,
+            "legenda": "Tem vínculo? Declare-se impedido",
+            "lado": "cima"
+          },
+          {
+            "x": 50,
+            "y": 78.03,
+            "w": 38.07,
+            "h": 2.33,
+            "legenda": "Confirme que examinou a lista",
+            "lado": "esquerda"
+          },
+          {
+            "x": 21.5,
+            "y": 84.65,
+            "w": 14.31,
+            "h": 5.32,
+            "legenda": "Registre",
+            "lado": "direita"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ficha",
+    "titulo": "Dê as notas e envie",
+    "telas": [
+      {
+        "imagem": "/tutorial/a4-ficha.png",
+        "pontos": [
+          {
+            "x": 27.17,
+            "y": 22.68,
+            "w": 18.61,
+            "h": 4.88,
+            "legenda": "Leia o material da indicação",
+            "lado": "direita"
+          },
+          {
+            "x": 81.55,
+            "y": 33.03,
+            "w": 8.78,
+            "h": 6.28,
+            "legenda": "Nota de 0 a 10 em cada critério",
+            "lado": "esquerda"
+          },
+          {
+            "x": 50,
+            "y": 54.31,
+            "w": 38.07,
+            "h": 7.67,
+            "legenda": "Nota abaixo de 4 ou acima de 9: comente",
+            "lado": "esquerda"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/a5-ficha-enviar.png",
+        "pontos": [
+          {
+            "x": 68.25,
+            "y": 93.97,
+            "w": 12.79,
+            "h": 4.88,
+            "legenda": "Salve e volte depois, se quiser",
+            "lado": "cima"
+          },
+          {
+            "x": 81.03,
+            "y": 93.97,
+            "w": 11.01,
+            "h": 5.32,
+            "legenda": "Todas as notas? Envie (não muda depois)",
+            "lado": "cima"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "honoraria",
+    "titulo": "Honorárias: vote em um nome",
+    "telas": [
+      {
+        "imagem": "/tutorial/a6-voto.png",
+        "pontos": [
+          {
+            "x": 50,
+            "y": 39.78,
+            "w": 38.07,
+            "h": 5.81,
+            "legenda": "Escolha um nome (ou abstenha-se)",
+            "lado": "esquerda"
+          },
+          {
+            "x": 18.35,
+            "y": 76.16,
+            "w": 12.26,
+            "h": 5.32,
+            "legenda": "Registre o voto (não muda depois)",
+            "lado": "direita"
+          }
+        ]
+      }
+    ]
+  }
+]

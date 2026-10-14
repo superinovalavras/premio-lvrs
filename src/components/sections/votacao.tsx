@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { motion } from "framer-motion";
 import { EyeOff, Fingerprint, MapPin, ShieldCheck, UserCheck, Vote } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -55,6 +57,9 @@ export function Votacao() {
                   {estado === "aberta" && `Aberta até ${dia(votacaoFecha)}, às ${hora(votacaoFecha)}`}
                   {estado === "encerrada" && "Votação encerrada"}
                 </span>
+                <Link href="/como-votar" className="text-sm font-medium text-white underline underline-offset-4 hover:text-amarelo">
+                  Como votar? Veja o passo a passo
+                </Link>
               </div>
               <p className="mt-6 flex max-w-lg gap-2 text-sm text-white/75">
                 <ShieldCheck className="size-4 shrink-0 text-amarelo" />

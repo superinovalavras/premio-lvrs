@@ -1,6 +1,8 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element -- prints estáticos do próprio painel */
+/* eslint-disable @next/next/no-img-element -- prints estáticos das próprias telas */
+// Tutorial visual: print real da tela, contorno no alvo, seta numerada e legenda curta.
+// Usado no painel (escuro), na página pública "Como votar" (escuro) e na área do conselho (claro).
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -76,7 +78,7 @@ function Marcadores({ pontos, inicio }: { pontos: Ponto[]; inicio: number }) {
   );
 }
 
-export function Tutorial({ topicos }: { topicos: Topico[] }) {
+export function Tutorial({ topicos, claro = false }: { topicos: Topico[]; claro?: boolean }) {
   const [ativo, setAtivo] = useState(topicos[0]?.id);
   const t = topicos.find((x) => x.id === ativo) ?? topicos[0];
   if (!t) return null;
@@ -93,13 +95,13 @@ export function Tutorial({ topicos }: { topicos: Topico[] }) {
             onClick={() => setAtivo(x.id)}
             className={cn(
               "flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13.5px] font-medium transition",
-              x.id === t.id ? "bg-amarelo text-fundo" : "text-white/80 hover:bg-white/5",
+              x.id === t.id ? "bg-amarelo text-fundo" : claro ? "text-fundo/80 hover:bg-fundo/5" : "text-white/80 hover:bg-white/5",
             )}
           >
             <span
               className={cn(
                 "grid size-7 shrink-0 place-items-center rounded-full text-[12px] font-bold",
-                x.id === t.id ? "bg-fundo text-amarelo" : "bg-white/10",
+                x.id === t.id ? "bg-fundo text-amarelo" : claro ? "bg-fundo/10" : "bg-white/10",
               )}
             >
               {i + 1}
@@ -111,22 +113,22 @@ export function Tutorial({ topicos }: { topicos: Topico[] }) {
 
       <div className="grid gap-6">
         {t.aviso && (
-          <p className="rounded-2xl border border-amarelo/60 bg-amarelo/10 px-4 py-3 text-sm text-white/90">{t.aviso}</p>
+          <p className={cn("rounded-2xl border border-amarelo/60 bg-amarelo/10 px-4 py-3 text-sm", claro ? "text-fundo" : "text-white/90")}>{t.aviso}</p>
         )}
         {t.telas.map((tela, j) => {
           const inicio = inicios[j];
           return (
             <figure key={tela.imagem} className="grid gap-3">
               {t.telas.length > 1 && (
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amarelo">Tela {j + 1}</p>
+                <p className={cn("text-[11px] font-semibold uppercase tracking-[0.2em]", claro ? "text-verde" : "text-amarelo")}>Tela {j + 1}</p>
               )}
-              <div className="relative overflow-hidden rounded-2xl border border-white/15 shadow-2xl" style={{ aspectRatio: `${W} / ${H}` }}>
+              <div className={cn("relative overflow-hidden rounded-2xl border shadow-2xl", claro ? "border-fundo/15" : "border-white/15")} style={{ aspectRatio: `${W} / ${H}` }}>
                 <img src={tela.imagem} alt={`${t.titulo} — tela ${j + 1}`} className="absolute inset-0 size-full" />
                 <Marcadores pontos={tela.pontos} inicio={inicio} />
               </div>
               <figcaption className="flex flex-wrap gap-x-6 gap-y-2">
                 {tela.pontos.map((p, i) => (
-                  <span key={i} className="flex items-center gap-2 text-sm">
+                  <span key={i} className={cn("flex items-center gap-2 text-sm", claro && "text-fundo")}>
                     <span className="grid size-6 place-items-center rounded-full bg-amarelo text-[12px] font-bold text-fundo">
                       {inicio + i}
                     </span>
