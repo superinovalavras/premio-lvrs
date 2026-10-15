@@ -26,7 +26,6 @@ export const PENDENCIAS_REGULAMENTO: Pendencia[] = [
 ];
 
 export const PENDENCIAS_TECNICAS: string[] = [
-  "Rodar a migração 0011 no Supabase: sem ela não há análise de elegibilidade (26 a 28/10), cota conjunta nem relatório de votos recusados.",
   "Convidar os conselheiros e suplentes em Avaliação do Conselho → Avaliadores: é por esse acesso que eles indicam até 23/10.",
   "E-mails automáticos (deferimento e indeferimento de cadastro) ainda não saem: falta configurar o envio.",
 ];
