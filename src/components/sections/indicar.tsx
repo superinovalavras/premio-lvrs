@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CircleHelp } from "lucide-react";
 import { Titulo } from "@/components/titulo";
 import { buttonVariants } from "@/components/ui/button";
 import { useParametros } from "@/components/parametros-context";
@@ -55,6 +55,9 @@ export function Indicar() {
               </Link>
               <Link href="/entrar" className={buttonVariants({ variant: "outline", size: "lg" })}>
                 Já tenho acesso
+              </Link>
+              <Link href="/como-indicar" className={buttonVariants({ variant: "ajuda", size: "lg" })}>
+                <CircleHelp className="size-4" /> Como indicar?
               </Link>
             </div>
           </div>

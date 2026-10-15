@@ -125,6 +125,9 @@ export default async function PainelEntidade() {
               </p>
             )}
 
+            <Link href="/como-indicar" className="mt-4 inline-block text-sm font-semibold text-verde underline underline-offset-4">
+              Passo a passo com imagens
+            </Link>
             <ol className="mt-6 grid gap-2 border-t border-fundo/10 pt-5 sm:grid-cols-3">
               {etapas.map((et, i) => (
                 <li key={et.rotulo} className="flex items-center gap-2 text-[13px]">

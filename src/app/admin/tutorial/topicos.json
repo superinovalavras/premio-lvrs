@@ -322,6 +322,191 @@
     ]
   },
   {
+    "id": "analisar-indicacoes",
+    "titulo": "Analisar indicações (26 a 28/10)",
+    "aviso": "Abra cada indicação em Indicações. Apta segue para a avaliação com o botão “Incluir como concorrente”; inapta pode pedir reconsideração em 2 dias úteis.",
+    "telas": [
+      {
+        "imagem": "/tutorial/23-analise-escolha.png",
+        "pontos": [
+          {
+            "x": 30.52,
+            "y": 19.2,
+            "w": 5.66,
+            "h": 4.57,
+            "legenda": "Apta ou inapta",
+            "lado": "direita"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/23-analise.png",
+        "pontos": [
+          {
+            "x": 59.08,
+            "y": 27.18,
+            "w": 73.5,
+            "h": 9.53,
+            "legenda": "Inapta: escreva o motivo",
+            "lado": "direita"
+          },
+          {
+            "x": 29.08,
+            "y": 35.17,
+            "w": 13.51,
+            "h": 4.57,
+            "legenda": "Registre",
+            "lado": "direita"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/24-analise-mensagem.png",
+        "pontos": [
+          {
+            "x": 59.08,
+            "y": 72.12,
+            "w": 73.5,
+            "h": 30.05,
+            "legenda": "A mensagem para indicador e indicado",
+            "lado": "direita"
+          },
+          {
+            "x": 30.06,
+            "y": 83.35,
+            "w": 13.56,
+            "h": 4.57,
+            "legenda": "Copie e envie (e-mail automático ainda não sai)",
+            "lado": "direita"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/25-reconsideracao.png",
+        "pontos": [
+          {
+            "x": 59.08,
+            "y": 39.29,
+            "w": 73.5,
+            "h": 23.52,
+            "legenda": "Inapta pediu reconsideração? Cole aqui",
+            "lado": "direita"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "propostas-honorarias",
+    "titulo": "Propostas honorárias",
+    "telas": [
+      {
+        "imagem": "/tutorial/26-propostas.png",
+        "pontos": [
+          {
+            "x": 59.08,
+            "y": 24.24,
+            "w": 76.57,
+            "h": 13.72,
+            "legenda": "Proposta enviada por um conselheiro",
+            "lado": "esquerda"
+          },
+          {
+            "x": 89.28,
+            "y": 21.92,
+            "w": 13.09,
+            "h": 4.19,
+            "legenda": "Leve para a votação nominal",
+            "lado": "esquerda"
+          },
+          {
+            "x": 26.12,
+            "y": 53.44,
+            "w": 10.66,
+            "h": 4.68,
+            "legenda": "Depois, abra a rodada",
+            "lado": "direita"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "minerva",
+    "titulo": "Empate nas honorárias: minerva",
+    "aviso": "Só aparece quando a rodada final empata. A escolha da Presidência fica registrada e não muda.",
+    "telas": [
+      {
+        "imagem": "/tutorial/27-minerva.png",
+        "pontos": [
+          {
+            "x": 39.91,
+            "y": 47.27,
+            "w": 32.67,
+            "h": 2.33,
+            "legenda": "Empate na rodada final",
+            "lado": "esquerda"
+          },
+          {
+            "x": 44.29,
+            "y": 64.01,
+            "w": 43.92,
+            "h": 5.58,
+            "legenda": "Marque a escolha da Presidência",
+            "lado": "esquerda"
+          },
+          {
+            "x": 30.02,
+            "y": 70.54,
+            "w": 15.38,
+            "h": 4.68,
+            "legenda": "Registre",
+            "lado": "direita"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vincular-conselheiro",
+    "titulo": "Conselheiro de instituição",
+    "aviso": "Se a instituição do conselheiro também se cadastrar, ligue os dois: as indicações somam na mesma cota (art. 8º, § 7º).",
+    "telas": [
+      {
+        "imagem": "/tutorial/28-vinculo.png",
+        "pontos": [
+          {
+            "x": 47.34,
+            "y": 48.61,
+            "w": 24.82,
+            "h": 4.19,
+            "legenda": "Escolha a instituição que ele representa",
+            "lado": "direita"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "relatorio-votacao",
+    "titulo": "Relatório da votação",
+    "telas": [
+      {
+        "imagem": "/tutorial/29-relatorio.png",
+        "pontos": [
+          {
+            "x": 59.08,
+            "y": 58.06,
+            "w": 76.57,
+            "h": 21.57,
+            "legenda": "Votos válidos e recusados, sem dado pessoal",
+            "lado": "direita"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "teste-votacao",
     "titulo": "Testar a votação popular",
     "aviso": "Enquanto o teste estiver aberto, quem visitar o site vê a votação aberta com o finalista provisório. Faça o teste e desfaça logo em seguida. Vote com o seu CPF: depois de zerar, ele pode votar de novo.",

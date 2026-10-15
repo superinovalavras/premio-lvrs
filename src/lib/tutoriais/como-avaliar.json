@@ -32,6 +32,135 @@
     ]
   },
   {
+    "id": "indicar",
+    "titulo": "Indique até 23/10",
+    "aviso": "Até 2 indicações por categoria e 6 no total. O formulário mostra o que falta antes de enviar.",
+    "telas": [
+      {
+        "imagem": "/tutorial/a1-painel.png",
+        "pontos": [
+          {
+            "x": 53.89,
+            "y": 36.62,
+            "w": 13.16,
+            "h": 5.32,
+            "legenda": "Até 23/10: comece uma indicação",
+            "lado": "esquerda"
+          },
+          {
+            "x": 37.41,
+            "y": 70.39,
+            "w": 46.12,
+            "h": 16.98,
+            "legenda": "Honorárias: uma proposta por categoria",
+            "lado": "esquerda"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/a7-indicacao.png",
+        "pontos": [
+          {
+            "x": 59,
+            "y": 37.68,
+            "w": 53.29,
+            "h": 5.93,
+            "legenda": "Escolha a categoria",
+            "lado": "direita"
+          },
+          {
+            "x": 59,
+            "y": 49.31,
+            "w": 53.29,
+            "h": 5.35,
+            "legenda": "Pessoa (18+), grupo ou instituição",
+            "lado": "direita"
+          },
+          {
+            "x": 59,
+            "y": 60.18,
+            "w": 53.29,
+            "h": 5.81,
+            "legenda": "Nome do indicado",
+            "lado": "direita"
+          },
+          {
+            "x": 78.37,
+            "y": 84.65,
+            "w": 14.57,
+            "h": 5.32,
+            "legenda": "Salve: dá para parar e voltar depois",
+            "lado": "direita"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/a8-indicacao-envio.png",
+        "pontos": [
+          {
+            "x": 59,
+            "y": 51.52,
+            "w": 53.29,
+            "h": 7.67,
+            "legenda": "Quem indica não avalia aquela categoria (art. 23)",
+            "lado": "direita"
+          },
+          {
+            "x": 59,
+            "y": 69.69,
+            "w": 53.29,
+            "h": 13.26,
+            "legenda": "Declaração do indicador",
+            "lado": "esquerda"
+          },
+          {
+            "x": 79.68,
+            "y": 84.67,
+            "w": 11.93,
+            "h": 5.32,
+            "legenda": "Envie quando não faltar nada",
+            "lado": "direita"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "propor",
+    "titulo": "Proponha uma honorária",
+    "telas": [
+      {
+        "imagem": "/tutorial/a9-honoraria.png",
+        "pontos": [
+          {
+            "x": 37.41,
+            "y": 15.71,
+            "w": 46.12,
+            "h": 5.81,
+            "legenda": "Quem você propõe",
+            "lado": "esquerda"
+          },
+          {
+            "x": 37.41,
+            "y": 31,
+            "w": 46.12,
+            "h": 14.19,
+            "legenda": "Trajetória, contribuição, vínculo e relevância",
+            "lado": "esquerda"
+          },
+          {
+            "x": 76.06,
+            "y": 19.66,
+            "w": 23.43,
+            "h": 46.51,
+            "legenda": "Escolha por votação nominal; empate: minerva",
+            "lado": "direita"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "rodadas",
     "titulo": "Suas rodadas",
     "telas": [
@@ -40,15 +169,15 @@
         "pontos": [
           {
             "x": 57.37,
-            "y": 37.83,
+            "y": 61.58,
             "w": 6.78,
             "h": 5.32,
             "legenda": "Rodada aberta: clique em Avaliar",
-            "lado": "baixo"
+            "lado": "esquerda"
           },
           {
             "x": 76.06,
-            "y": 71.75,
+            "y": 27.45,
             "w": 19.18,
             "h": 4.88,
             "legenda": "Este passo a passo",

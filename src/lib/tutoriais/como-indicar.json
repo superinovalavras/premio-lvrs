@@ -1,0 +1,173 @@
+[
+  {
+    "id": "acesso",
+    "titulo": "Crie o acesso",
+    "aviso": "Quem cria o acesso é o representante designado pela instituição. Prefira um e-mail institucional.",
+    "telas": [
+      {
+        "imagem": "/tutorial/i1-acesso.png",
+        "pontos": [
+          {
+            "x": 75.61,
+            "y": 40.51,
+            "w": 29.28,
+            "h": 5.81,
+            "legenda": "Seu nome (representante)",
+            "lado": "esquerda"
+          },
+          {
+            "x": 75.61,
+            "y": 51.15,
+            "w": 29.28,
+            "h": 5.81,
+            "legenda": "E-mail: vira o seu login",
+            "lado": "esquerda"
+          },
+          {
+            "x": 68,
+            "y": 64.35,
+            "w": 14.06,
+            "h": 5.81,
+            "legenda": "Crie uma senha",
+            "lado": "esquerda"
+          },
+          {
+            "x": 75.61,
+            "y": 87.65,
+            "w": 29.28,
+            "h": 5.32,
+            "legenda": "Crie e comece o cadastro",
+            "lado": "esquerda"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cadastro",
+    "titulo": "Preencha o cadastro",
+    "aviso": "Com documentos e representante. A Secretaria Executiva analisa em até 1 dia útil e avisa o resultado.",
+    "telas": [
+      {
+        "imagem": "/tutorial/i2-painel.png",
+        "pontos": [
+          {
+            "x": 21.11,
+            "y": 55.59,
+            "w": 13.53,
+            "h": 5.32,
+            "legenda": "Preencha o cadastro da instituição",
+            "lado": "direita"
+          },
+          {
+            "x": 33.24,
+            "y": 64.52,
+            "w": 37.79,
+            "h": 6.98,
+            "legenda": "Etapas: cadastro, análise, indicações",
+            "lado": "esquerda"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/i3-cadastro.png",
+        "pontos": [
+          {
+            "x": 20.64,
+            "y": 46.75,
+            "w": 14.93,
+            "h": 27.44,
+            "legenda": "5 passos: cada um é salvo ao continuar",
+            "lado": "direita"
+          },
+          {
+            "x": 59,
+            "y": 70.36,
+            "w": 53.29,
+            "h": 41.16,
+            "legenda": "Enquadramento da instituição (art. 2º-B)",
+            "lado": "direita"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "indicar",
+    "titulo": "Indique até 23/10",
+    "aviso": "Até 2 indicações por categoria e 6 no total. Pessoa indicada precisa ter 18 anos ou mais (art. 7º). O formulário mostra o que falta antes de enviar.",
+    "telas": [
+      {
+        "imagem": "/tutorial/i4-deferida.png",
+        "pontos": [
+          {
+            "x": 79.07,
+            "y": 80.47,
+            "w": 13.16,
+            "h": 5.32,
+            "legenda": "Deferida: comece uma indicação",
+            "lado": "esquerda"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/i5-indicacao.png",
+        "pontos": [
+          {
+            "x": 59,
+            "y": 37.68,
+            "w": 53.29,
+            "h": 5.93,
+            "legenda": "Categoria",
+            "lado": "direita"
+          },
+          {
+            "x": 59,
+            "y": 49.31,
+            "w": 53.29,
+            "h": 5.35,
+            "legenda": "Pessoa (18+), grupo ou instituição",
+            "lado": "direita"
+          },
+          {
+            "x": 59,
+            "y": 60.18,
+            "w": 53.29,
+            "h": 5.81,
+            "legenda": "Nome do indicado",
+            "lado": "direita"
+          },
+          {
+            "x": 78.37,
+            "y": 84.65,
+            "w": 14.57,
+            "h": 5.32,
+            "legenda": "Salve: dá para parar e voltar depois",
+            "lado": "direita"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/i6-envio.png",
+        "pontos": [
+          {
+            "x": 59,
+            "y": 69.69,
+            "w": 53.29,
+            "h": 13.26,
+            "legenda": "Declaração do indicador",
+            "lado": "esquerda"
+          },
+          {
+            "x": 79.68,
+            "y": 84.67,
+            "w": 11.93,
+            "h": 5.32,
+            "legenda": "Envie até 23/10, às 23h59",
+            "lado": "direita"
+          }
+        ]
+      }
+    ]
+  }
+]

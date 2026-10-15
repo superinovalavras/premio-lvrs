@@ -6,7 +6,7 @@ import { Tutorial, type Topico } from "@/components/tutorial-visual";
 import { exigirAvaliador } from "@/lib/server/sessao";
 import topicos from "@/lib/tutoriais/como-avaliar.json";
 
-export const metadata: Metadata = { title: "Como avaliar · Prêmio Lavras de Inovação 2026" };
+export const metadata: Metadata = { title: "Como participar · Prêmio Lavras de Inovação 2026" };
 
 export default async function ComoAvaliar() {
   const { avaliador } = await exigirAvaliador();
@@ -19,13 +19,13 @@ export default async function ComoAvaliar() {
         selo="Ajuda"
         titulo={
           <>
-            Como <span className="enfase">avaliar</span>
+            Como <span className="enfase">participar</span>
           </>
         }
       />
       <ConteudoArea>
         <Link href="/avaliacao" className="mb-6 inline-flex items-center gap-1.5 rounded-lg bg-papel px-3 py-2 text-sm font-semibold text-fundo shadow-sm">
-          <ArrowLeft className="size-4" /> Minhas rodadas
+          <ArrowLeft className="size-4" /> Área do conselho
         </Link>
         <Tutorial topicos={topicos as Topico[]} claro />
       </ConteudoArea>
