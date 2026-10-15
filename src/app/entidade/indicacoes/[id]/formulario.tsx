@@ -20,8 +20,6 @@ import {
   MAX_EVIDENCIAS_VINCULO,
   PASSOS_INDICACAO,
   TIPOS_INDICADO,
-  menores,
-  tipoAnexoIV,
   type IndDocRow,
   type IndicacaoRow,
   type Integrante,
@@ -294,7 +292,7 @@ function PassoIndicado(p: Props & { onSubmit: (e: React.FormEvent<HTMLFormElemen
       </div>
       {jovem && (
         <Aviso tom="info" className="mt-3">
-          Jovem Inovador: a pessoa (ou cada integrante) precisa ter de 15 a 29 anos em {fim}. A idade é calculada pela data de nascimento.
+          Jovem Inovador: a pessoa (ou cada integrante) precisa ter de 18 a 29 anos em {fim}. A idade é calculada pela data de nascimento.
         </Aviso>
       )}
 
@@ -337,7 +335,7 @@ function PassoIndicado(p: Props & { onSubmit: (e: React.FormEvent<HTMLFormElemen
             />
           </Campo>
           {tipo === "pf" && (
-            <Campo label="Data de nascimento" dica="Obrigatória: confere a idade do Jovem Inovador e se há menor de 18 anos.">
+            <Campo label="Data de nascimento" dica="Obrigatória: só podem ser indicadas pessoas com 18 anos ou mais (art. 7º).">
               <input name="indicado_nascimento" type="date" defaultValue={i.indicado_nascimento ?? ""} className={inputCls} />
             </Campo>
           )}
@@ -481,7 +479,6 @@ type Comuns = {
 };
 
 function PassoEvidencias(p: Props & { comuns: Comuns; docs: (tipo: string) => IndDocRow[] }) {
-  const menoresDeIdade = menores(p.indicacao);
   return (
     <div>
       <h2 className="text-xl font-semibold">Evidências e documentos</h2>
@@ -508,17 +505,6 @@ function PassoEvidencias(p: Props & { comuns: Comuns; docs: (tipo: string) => In
           Falta a evidência do vínculo com Lavras: ela fica no passo 2.
         </Aviso>
       )}
-      {menoresDeIdade.map((m) => (
-        <ListaDocs
-          key={m.cpf}
-          {...p.comuns}
-          tipo={tipoAnexoIV(m.cpf)}
-          titulo={`Anexo IV: autorização do responsável por ${m.nome || "menor de 18 anos"}`}
-          dica="Menor de 18 anos: sem o termo assinado por pai, mãe ou responsável legal, a indicação não é enviada (art. 37). O modelo está no regulamento."
-          max={1}
-          docs={p.docs(tipoAnexoIV(m.cpf))}
-        />
-      ))}
     </div>
   );
 }

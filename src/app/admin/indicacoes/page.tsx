@@ -109,7 +109,7 @@ export default async function PaginaIndicacoes() {
                               })()}
                               {conflito(i) && <span className="rounded-lg bg-amarelo/15 px-2 py-0.5 text-amarelo">Conflito declarado</span>}
                               {repetido(i) && <span className="rounded-lg bg-amarelo/15 px-2 py-0.5 text-amarelo">Em 2+ categorias</span>}
-                              {menores(i).length > 0 && <span className="rounded-lg bg-white/10 px-2 py-0.5 text-white/75">Menor · Anexo IV</span>}
+                              {menores(i).length > 0 && <span className="rounded-lg bg-vermelho/25 px-2 py-0.5 text-[#ff8a8f]">Menor de 18 (art. 7º)</span>}
                             </div>
                             <ChevronRight className="size-4 text-white/40 group-hover:text-amarelo" />
                           </Link>

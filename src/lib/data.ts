@@ -115,7 +115,7 @@ export const CATEGORIAS: Categoria[] = [
     slug: "jovem-inovador",
     nome: "Jovem Inovador",
     tipo: "competitive",
-    resumo: "Talentos de 15 a 29 anos que já estão transformando ideias em impacto.",
+    resumo: "Talentos de 18 a 29 anos que já estão transformando ideias em impacto.",
   },
   {
     slug: "conexao-do-ano",
@@ -217,11 +217,6 @@ export const DOCUMENTOS: Documento[] = [
     titulo: "Regulamento Oficial",
     descricao: "Regras, categorias, critérios de avaliação e composição da nota final.",
     href: null, // "/docs/regulamento-premio-lavras-2026.pdf"
-  },
-  {
-    titulo: "Anexo IV — Termo para menores de 18 anos",
-    descricao: "Autorização do responsável legal para participantes menores de idade.",
-    href: null, // "/docs/anexo-iv-termo-menores.pdf"
   },
 ];
 

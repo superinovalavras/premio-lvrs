@@ -28,7 +28,7 @@ Para testar o formulário fora do prazo, use `NEXT_PUBLIC_VOTACAO_PREVIEW=1` e `
 | Logos (Prefeitura, LVRS+, Vale dos Ipês) | `public/marca/` |
 | Rota de voto | `src/app/api/votar/route.ts` |
 | Esquema, RLS, `cast_vote`, `compute_results` | `supabase/migrations/0001_premio.sql` |
-| PDFs (Regulamento, Anexo IV) | colocar em `public/docs/` e preencher `href` em `DOCUMENTOS` |
+| PDFs públicos (Regulamento) | painel → Documentos (bucket `publico`) |
 
 ## Como o voto é protegido
 
@@ -61,7 +61,7 @@ Especificação, itens 2 e 3 (Anexo II; arts. 6º a 10 e 37). Migração `supaba
 
 | O quê | Onde |
 |---|---|
-| Campos, limites, pendências, idade do Jovem Inovador, Anexo IV | `src/lib/indicacoes.ts` |
+| Campos, limites, pendências, idade mínima (18) e do Jovem Inovador | `src/lib/indicacoes.ts` |
 | Salvar passos, arquivos, envio com as travas do item 3.1, reabrir | `src/lib/server/acoes-indicacao.ts` |
 | Formulário da instituição (6 passos) | `/entidade/indicacoes/[id]` |
 | Lista por categoria e detalhe para a Secretaria | `/admin/indicacoes` |
@@ -71,7 +71,7 @@ Especificação, itens 2 e 3 (Anexo II; arts. 6º a 10 e 37). Migração `supaba
 - Honorárias não entram no formulário: cada conselheiro envia uma proposta por categoria em `/avaliacao/honorarias/[slug]`
   (art. 13), e a Secretaria a inclui na votação nominal. Empate na rodada final: voto de minerva registrado no painel.
 - Travas no envio: 2 por categoria e 6 no total (contam as enviadas), autoindicação por CPF/CNPJ,
-  Jovem Inovador de 15 a 29 anos no fim do prazo, Anexo IV para menor de 18, campos do art. 9º.
+  indicado pessoa física com 18 anos ou mais (art. 7º), Jovem Inovador de 18 a 29 anos no fim do prazo, campos do art. 9º.
 - Envio guarda o carimbo do primeiro envio (ordem de chegada), uma versão completa e o aceite do Anexo II.
   "Editar" reabre como rascunho; a ordem continua a do primeiro envio.
 - Arquivos no bucket privado `entidades`, pasta `<entidade>/indicacoes/<indicação>/`.
@@ -97,7 +97,6 @@ Regulamento, arts. 11, 13, 15 a 23 e Anexos I e III. Migração `supabase/migrat
 ## Pendências de conteúdo
 
 - Finalistas (cadastrar em `finalists` com `technical_score` e `image_url`).
-- PDFs do Regulamento e do Anexo IV.
 - Datas de inscrição, avaliação e divulgação dos finalistas (`CRONOGRAMA`).
 - Horário da cerimônia (o contador usa 19h, provisório — `CERIMONIA`).
 - Chaves do Turnstile e do Supabase na Vercel.

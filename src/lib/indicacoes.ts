@@ -8,7 +8,8 @@ export const LIMITE_TOTAL = 6; // art. 8º, § 5º
 export const MAX_EVIDENCIAS = 10;
 export const MAX_COMPROBATORIOS = 5;
 export const MAX_EVIDENCIAS_VINCULO = 5;
-export const JOVEM = { slug: "jovem-inovador", min: 15, max: 29 }; // art. 6º, tabela
+export const JOVEM = { slug: "jovem-inovador", min: 18, max: 29 }; // art. 6º, tabela (v3: 18 a 29)
+export const IDADE_MINIMA_INDICADO = 18; // art. 7º: pessoas físicas maiores de 18 anos
 
 export const PASSOS_INDICACAO = ["Indicado", "Vínculo com Lavras", "A realização", "Evidências", "Contato e conflitos", "Revisão e envio"];
 
@@ -103,11 +104,10 @@ export function pessoasDaIndicacao(i: Pick<IndicacaoRow, "indicado_tipo" | "indi
   return [];
 }
 
-// Art. 37: menor de 18 anos na data da indicação exige o Anexo IV assinado pelo responsável.
-export function menores(i: Parameters<typeof pessoasDaIndicacao>[0], hoje = new Date()) {
-  return pessoasDaIndicacao(i).filter((p) => /^\d{4}-\d{2}-\d{2}$/.test(p.nascimento) && idadeEm(p.nascimento, hoje) < 18);
+// Art. 7º: só pessoas físicas maiores de 18 anos podem ser indicadas, aferido no fim das indicações.
+export function menores(i: Parameters<typeof pessoasDaIndicacao>[0], quando = new Date()) {
+  return pessoasDaIndicacao(i).filter((p) => /^\d{4}-\d{2}-\d{2}$/.test(p.nascimento) && idadeEm(p.nascimento, quando) < IDADE_MINIMA_INDICADO);
 }
-export const tipoAnexoIV = (cpf: string) => `anexo_iv:${somenteDigitos(cpf)}`;
 
 export type Pendencia = { passo: number; texto: string };
 export type Contexto = {
@@ -150,7 +150,7 @@ export function pendenciasIndicacao(i: IndicacaoRow, docs: IndDocRow[], ctx: Con
       if (!dataOk(pessoa.nascimento)) continue;
       const idade = idadeEm(pessoa.nascimento, new Date(ctx.fechamento));
       if (idade < JOVEM.min || idade > JOVEM.max) {
-        p.push({ passo: 1, texto: `${pessoa.nome || "Indicado"}: precisa ter de 15 a 29 anos no fim das indicações (tem ${idade})` });
+        p.push({ passo: 1, texto: `${pessoa.nome || "Indicado"}: precisa ter de ${JOVEM.min} a ${JOVEM.max} anos no fim das indicações (tem ${idade})` });
       }
     }
   }
@@ -173,11 +173,13 @@ export function pendenciasIndicacao(i: IndicacaoRow, docs: IndDocRow[], ctx: Con
   else if (i.periodo_fim! < i.periodo_inicio!) p.push({ passo: 3, texto: "O fim do período vem antes do início" });
   if (vazio(i.beneficiarios) || i.beneficiarios_qtd === null) p.push({ passo: 3, texto: "Beneficiários: quem e quantos" });
 
-  // 4. Evidências e Anexo IV
-  if (!conta("evidencia")) p.push({ passo: 4, texto: "Pelo menos uma evidência (link ou arquivo)" });
-  for (const m of menores(i, hoje)) {
-    if (!conta(tipoAnexoIV(m.cpf))) p.push({ passo: 4, texto: `Anexo IV assinado pelo responsável de ${m.nome || "menor de 18 anos"}` });
+  // Art. 7º: indicado pessoa física precisa ter 18 anos ou mais (não há mais autorização de responsável).
+  for (const m of menores(i, new Date(ctx.fechamento))) {
+    p.push({ passo: 1, texto: `${m.nome || "Indicado"}: só podem ser indicadas pessoas maiores de 18 anos (art. 7º)` });
   }
+
+  // 4. Evidências
+  if (!conta("evidencia")) p.push({ passo: 4, texto: "Pelo menos uma evidência (link ou arquivo)" });
 
   // 5. Contato e conflitos
   if (vazio(i.contato_nome) || vazio(i.contato_email) || vazio(i.contato_telefone)) {
@@ -192,9 +194,8 @@ export function pendenciasIndicacao(i: IndicacaoRow, docs: IndDocRow[], ctx: Con
 }
 
 // Tipos de arquivo/link aceitos nesta indicação (o servidor recusa qualquer outro).
-export function tipoDocumentoValido(i: IndicacaoRow, tipo: string, hoje = new Date()) {
-  if (tipo === "evidencia" || tipo === "vinculo" || tipo === "comprobatorio") return true;
-  return menores(i, hoje).some((m) => tipoAnexoIV(m.cpf) === tipo);
+export function tipoDocumentoValido(_i: IndicacaoRow, tipo: string) {
+  return tipo === "evidencia" || tipo === "vinculo" || tipo === "comprobatorio";
 }
 export const maximoPorTipo = (tipo: string) =>
   tipo === "evidencia" ? MAX_EVIDENCIAS : tipo === "comprobatorio" ? MAX_COMPROBATORIOS : tipo === "vinculo" ? MAX_EVIDENCIAS_VINCULO : 1;

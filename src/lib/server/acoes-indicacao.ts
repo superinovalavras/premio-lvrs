@@ -275,7 +275,7 @@ export async function confirmarUploadIndicacao(id: string, tipo: string, caminho
   if (c.erro !== undefined) return { ok: false, erro: c.erro };
   if (!caminho.startsWith(`${c.pasta}/indicacoes/${id}/`)) return { ok: false, erro: "Envio inválido." };
   if (!tipoDocumentoValido(c.indicacao, tipo)) return { ok: false, erro: "Arquivo inválido." };
-  // Tipos de um item só (Anexo IV): o novo substitui o anterior.
+  // Tipo de um item só: o novo substitui o anterior.
   const anteriores = maximoPorTipo(tipo) === 1 ? c.documentos.filter((d) => d.tipo === tipo) : [];
   const { error } = await servico()
     .from("indicacao_documentos")

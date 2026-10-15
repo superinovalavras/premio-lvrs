@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { CartaoAdmin, TopoAdmin } from "@/components/admin/ui";
 import { servico } from "@/lib/server/sessao";
 import { carregarIndicacao } from "@/lib/server/indicacoes-dados";
-import { CONDICOES_VINCULO, CONFLITOS, STATUS_INDICACAO, TIPOS_INDICADO, menores, tipoAnexoIV } from "@/lib/indicacoes";
+import { CONDICOES_VINCULO, CONFLITOS, STATUS_INDICACAO, TIPOS_INDICADO, menores } from "@/lib/indicacoes";
 import { formatarCnpj, formatarData } from "@/lib/entidades";
 import { idadeEm, mascaraCelular, mascaraCpf } from "@/lib/voto";
 import { AbrirDoc } from "./abrir";
@@ -126,14 +126,10 @@ export default async function DetalheIndicacao({ params }: PageProps<"/admin/ind
           </dl>
 
           {menores(i).length > 0 && (
-            <>
-              <h2 className="mb-2 mt-6 font-semibold">Anexo IV (menores de 18 anos)</h2>
-              <dl>
-                {menores(i).map((m) => (
-                  <Linha key={m.cpf} rotulo={m.nome} valor={listaDocs(tipoAnexoIV(m.cpf))} />
-                ))}
-              </dl>
-            </>
+            <p className="mt-6 rounded-xl border border-vermelho/50 bg-vermelho/15 px-4 py-3 text-sm">
+              Indicado menor de 18 anos ({menores(i).map((m) => m.nome).join(", ")}): pelo art. 7º do Regulamento, só podem ser indicadas
+              pessoas maiores de 18 anos. Indicação enviada antes da versão final do regulamento — avalie como inapta.
+            </p>
           )}
         </CartaoAdmin>
 
