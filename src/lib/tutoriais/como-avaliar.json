@@ -71,7 +71,7 @@
             "w": 35.21,
             "h": 9.53,
             "legenda": "Sem impedimento? Marque aqui",
-            "lado": "cima"
+            "lado": "esquerda"
           },
           {
             "x": 68.05,
@@ -79,12 +79,12 @@
             "w": 35.21,
             "h": 9.53,
             "legenda": "Tem vínculo? Declare-se impedido",
-            "lado": "cima"
+            "lado": "direita"
           },
           {
             "x": 50,
             "y": 78.03,
-            "w": 38.07,
+            "w": 71.3,
             "h": 2.33,
             "legenda": "Confirme que examinou a lista",
             "lado": "esquerda"
@@ -122,12 +122,12 @@
             "w": 8.78,
             "h": 6.28,
             "legenda": "Nota de 0 a 10 em cada critério",
-            "lado": "esquerda"
+            "lado": "direita"
           },
           {
             "x": 50,
             "y": 54.31,
-            "w": 38.07,
+            "w": 71.89,
             "h": 7.67,
             "legenda": "Nota abaixo de 4 ou acima de 9: comente",
             "lado": "esquerda"
@@ -167,8 +167,8 @@
           {
             "x": 50,
             "y": 39.78,
-            "w": 38.07,
-            "h": 5.81,
+            "w": 75.55,
+            "h": 11.63,
             "legenda": "Escolha um nome (ou abstenha-se)",
             "lado": "esquerda"
           },

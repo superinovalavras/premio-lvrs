@@ -15,34 +15,59 @@ export type Topico = { id: string; titulo: string; aviso?: string; telas: Tela[]
 const W = 1366;
 const H = 860;
 
-// Cada alvo ganha um contorno amarelo; o marcador fica do lado indicado (ou à esquerda, se couber)
-// e a seta para na borda do contorno, sem cobrir o texto. Se encostar em outro marcador, desloca.
+// Cada alvo ganha um contorno amarelo; o marcador fica do lado indicado e a seta para na borda do
+// contorno. O marcador nunca cai dentro de um contorno nem encosta em outro marcador: se o lado
+// preferido estiver ocupado, ele se afasta mais, desliza ao longo do alvo ou troca de lado.
 type Pino = { cx: number; cy: number; bw: number; bh: number; px: number; py: number; lado: Lado };
+const R = 25; // raio do marcador
+const OPOSTO: Record<Lado, Lado> = { esquerda: "direita", direita: "esquerda", cima: "baixo", baixo: "cima" };
 
 function posicionar(pontos: Ponto[]): Pino[] {
-  const pinos: Pino[] = [];
-  for (const p of pontos) {
+  const caixas = pontos.map((p) => {
     const cx = (p.x / 100) * W;
     const cy = (p.y / 100) * H;
-    const bw = Math.max(44, ((p.w ?? 3) / 100) * W + 12);
-    const bh = Math.max(36, ((p.h ?? 4) / 100) * H + 10);
-    const lado: Lado = p.lado ?? (cx - bw / 2 > 140 ? "esquerda" : "direita");
-    let px = cx;
-    let py = cy;
-    if (lado === "esquerda") px = cx - bw / 2 - 90;
-    if (lado === "direita") px = cx + bw / 2 + 90;
-    if (lado === "cima") py = cy - bh / 2 - 80;
-    if (lado === "baixo") py = cy + bh / 2 + 80;
-    px = Math.min(W - 34, Math.max(34, px));
-    py = Math.min(H - 34, Math.max(34, py));
-    const horizontal = lado === "esquerda" || lado === "direita";
-    for (let k = 1; k < 10 && pinos.some((o) => Math.hypot(o.px - px, o.py - py) < 64); k++) {
-      const passo = (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 64;
-      if (horizontal) py = Math.min(H - 34, Math.max(34, cy + passo));
-      else px = Math.min(W - 34, Math.max(34, cx + passo));
+    return { cx, cy, bw: Math.max(44, ((p.w ?? 3) / 100) * W + 12), bh: Math.max(36, ((p.h ?? 4) / 100) * H + 10) };
+  });
+  const dentro = (x: number, y: number) =>
+    x < R + 6 || x > W - R - 6 || y < R + 6 || y > H - R - 6 ||
+    caixas.some((c) => Math.abs(x - c.cx) < c.bw / 2 + R + 8 && Math.abs(y - c.cy) < c.bh / 2 + R + 8);
+  const pinos: Pino[] = [];
+  pontos.forEach((p, i) => {
+    const { cx, cy, bw, bh } = caixas[i];
+    const pref: Lado = p.lado ?? (cx - bw / 2 > 140 ? "esquerda" : "direita");
+    const lados: Lado[] = [pref, ...(["esquerda", "direita", "baixo", "cima"] as Lado[]).filter((l) => l !== pref)];
+    // o lado oposto é a última opção: a seta atravessaria o próprio alvo
+    lados.splice(lados.indexOf(OPOSTO[pref]), 1);
+    lados.push(OPOSTO[pref]);
+    const livre = (x: number, y: number) => !dentro(x, y) && !pinos.some((o) => Math.hypot(o.px - x, o.py - y) < 2 * R + 14);
+    let achou: Pino | null = null;
+    busca: for (const lado of lados) {
+      const horizontal = lado === "esquerda" || lado === "direita";
+      for (const dist of [70, 110, 160, 220]) {
+        for (const desl of [0, 1, -1, 2, -2, 3, -3]) {
+          let px = cx;
+          let py = cy;
+          if (lado === "esquerda") px = cx - bw / 2 - dist;
+          if (lado === "direita") px = cx + bw / 2 + dist;
+          if (lado === "cima") py = cy - bh / 2 - dist;
+          if (lado === "baixo") py = cy + bh / 2 + dist;
+          if (horizontal) py += desl * 2 * R;
+          else px += desl * 2 * R;
+          if (livre(px, py)) {
+            achou = { cx, cy, bw, bh, px, py, lado };
+            break busca;
+          }
+        }
+      }
     }
-    pinos.push({ cx, cy, bw, bh, px, py, lado });
-  }
+    pinos.push(
+      achou ?? {
+        cx, cy, bw, bh, lado: pref,
+        px: Math.min(W - 34, Math.max(34, pref === "esquerda" ? cx - bw / 2 - 90 : pref === "direita" ? cx + bw / 2 + 90 : cx)),
+        py: Math.min(H - 34, Math.max(34, pref === "cima" ? cy - bh / 2 - 80 : pref === "baixo" ? cy + bh / 2 + 80 : cy)),
+      },
+    );
+  });
   return pinos;
 }
 

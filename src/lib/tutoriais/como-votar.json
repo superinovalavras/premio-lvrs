@@ -28,8 +28,8 @@
           {
             "x": 50,
             "y": 57.16,
-            "w": 38.07,
-            "h": 18.6,
+            "w": 44.95,
+            "h": 42.56,
             "legenda": "Leia sobre cada finalista",
             "lado": "esquerda"
           },
@@ -39,7 +39,7 @@
             "w": 11.47,
             "h": 5.12,
             "legenda": "Quero votar",
-            "lado": "cima"
+            "lado": "direita"
           }
         ]
       }
@@ -55,7 +55,7 @@
           {
             "x": 50,
             "y": 44.84,
-            "w": 38.07,
+            "w": 44.95,
             "h": 9.53,
             "legenda": "Escolha um",
             "lado": "esquerda"
@@ -66,7 +66,7 @@
             "w": 10.54,
             "h": 5.12,
             "legenda": "Continuar",
-            "lado": "cima"
+            "lado": "direita"
           }
         ]
       }
@@ -82,7 +82,7 @@
           {
             "x": 50,
             "y": 42.86,
-            "w": 38.07,
+            "w": 44.95,
             "h": 5.81,
             "legenda": "Nome completo",
             "lado": "esquerda"
@@ -109,7 +109,7 @@
             "w": 10.54,
             "h": 5.12,
             "legenda": "Continuar",
-            "lado": "cima"
+            "lado": "direita"
           }
         ]
       }
@@ -133,7 +133,7 @@
           {
             "x": 50,
             "y": 54.37,
-            "w": 38.07,
+            "w": 44.95,
             "h": 8.6,
             "legenda": "Declaração",
             "lado": "esquerda"
@@ -141,7 +141,7 @@
           {
             "x": 50,
             "y": 66.47,
-            "w": 38.07,
+            "w": 44.95,
             "h": 10.93,
             "legenda": "Privacidade",
             "lado": "esquerda"
@@ -152,7 +152,7 @@
             "w": 10.54,
             "h": 5.12,
             "legenda": "Continuar",
-            "lado": "cima"
+            "lado": "direita"
           }
         ]
       }
@@ -166,10 +166,10 @@
         "imagem": "/tutorial/v6-confirmar.png",
         "pontos": [
           {
-            "x": 35.19,
+            "x": 50,
             "y": 42.86,
-            "w": 12.85,
-            "h": 6.51,
+            "w": 44.95,
+            "h": 10.47,
             "legenda": "Confira o seu voto",
             "lado": "esquerda"
           },
@@ -179,7 +179,7 @@
             "w": 13.19,
             "h": 5.12,
             "legenda": "Confirme. Pronto: aparece “Voto registrado”",
-            "lado": "cima"
+            "lado": "direita"
           }
         ]
       }
