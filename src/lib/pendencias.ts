@@ -7,21 +7,10 @@ export const AVISO_VERSAO = "2026-10-15";
 export type Pendencia = { titulo: string; regulamento: string; site: string; decidir: string };
 
 // Revisado em 15/10/2026 com o Regulamento aprovado (Resolução COCITIEIS nº 03, de 6/10/2026).
-// Resolvidos: peso 80/20, conselheiro indica, propostas honorárias pelo site, voto de minerva, e-mail
+// Resolvidos: idade do voto popular fica em 18 (decisão do Ramon, 15/10, apesar do art. 19, § 1º dizer 16),
+// regulamento publicado em Documentos, peso 80/20, conselheiro indica, propostas honorárias pelo site, voto de minerva, e-mail
 // de privacidade, horário e local da cerimônia.
 export const PENDENCIAS_REGULAMENTO: Pendencia[] = [
-  {
-    titulo: "Idade mínima do voto popular",
-    regulamento: "O texto aprovado em 6/10 manteve “dezesseis anos ou mais” (art. 19, § 1º).",
-    site: "Aceita só 18 anos ou mais (decisão de 09/10).",
-    decidir: "Vale o regulamento (16) ou o Conselho corrige o texto para 18?",
-  },
-  {
-    titulo: "Publicar o regulamento no site",
-    regulamento: "Versão aprovada pela Resolução COCITIEIS nº 03, de 6/10/2026 (art. 8º-A, I: publicar até 09/10).",
-    site: "Mostra o regulamento como “Em breve”.",
-    decidir: "Enviar o PDF em Documentos para ele virar download no site.",
-  },
   {
     titulo: "Quantos finalistas por categoria",
     regulamento: "Até três, só com 60 pontos ou mais; um único finalista não vence automaticamente (arts. 11 e 12, § 3º).",
