@@ -77,8 +77,8 @@ export function AvisoPendencias() {
             Decisões que dependem de <span className="enfase">você</span>
           </h2>
           <p className="mt-2 max-w-[60ch] text-sm font-light text-white/80">
-            Estes pontos divergem do regulamento ou não estão definidos nele. Cada item mostra o que o regulamento diz e o que o
-            site faz hoje. Repasse a decisão à equipe do site.
+            Pontos do regulamento que ainda precisam de decisão. Cada item mostra o que o regulamento diz e o que o site faz
+            hoje.
           </p>
         </header>
 

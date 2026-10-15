@@ -2,43 +2,25 @@
 // Ao resolver um item, tire-o da lista; com as duas listas vazias, o aviso some.
 // Trocar AVISO_VERSAO faz o aviso reaparecer para quem já fechou.
 
-export const AVISO_VERSAO = "2026-10-09";
+export const AVISO_VERSAO = "2026-10-15";
 
 export type Pendencia = { titulo: string; regulamento: string; site: string; decidir: string };
 
+// Revisado em 15/10/2026 com o Regulamento aprovado (Resolução COCITIEIS nº 03, de 6/10/2026).
+// Resolvidos: peso 80/20, conselheiro indica, propostas honorárias pelo site, voto de minerva, e-mail
+// de privacidade, horário e local da cerimônia.
 export const PENDENCIAS_REGULAMENTO: Pendencia[] = [
   {
-    titulo: "Peso do voto popular",
-    regulamento:
-      "O art. 19 fala em 80% técnica e 20% popular, mas o título da matriz Agro/Food/Tech no Anexo I diz “70% da nota final”, e a providência nº 3 fala em 70/30.",
-    site: "Calcula 80/20.",
-    decidir: "Corrigir o Anexo I (80/20) ou mudar para 70/30?",
+    titulo: "Idade mínima do voto popular",
+    regulamento: "O texto aprovado em 6/10 manteve “dezesseis anos ou mais” (art. 19, § 1º).",
+    site: "Aceita só 18 anos ou mais (decisão de 09/10).",
+    decidir: "Vale o regulamento (16) ou o Conselho corrige o texto para 18?",
   },
   {
-    titulo: "Versão do regulamento",
-    regulamento: "O PDF recebido está marcado como “Minuta técnica para discussão”. O art. 8º-A, I manda publicar até 09/10.",
+    titulo: "Publicar o regulamento no site",
+    regulamento: "Versão aprovada pela Resolução COCITIEIS nº 03, de 6/10/2026 (art. 8º-A, I: publicar até 09/10).",
     site: "Mostra o regulamento como “Em breve”.",
-    decidir:
-      "É a versão final para publicar? Antes, trocar “dezesseis anos” por “dezoito anos” no art. 19, § 1º (decisão de 09/10) e revisar o art. 28, que tem parágrafos e um “Parágrafo único” ao mesmo tempo.",
-  },
-  {
-    titulo: "Conselheiro pode indicar?",
-    regulamento:
-      "Indicam os membros do COCITIEIS e as instituições do art. 2º-B; as indicações do conselheiro somam na cota da instituição (art. 8º, § 7º).",
-    site: "Só instituições habilitadas indicam.",
-    decidir: "O conselheiro indica em nome próprio, pela instituição que representa ou não indica nesta edição?",
-  },
-  {
-    titulo: "Propostas das categorias honorárias",
-    regulamento: "Cada membro pode apresentar uma proposta fundamentada; havendo mais de uma, há votação nominal (art. 13).",
-    site: "A Secretaria cadastra as propostas no painel, e a votação acontece no sistema.",
-    decidir: "As propostas chegam pelo formulário de indicação, enviadas por cada conselheiro ou entregues à Secretaria?",
-  },
-  {
-    titulo: "Empate na 2ª rodada das honorárias",
-    regulamento: "Não prevê o que fazer.",
-    site: "Aponta o empate e devolve a decisão ao plenário.",
-    decidir: "O plenário decide, faz-se nova rodada ou vale outra regra?",
+    decidir: "Enviar o PDF em Documentos para ele virar download no site.",
   },
   {
     titulo: "Quantos finalistas por categoria",
@@ -55,15 +37,15 @@ export const PENDENCIAS_REGULAMENTO: Pendencia[] = [
   {
     titulo: "Cronograma no site",
     regulamento:
-      "Todas as datas estão no art. 8º-A: análise 26–28/10, reconsideração e pré-seleção 29/10–03/11, finalistas até 04/11, avaliação técnica 06–12/11, homologação até 13/11.",
-    site: "Mostra “Avaliação técnica · A confirmar · O COCITIEIS avalia as indicações e define os finalistas”.",
+      "Art. 8º-A: análise e reconsideração 26–30/10, finalistas aprovados até 03/11, comunicação aos finalistas 03–06/11, avaliação técnica 06–12/11, homologação até 13/11.",
+    site: "Mostra “Avaliação técnica · A confirmar” e “Divulgação dos finalistas · A confirmar”.",
     decidir: "Atualizar o cronograma com as datas do art. 8º-A?",
   },
   {
     titulo: "Aviso de privacidade",
     regulamento: "Precisa trazer canal de direitos, dados coletados e prazo de retenção (art. 38, parágrafo único).",
-    site: "Só traz o endereço físico, sem e-mail; está marcado “versão em revisão” e não cita os avaliadores.",
-    decidir: "Qual e-mail recebe os pedidos de dados? O texto pode ser aprovado como final?",
+    site: "Já traz o e-mail superinovalavras@gmail.com e os dados dos conselheiros; segue marcado “versão em revisão”.",
+    decidir: "A Secretaria aprova o texto de premio.lvrs.com.br/privacidade como final?",
   },
   {
     titulo: "Nome “Prêmio Alysson Paolinelli”",
@@ -71,16 +53,10 @@ export const PENDENCIAS_REGULAMENTO: Pendencia[] = [
     site: "Já usa o nome.",
     decidir: "A Procuradoria já confirmou?",
   },
-  {
-    titulo: "Horário e local da cerimônia",
-    regulamento: "17/11/2026 (art. 8º-A, XI), sem horário.",
-    site: "19h, provisório, sem local.",
-    decidir: "Qual o horário e o local?",
-  },
 ];
 
 export const PENDENCIAS_TECNICAS: string[] = [
-  "Indicações: o formulário está no ar; falta rodar a migração 0009 no Supabase e deferir as instituições antes de 12/10.",
+  "Rodar a migração 0010 no Supabase: sem ela, conselheiros não indicam, não enviam propostas honorárias e o voto de minerva não grava.",
+  "Convidar os conselheiros e suplentes em Avaliação do Conselho → Avaliadores: é por esse acesso que eles indicam até 23/10.",
   "E-mails automáticos (deferimento e indeferimento de cadastro) ainda não saem: falta configurar o envio.",
-  "Avaliadores: convidar os conselheiros e suplentes em Avaliação do Conselho → Avaliadores.",
 ];

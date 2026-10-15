@@ -13,6 +13,7 @@ export type Rodada = {
   encerrada_em: string | null;
   is_test: boolean;
   criado_em: string;
+  minerva_finalist_id: string | null; // voto de minerva da Presidência (empate na rodada final das honorárias)
 };
 
 export type Categoria = { id: string; slug: string; name: string; type: string; has_popular_vote: boolean };
@@ -30,7 +31,7 @@ export type Concorrente = {
   material_link: string | null;
 };
 
-export const CAMPOS_RODADA = "id, category_id, tipo, turno, candidatos, abre_em, fecha_em, encerrada_em, is_test, criado_em";
+export const CAMPOS_RODADA = "id, category_id, tipo, turno, candidatos, abre_em, fecha_em, encerrada_em, is_test, criado_em, minerva_finalist_id";
 export const CAMPOS_CONCORRENTE =
   "id, name, summary, etapa, is_test, sort_order, image_url, material_path, material_nome, material_link";
 

@@ -11,6 +11,7 @@ import {
   promoverClassificados,
   prorrogarRodada,
   registrarImpedimento,
+  registrarMinerva,
   type Resultado,
 } from "@/lib/server/acoes-avaliacao-admin";
 import { btnAmarelo, btnContorno, btnPerigo, inputEscuro } from "@/components/admin/ui";
@@ -226,6 +227,35 @@ export function SegundaRodada({ id, candidatos, sugeridos }: { id: string; candi
         onClick={() => rodar(() => abrirSegundaRodada(id, abre, fecha, marcados), (r) => r.id && router.push(`/admin/avaliacao/rodada/${r.id}`))}
       >
         {pendente && <Loader2 className="size-4 animate-spin" />} Abrir 2ª rodada
+      </button>
+      <Msg msg={msg} />
+    </div>
+  );
+}
+
+// Empate na rodada final: a Presidência escolhe entre os empatados (voto de minerva).
+export function Minerva({ id, empatados }: { id: string; empatados: { id: string; nome: string }[] }) {
+  const { msg, pendente, rodar } = useAcao();
+  const [escolha, setEscolha] = useState("");
+  return (
+    <div className="mt-5 border-t border-white/10 pt-4">
+      <h3 className="font-semibold">Voto de minerva da Presidência</h3>
+      <p className="mt-1 text-sm text-white/70">Registre a escolha da Presidência do COCITIEIS. Depois de registrado, não muda.</p>
+      <div className="mt-3 grid gap-2">
+        {empatados.map((c) => (
+          <label key={c.id} className="flex cursor-pointer items-center gap-3 text-sm">
+            <input type="radio" name="minerva" checked={escolha === c.id} onChange={() => setEscolha(c.id)} className="accent-[#ffcd00]" />
+            {c.nome}
+          </label>
+        ))}
+      </div>
+      <button
+        type="button"
+        className={`${btnAmarelo} mt-3`}
+        disabled={pendente || !escolha}
+        onClick={() => confirm("Registrar o voto de minerva? Não dá para desfazer.") && rodar(() => registrarMinerva(id, escolha))}
+      >
+        {pendente && <Loader2 className="size-4 animate-spin" />} Registrar voto de minerva
       </button>
       <Msg msg={msg} />
     </div>

@@ -2,17 +2,17 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Aviso, Cartao } from "@/components/area/ui";
 import { servico } from "@/lib/server/sessao";
-import { indicacoesDaEntidade, janelaIndicacoes } from "@/lib/server/indicacoes-dados";
+import { indicacoesDoDono, janelaIndicacoes, type DonoIndicacao } from "@/lib/server/indicacoes-dados";
 import { LIMITE_POR_CATEGORIA, LIMITE_TOTAL, STATUS_INDICACAO } from "@/lib/indicacoes";
 import { formatarData } from "@/lib/entidades";
 import { dia, hora } from "@/lib/datas";
 import { cn } from "@/lib/utils";
 import { NovaIndicacao } from "./nova-indicacao";
 
-// Lista de indicações da instituição deferida, com as cotas do art. 8º.
-export async function PainelIndicacoes({ entidadeId }: { entidadeId: string }) {
+// Lista de indicações de quem indica (instituição deferida ou conselheiro), com as cotas do art. 8º.
+export async function PainelIndicacoes({ dono, base = "/entidade" }: { dono: DonoIndicacao; base?: "/entidade" | "/avaliacao" }) {
   const [lista, janela, { data: cats }] = await Promise.all([
-    indicacoesDaEntidade(entidadeId),
+    indicacoesDoDono(dono),
     janelaIndicacoes(),
     servico().from("categories").select("id, name"),
   ]);
@@ -31,7 +31,7 @@ export async function PainelIndicacoes({ entidadeId }: { entidadeId: string }) {
             {enviadas.length} de {LIMITE_TOTAL} enviadas
           </h2>
         </div>
-        {janela.estado === "aberta" && enviadas.length < LIMITE_TOTAL && <NovaIndicacao />}
+        {janela.estado === "aberta" && enviadas.length < LIMITE_TOTAL && <NovaIndicacao origem={"entidadeId" in dono ? "entidade" : "conselheiro"} base={base} />}
       </div>
       {janela.estado === "antes" && (
         <Aviso className="mt-4">
@@ -49,7 +49,7 @@ export async function PainelIndicacoes({ entidadeId }: { entidadeId: string }) {
         <ul className="mt-5 divide-y divide-fundo/10 border-t border-fundo/10">
           {lista.map((i) => (
             <li key={i.id}>
-              <Link href={`/entidade/indicacoes/${i.id}`} className="group flex items-center gap-4 py-3.5">
+              <Link href={`${base}/indicacoes/${i.id}`} className="group flex items-center gap-4 py-3.5">
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{i.indicado_nome || "Indicação sem nome"}</p>
                   <p className="truncate text-sm text-fundo/60">

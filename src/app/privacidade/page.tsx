@@ -23,6 +23,11 @@ const SECOES: { titulo: string; corpo: React.ReactNode }[] = [
       <ul>
         <li>Analisar o pedido de habilitação das instituições indicadoras (art. 8º do Regulamento).</li>
         <li>Receber e processar as indicações, inclusive a checagem de autoindicação e de impedimento.</li>
+        <li>
+          Registrar a avaliação do COCITIEIS: nome, e-mail e instituição de cada conselheiro, declarações de
+          impedimento, notas e votos nominais, que ficam associados ao nome de quem avaliou (arts. 13, 15 e 23 do
+          Regulamento).
+        </li>
         <li>Garantir um voto por CPF na votação popular e permitir a auditoria do resultado.</li>
         <li>Comunicar decisões e etapas do Prêmio a quem participa.</li>
         <li>Manter o processo administrativo do Prêmio (art. 26 do Regulamento).</li>
@@ -82,7 +87,11 @@ const SECOES: { titulo: string; corpo: React.ReactNode }[] = [
     corpo: (
       <p>
         Você pode pedir confirmação, acesso, correção ou eliminação dos seus dados, entre outros direitos do art. 18
-        da LGPD, junto à Superintendência, no endereço acima.
+        da LGPD, pelo e-mail{" "}
+        <a href="mailto:superinovalavras@gmail.com" className="font-medium text-verde underline underline-offset-2">
+          superinovalavras@gmail.com
+        </a>{" "}
+        ou no endereço acima.
       </p>
     ),
   },

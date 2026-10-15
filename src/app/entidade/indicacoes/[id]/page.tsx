@@ -21,7 +21,7 @@ export default async function PaginaIndicacao({ params }: PageProps<"/entidade/i
   const [ctx, janela, { data: cats }] = await Promise.all([
     contextoIndicacao(r.indicacao),
     janelaIndicacoes(),
-    servico().from("categories").select("id, slug, name, type").order("sort_order"),
+    servico().from("categories").select("id, slug, name, type").neq("type", "honorary").order("sort_order"),
   ]);
   const aberta = janela.estado === "aberta" && dados.entidade.status === "deferido";
   const editavel = aberta && r.indicacao.status === "rascunho";

@@ -13,14 +13,18 @@ export const metadata: Metadata = { title: "Indicações · Painel do Prêmio" }
 
 export default async function PaginaIndicacoes() {
   const sb = servico();
-  const [{ data: lista, error }, { data: cats }, { data: ents }, janela] = await Promise.all([
+  const [{ data: lista, error }, { data: cats }, { data: ents }, { data: avs }, janela] = await Promise.all([
     sb.from("indicacoes").select(CAMPOS_INDICACAO).neq("status", "rascunho").order("submetido_em").returns<IndicacaoRow[]>(),
     sb.from("categories").select("id, name, type").order("sort_order"),
     sb.from("entidades").select("id, razao_social"),
+    sb.from("avaliadores").select("id, nome"),
     janelaIndicacoes(),
   ]);
   const { count: emEdicao } = await sb.from("indicacoes").select("id", { count: "exact", head: true }).eq("status", "rascunho");
   const nomeEnt = new Map((ents ?? []).map((e) => [e.id, e.razao_social as string | null]));
+  const nomeAv = new Map((avs ?? []).map((a) => [a.id, a.nome as string]));
+  const indicador = (i: IndicacaoRow) =>
+    i.avaliador_id ? `Conselheiro: ${nomeAv.get(i.avaliador_id) ?? "—"}` : (nomeEnt.get(i.entidade_id ?? "") ?? "Instituição");
   const enviadas = (lista ?? []).filter((i) => i.status === "enviada");
 
   // Gatilho 3.2: mesmo indicado (CPF/CNPJ) em mais de uma categoria.
@@ -86,7 +90,7 @@ export default async function PaginaIndicacoes() {
                             <div className="min-w-0 flex-1">
                               <p className="truncate font-medium">{i.indicado_nome}</p>
                               <p className="truncate text-[13px] text-white/60">
-                                {nomeEnt.get(i.entidade_id) ?? "Instituição"} · {formatarData(i.submetido_em)}
+                                {indicador(i)} · {formatarData(i.submetido_em)}
                                 {i.versao > 1 && ` · versão ${i.versao}`}
                               </p>
                             </div>

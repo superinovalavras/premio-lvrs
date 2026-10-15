@@ -10,6 +10,8 @@ import { dia, hora } from "@/lib/datas";
 import { cn } from "@/lib/utils";
 import { Concorrentes } from "./concorrentes";
 import { NovaRodada } from "./nova-rodada";
+import { Propostas } from "./propostas";
+import { SELECT_PROPOSTA, type PropostaRow } from "@/lib/honorarias";
 
 export const metadata: Metadata = { title: "Categoria · Avaliação · Painel do Prêmio" };
 
@@ -21,10 +23,15 @@ export default async function CategoriaAvaliacao({ params }: PageProps<"/admin/a
   const sb = servico();
   const { data: cat } = await sb.from("categories").select("id, slug, name, type, has_popular_vote").eq("slug", slug).maybeSingle();
   if (!cat) notFound();
-  const [{ data: lista }, { data: rodadas }] = await Promise.all([
+  const [{ data: lista }, { data: rodadas }, { data: propostas }, { data: avs }] = await Promise.all([
     sb.from("finalists").select(CAMPOS_CONCORRENTE).eq("category_id", cat.id).order("is_test").order("etapa").order("sort_order").returns<Concorrente[]>(),
     sb.from("rodadas").select(CAMPOS_RODADA).eq("category_id", cat.id).order("criado_em", { ascending: false }).returns<Rodada[]>(),
+    cat.type === "honorary"
+      ? sb.from("propostas_honorarias").select(SELECT_PROPOSTA).eq("category_id", cat.id).order("enviada_em").returns<PropostaRow[]>()
+      : Promise.resolve({ data: [] as PropostaRow[] }),
+    sb.from("avaliadores").select("id, nome"),
   ]);
+  const nomeAv = new Map((avs ?? []).map((a) => [a.id, a.nome as string]));
   const matriz = matrizDaCategoria(cat.slug, cat.type);
   const honoraria = cat.type === "honorary";
   const oficiais = (lista ?? []).filter((f) => !f.is_test);
@@ -40,7 +47,7 @@ export default async function CategoriaAvaliacao({ params }: PageProps<"/admin/a
         titulo={cat.name}
         sub={
           honoraria
-            ? "Cadastre as propostas fundamentadas apresentadas pelos membros. Havendo mais de uma, a escolha é por votação nominal: vence quem tiver maioria simples dos votos válidos; senão, as duas mais votadas vão para a 2ª rodada."
+            ? "Os conselheiros enviam as propostas pela área do conselho. Inclua cada uma na votação e abra a rodada: vence quem tiver maioria simples dos votos válidos; senão, as duas mais votadas vão para a rodada final. Empate na rodada final: voto de minerva da Presidência."
             : `Cadastre as indicações aptas como “Indicado”. Com mais de 3, abra a pré-seleção: os 3 maiores resultados com 60 ou mais viram finalistas. Com 3 ou menos, cadastre direto como “Finalista”.${cat.has_popular_vote ? " Os finalistas desta categoria também aparecem na votação popular do site." : ""}`
         }
       />
@@ -59,6 +66,13 @@ export default async function CategoriaAvaliacao({ params }: PageProps<"/admin/a
             <p className="mt-3 text-sm text-amarelo">{indicados} indicados oficiais: esta categoria precisa de pré-seleção (art. 11).</p>
           )}
         </CartaoAdmin>
+      )}
+
+      {honoraria && (
+        <>
+          <h2 className="mb-3 text-lg font-semibold">Propostas dos conselheiros</h2>
+          <Propostas lista={(propostas ?? []).map((p) => ({ ...p, conselheiro: nomeAv.get(p.avaliador_id) ?? "—" }))} />
+        </>
       )}
 
       <h2 className="mb-3 text-lg font-semibold">Rodadas</h2>
@@ -86,7 +100,7 @@ export default async function CategoriaAvaliacao({ params }: PageProps<"/admin/a
       </div>
       <NovaRodada categoriaId={cat.id} honoraria={honoraria} />
 
-      <h2 className="mb-3 mt-10 text-lg font-semibold">{honoraria ? "Propostas" : "Concorrentes"}</h2>
+      <h2 className="mb-3 mt-10 text-lg font-semibold">{honoraria ? "Na votação" : "Concorrentes"}</h2>
       <Concorrentes
         categoriaId={cat.id}
         honoraria={honoraria}

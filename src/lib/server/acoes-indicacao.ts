@@ -4,9 +4,9 @@ import { revalidatePath } from "next/cache";
 import { randomUUID } from "node:crypto";
 import { auditar } from "./auditoria";
 import { enviarEmail, URL_SITE } from "./email";
-import { ehAdmin, exigirUsuario, ipDaRequisicao, servico, userAgent } from "./sessao";
+import { avaliadorDoUsuario, ehAdmin, exigirUsuario, ipDaRequisicao, servico, userAgent } from "./sessao";
 import { carregarEntidadeDoUsuario, emailsAdmins } from "./entidades-dados";
-import { carregarIndicacao, contextoIndicacao, janelaIndicacoes } from "./indicacoes-dados";
+import { carregarIndicacao, contextoIndicacao, filtroDono, janelaIndicacoes, type DonoIndicacao } from "./indicacoes-dados";
 import { dia, hora } from "@/lib/datas";
 import { cnpjValido } from "@/lib/entidades";
 import { cpfValido, somenteDigitos } from "@/lib/voto";
@@ -29,28 +29,80 @@ export type Resultado = { ok: true; msg?: string; id?: string } | { ok: false; e
 const LIMITE_ARQUIVO = 10 * 1024 * 1024;
 const MIMES = ["application/pdf", "image/png", "image/jpeg"];
 
-// Instituição deferida, dentro do prazo (art. 8º, caput, e art. 8º-A, II).
-async function minhaEntidadeHabilitada() {
+// Quem indica (art. 8º, caput): instituição deferida ou membro do COCITIEIS, sempre dentro do prazo (art. 8º-A, II).
+type Indicador = {
+  user: Awaited<ReturnType<typeof exigirUsuario>>;
+  dono: DonoIndicacao;
+  pasta: string; // pasta no bucket privado "entidades"
+  nome: string; // como aparece para a Secretaria
+  emailConfirmacao: string | null;
+  proibidos: Set<string>; // CPF/CNPJ que caracterizam autoindicação (art. 8º, § 2º)
+  painel: "/entidade" | "/avaliacao";
+};
+
+async function prazoAberto() {
+  const janela = await janelaIndicacoes();
+  if (janela.estado === "antes") return `As indicações abrem em ${dia(janela.abre)}, à ${hora(janela.abre)}.`;
+  if (janela.estado === "encerrada") return "O prazo de indicações terminou.";
+  return null;
+}
+
+async function indicadorEntidade(): Promise<Indicador | { erro: string }> {
   const user = await exigirUsuario();
   const dados = await carregarEntidadeDoUsuario(user.id);
-  if (!dados) return { erro: "Cadastro não encontrado." } as const;
-  if (dados.entidade.status !== "deferido") return { erro: "Só instituições com cadastro deferido podem indicar (art. 8º)." } as const;
-  const janela = await janelaIndicacoes();
-  if (janela.estado === "antes") return { erro: `As indicações abrem em ${dia(janela.abre)}, à ${hora(janela.abre)}.` } as const;
-  if (janela.estado === "encerrada") return { erro: "O prazo de indicações terminou." } as const;
-  return { user, dados, janela } as const;
+  if (!dados) return { erro: "Cadastro não encontrado." };
+  if (dados.entidade.status !== "deferido") return { erro: "Só instituições com cadastro deferido podem indicar (art. 8º)." };
+  const fora = await prazoAberto();
+  if (fora) return { erro: fora };
+  // Órgão municipal que usa o CNPJ da Prefeitura não é comparado por CNPJ (todos os órgãos o compartilham).
+  const proibidos = new Set(
+    [dados.titular?.cpf, dados.suplente?.cpf, dados.entidade.unidade_municipal ? null : dados.entidade.cnpj].filter(Boolean) as string[],
+  );
+  return {
+    user,
+    dono: { entidadeId: dados.entidade.id },
+    pasta: dados.entidade.id,
+    nome: dados.entidade.razao_social ?? "Instituição",
+    emailConfirmacao: dados.titular?.email ?? null,
+    proibidos,
+    painel: "/entidade",
+  };
+}
+
+async function indicadorConselheiro(): Promise<Indicador | { erro: string }> {
+  const user = await exigirUsuario();
+  const av = await avaliadorDoUsuario(user.id);
+  if (!av?.ativo) return { erro: "Acesso de conselheiro não encontrado." };
+  const fora = await prazoAberto();
+  if (fora) return { erro: fora };
+  return {
+    user,
+    dono: { avaliadorId: av.id },
+    pasta: `conselheiros/${av.id}`,
+    nome: `${av.nome} (conselheiro${av.instituicao ? `, ${av.instituicao}` : ""})`,
+    emailConfirmacao: av.email,
+    proibidos: new Set(),
+    painel: "/avaliacao",
+  };
 }
 
 async function minhaIndicacao(id: string, exigeRascunho = true) {
-  const c = await minhaEntidadeHabilitada();
-  if (c.erro !== undefined) return { erro: c.erro } as const;
   const r = await carregarIndicacao(id);
-  if (!r || r.indicacao.entidade_id !== c.dados.entidade.id) return { erro: "Indicação não encontrada." } as const;
+  if (!r) return { erro: "Indicação não encontrada." } as const;
+  const c = r.indicacao.avaliador_id ? await indicadorConselheiro() : await indicadorEntidade();
+  if ("erro" in c) return { erro: c.erro } as const;
+  const [campo, valor] = filtroDono(c.dono);
+  if (r.indicacao[campo] !== valor) return { erro: "Indicação não encontrada." } as const;
   if (exigeRascunho && r.indicacao.status !== "rascunho") {
     return { erro: "Esta indicação já foi enviada. Use “Editar” para reabrir." } as const;
   }
-  return { ...c, ...r } as const;
+  return { ...c, ...r, erro: undefined } as const;
 }
+
+const revalidar = () => {
+  revalidatePath("/entidade", "layout");
+  revalidatePath("/avaliacao", "layout");
+};
 
 const texto = (fd: FormData, k: string, max: number, rotulo: string) => {
   const v = String(fd.get(k) ?? "").trim();
@@ -65,24 +117,25 @@ const simNao = (fd: FormData, k: string) => (fd.get(k) === "sim" ? true : fd.get
 
 // ───── Criar, salvar passos, excluir ─────
 
-export async function novaIndicacao(): Promise<Resultado> {
-  const c = await minhaEntidadeHabilitada();
-  if (c.erro !== undefined) return { ok: false, erro: c.erro };
+export async function novaIndicacao(origem: "entidade" | "conselheiro" = "entidade"): Promise<Resultado> {
+  const c = origem === "conselheiro" ? await indicadorConselheiro() : await indicadorEntidade();
+  if ("erro" in c) return { ok: false, erro: c.erro };
   const sb = servico();
+  const [campo, valor] = filtroDono(c.dono);
   const { count } = await sb
     .from("indicacoes")
     .select("id", { count: "exact", head: true })
-    .eq("entidade_id", c.dados.entidade.id)
+    .eq(campo, valor)
     .eq("status", "rascunho");
   if ((count ?? 0) >= 12) return { ok: false, erro: "Há muitos rascunhos abertos. Envie ou exclua algum antes de começar outro." };
   const { data: nova, error } = await sb
     .from("indicacoes")
-    .insert({ entidade_id: c.dados.entidade.id, criado_por: c.user.id })
+    .insert({ [campo]: valor, criado_por: c.user.id })
     .select("id")
     .single();
   if (error || !nova) return { ok: false, erro: "Não foi possível começar a indicação." };
-  await auditar(c.user, "indicacao_criada", { tipo: "indicacao", id: nova.id }, { entidade: c.dados.entidade.id });
-  revalidatePath("/entidade", "layout");
+  await auditar(c.user, "indicacao_criada", { tipo: "indicacao", id: nova.id }, { [campo]: valor });
+  revalidar();
   return { ok: true, id: nova.id };
 }
 
@@ -95,8 +148,9 @@ export async function salvarPassoIndicacao(id: string, passo: number, fd: FormDa
     if (passo === 1) {
       const cat = String(fd.get("category_id") ?? "");
       if (cat) {
-        const { data: existe } = await servico().from("categories").select("id").eq("id", cat).maybeSingle();
+        const { data: existe } = await servico().from("categories").select("id, type").eq("id", cat).maybeSingle();
         if (!existe) return { ok: false, erro: "Categoria inválida." };
+        if (existe.type === "honorary") return { ok: false, erro: "As honorárias têm formulário próprio, só para conselheiros (art. 13)." };
       }
       const tipo = String(fd.get("indicado_tipo") ?? "");
       if (tipo && !["pf", "conjunto", "instituicao"].includes(tipo)) return { ok: false, erro: "Tipo inválido." };
@@ -176,7 +230,7 @@ export async function salvarPassoIndicacao(id: string, passo: number, fd: FormDa
     .eq("status", "rascunho");
   if (error) return { ok: false, erro: "Não foi possível salvar. Tente novamente." };
   await auditar(c.user, "indicacao_editada", { tipo: "indicacao", id }, { passo });
-  revalidatePath("/entidade", "layout");
+  revalidar();
   return { ok: true };
 }
 
@@ -190,7 +244,7 @@ export async function excluirIndicacao(id: string): Promise<Resultado> {
   const { error } = await servico().from("indicacoes").delete().eq("id", id);
   if (error) return { ok: false, erro: "Não foi possível excluir." };
   await auditar(c.user, "indicacao_excluida", { tipo: "indicacao", id }, { indicado: c.indicacao.indicado_nome });
-  revalidatePath("/entidade", "layout");
+  revalidar();
   return { ok: true };
 }
 
@@ -206,7 +260,7 @@ export async function prepararUploadIndicacao(id: string, tipo: string, nome: st
   const max = maximoPorTipo(tipo);
   if (max > 1 && c.documentos.filter((d) => d.tipo === tipo).length >= max) return { ok: false as const, erro: `Máximo de ${max} itens.` };
   const seguro = nome.normalize("NFD").replace(/[^\w.-]+/g, "_").slice(-80);
-  const caminho = `${c.dados.entidade.id}/indicacoes/${id}/${tipo.replace(":", "-")}/${randomUUID()}-${seguro}`;
+  const caminho = `${c.pasta}/indicacoes/${id}/${tipo.replace(":", "-")}/${randomUUID()}-${seguro}`;
   const { data: u, error } = await servico().storage.from("entidades").createSignedUploadUrl(caminho);
   if (error || !u) return { ok: false as const, erro: "Não foi possível preparar o envio." };
   return { ok: true as const, caminho, token: u.token };
@@ -215,7 +269,7 @@ export async function prepararUploadIndicacao(id: string, tipo: string, nome: st
 export async function confirmarUploadIndicacao(id: string, tipo: string, caminho: string, nome: string, tamanho: number): Promise<Resultado> {
   const c = await minhaIndicacao(id);
   if (c.erro !== undefined) return { ok: false, erro: c.erro };
-  if (!caminho.startsWith(`${c.dados.entidade.id}/indicacoes/${id}/`)) return { ok: false, erro: "Envio inválido." };
+  if (!caminho.startsWith(`${c.pasta}/indicacoes/${id}/`)) return { ok: false, erro: "Envio inválido." };
   if (!tipoDocumentoValido(c.indicacao, tipo)) return { ok: false, erro: "Arquivo inválido." };
   // Tipos de um item só (Anexo IV): o novo substitui o anterior.
   const anteriores = maximoPorTipo(tipo) === 1 ? c.documentos.filter((d) => d.tipo === tipo) : [];
@@ -225,7 +279,7 @@ export async function confirmarUploadIndicacao(id: string, tipo: string, caminho
   if (error) return { ok: false, erro: "Não foi possível registrar o arquivo." };
   if (anteriores.length) await removerDocs(anteriores.map((d) => d.id));
   await auditar(c.user, "indicacao_arquivo", { tipo: "indicacao", id }, { tipo, nome, tamanho });
-  revalidatePath("/entidade", "layout");
+  revalidar();
   return { ok: true };
 }
 
@@ -244,7 +298,7 @@ export async function salvarLinkIndicacao(id: string, tipo: string, link: string
   const { error } = await servico().from("indicacao_documentos").insert({ indicacao_id: id, tipo, link: url.toString() });
   if (error) return { ok: false, erro: "Não foi possível salvar o link." };
   await auditar(c.user, "indicacao_link", { tipo: "indicacao", id }, { tipo, link: url.toString() });
-  revalidatePath("/entidade", "layout");
+  revalidar();
   return { ok: true };
 }
 
@@ -254,7 +308,7 @@ export async function removerDocIndicacao(id: string, docId: string): Promise<Re
   if (!c.documentos.some((d) => d.id === docId)) return { ok: false, erro: "Item não encontrado." };
   await removerDocs([docId]);
   await auditar(c.user, "indicacao_item_removido", { tipo: "indicacao", id }, { documento: docId });
-  revalidatePath("/entidade", "layout");
+  revalidar();
   return { ok: true };
 }
 
@@ -272,9 +326,13 @@ export async function abrirDocIndicacao(docId: string) {
   const sb = servico();
   const { data: doc } = await sb.from("indicacao_documentos").select("storage_path, link, indicacao_id").eq("id", docId).maybeSingle();
   if (!doc) return { ok: false as const, erro: "Arquivo não encontrado." };
-  const { data: ind } = await sb.from("indicacoes").select("entidade_id").eq("id", doc.indicacao_id).maybeSingle();
-  const { data: ent } = ind ? await sb.from("entidades").select("user_id").eq("id", ind.entidade_id).maybeSingle() : { data: null };
-  if (ent?.user_id !== user.id && !(await ehAdmin(user.id))) return { ok: false as const, erro: "Sem permissão." };
+  const { data: ind } = await sb.from("indicacoes").select("entidade_id, avaliador_id").eq("id", doc.indicacao_id).maybeSingle();
+  const { data: dono } = !ind
+    ? { data: null }
+    : ind.avaliador_id
+      ? await sb.from("avaliadores").select("user_id").eq("id", ind.avaliador_id).maybeSingle()
+      : await sb.from("entidades").select("user_id").eq("id", ind.entidade_id).maybeSingle();
+  if (dono?.user_id !== user.id && !(await ehAdmin(user.id))) return { ok: false as const, erro: "Sem permissão." };
   if (doc.link) return { ok: true as const, url: doc.link };
   const { data: s } = await sb.storage.from("entidades").createSignedUrl(doc.storage_path!, 300);
   return s ? { ok: true as const, url: s.signedUrl } : { ok: false as const, erro: "Arquivo indisponível." };
@@ -286,17 +344,16 @@ export async function enviarIndicacao(id: string, fd: FormData): Promise<Resulta
   const c = await minhaIndicacao(id);
   if (c.erro !== undefined) return { ok: false, erro: c.erro };
   if (fd.get("declaracao") !== "on") return { ok: false, erro: "Marque a declaração do indicador para enviar." };
-  const { indicacao: ind, documentos, dados, user } = c;
+  const { indicacao: ind, documentos, user } = c;
+  const [campo, valor] = filtroDono(c.dono);
+  const quem = "entidadeId" in c.dono ? "A instituição" : "Você";
 
   const ctx = await contextoIndicacao(ind);
   const pend = pendenciasIndicacao(ind, documentos, ctx);
   if (pend.length) return { ok: false, erro: "Ainda faltam itens para enviar.", pendencias: pend.map((p) => p.texto) };
 
   // Autoindicação (art. 8º, § 2º): CPF/CNPJ do indicado igual ao do indicador ou do representante.
-  // Órgão municipal que usa o CNPJ da Prefeitura não é comparado por CNPJ (todos os órgãos o compartilham).
-  const proibidos = new Set(
-    [dados.titular?.cpf, dados.suplente?.cpf, dados.entidade.unidade_municipal ? null : dados.entidade.cnpj].filter(Boolean) as string[],
-  );
+  const proibidos = c.proibidos;
   const docsIndicado = [ind.indicado_documento, ...pessoasDaIndicacao(ind).map((p) => p.cpf)].filter(Boolean) as string[];
   if (docsIndicado.some((d) => proibidos.has(d))) {
     return { ok: false, erro: "Autoindicação não é admitida: o CPF ou CNPJ do indicado coincide com o da instituição ou do seu representante (art. 8º, § 2º)." };
@@ -307,13 +364,13 @@ export async function enviarIndicacao(id: string, fd: FormData): Promise<Resulta
   const { data: enviadas } = await sb
     .from("indicacoes")
     .select("id, category_id")
-    .eq("entidade_id", dados.entidade.id)
+    .eq(campo, valor)
     .eq("status", "enviada")
     .neq("id", id);
   const outras = enviadas ?? [];
-  if (outras.length >= LIMITE_TOTAL) return { ok: false, erro: `A instituição já enviou ${LIMITE_TOTAL} indicações, o máximo da edição (art. 8º, § 5º).` };
+  if (outras.length >= LIMITE_TOTAL) return { ok: false, erro: `${quem} já enviou ${LIMITE_TOTAL} indicações, o máximo da edição (art. 8º, § 5º).` };
   if (outras.filter((o) => o.category_id === ind.category_id).length >= LIMITE_POR_CATEGORIA) {
-    return { ok: false, erro: `A instituição já enviou ${LIMITE_POR_CATEGORIA} indicações nesta categoria, o máximo permitido (art. 8º, § 3º).` };
+    return { ok: false, erro: `${quem} já enviou ${LIMITE_POR_CATEGORIA} indicações nesta categoria, o máximo permitido (art. 8º, § 3º).` };
   }
 
   const agora = new Date().toISOString();
@@ -334,7 +391,7 @@ export async function enviarIndicacao(id: string, fd: FormData): Promise<Resulta
     ip,
   });
   await sb.from("aceites").insert({
-    entidade_id: dados.entidade.id,
+    [campo]: valor,
     user_id: user.id,
     declaracao: `indicacao:${id}`,
     texto: DECLARACAO_INDICADOR,
@@ -344,33 +401,34 @@ export async function enviarIndicacao(id: string, fd: FormData): Promise<Resulta
   await auditar(user, versao > 1 ? "indicacao_reenviada" : "indicacao_enviada", { tipo: "indicacao", id }, { versao, categoria: ind.category_id });
 
   const { data: cat } = await sb.from("categories").select("name").eq("id", ind.category_id!).maybeSingle();
-  const instituicao = dados.entidade.razao_social ?? "Instituição";
+  const instituicao = c.nome;
+  const entidadeId = "entidadeId" in c.dono ? c.dono.entidadeId : null;
   for (const para of await emailsAdmins()) {
     await enviarEmail({
       para,
       assunto: `${versao > 1 ? "Indicação reenviada" : "Nova indicação"}: ${ind.indicado_nome} (${cat?.name ?? "categoria"})`,
       tipo: "alerta_indicacao",
-      entidadeId: dados.entidade.id,
+      entidadeId,
       titulo: versao > 1 ? "Indicação reenviada após edição" : "Nova indicação recebida",
       paragrafos: [`${instituicao} indicou ${ind.indicado_nome} na categoria ${cat?.name ?? ""}.`],
       botao: { texto: "Ver a indicação", url: `${URL_SITE}/admin/indicacoes/${id}` },
     });
   }
-  if (dados.titular?.email) {
+  if (c.emailConfirmacao) {
     await enviarEmail({
-      para: dados.titular.email,
+      para: c.emailConfirmacao,
       assunto: "Recebemos a sua indicação",
       tipo: "confirmacao_indicacao",
-      entidadeId: dados.entidade.id,
+      entidadeId,
       titulo: "Indicação recebida",
       paragrafos: [
         `A indicação de ${ind.indicado_nome} na categoria ${cat?.name ?? ""} foi registrada em ${dia(agora)}, às ${hora(agora)}.`,
-        "A Secretaria Executiva analisa completude e elegibilidade de 26 a 28/10 e comunica a decisão preliminar.",
+        "A Secretaria Executiva analisa completude e elegibilidade de 26 a 30/10 e comunica a decisão preliminar.",
       ],
-      botao: { texto: "Acompanhar", url: `${URL_SITE}/entidade` },
+      botao: { texto: "Acompanhar", url: `${URL_SITE}${c.painel}` },
     });
   }
-  revalidatePath("/entidade", "layout");
+  revalidar();
   revalidatePath("/admin", "layout");
   return { ok: true };
 }
@@ -387,7 +445,7 @@ export async function reabrirIndicacao(id: string): Promise<Resultado> {
     .eq("status", "enviada");
   if (error) return { ok: false, erro: "Não foi possível reabrir." };
   await auditar(c.user, "indicacao_reaberta", { tipo: "indicacao", id }, { versao: c.indicacao.versao });
-  revalidatePath("/entidade", "layout");
+  revalidar();
   revalidatePath("/admin", "layout");
   return { ok: true };
 }

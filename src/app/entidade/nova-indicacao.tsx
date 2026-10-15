@@ -6,7 +6,7 @@ import { Loader2, Plus } from "lucide-react";
 import { btnPrim } from "@/components/area/ui";
 import { novaIndicacao } from "@/lib/server/acoes-indicacao";
 
-export function NovaIndicacao() {
+export function NovaIndicacao({ origem = "entidade", base = "/entidade" }: { origem?: "entidade" | "conselheiro"; base?: string }) {
   const router = useRouter();
   const [erro, setErro] = useState<string | null>(null);
   const [pendente, iniciar] = useTransition();
@@ -19,9 +19,9 @@ export function NovaIndicacao() {
         onClick={() =>
           iniciar(async () => {
             setErro(null);
-            const r = await novaIndicacao();
+            const r = await novaIndicacao(origem);
             if (!r.ok) return setErro(r.erro);
-            router.push(`/entidade/indicacoes/${r.id}`);
+            router.push(`${base}/indicacoes/${r.id}`);
           })
         }
       >

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { createContext, useContext, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
@@ -55,8 +55,20 @@ type Props = {
 
 const N = PASSOS_INDICACAO.length;
 
+// Painel de origem: a instituição volta para /entidade, o conselheiro para /avaliacao.
+const Painel = createContext("/entidade");
+
 export function FormularioIndicacao(p: Props) {
+  return (
+    <Painel.Provider value={p.indicacao.avaliador_id ? "/avaliacao" : "/entidade"}>
+      <Formulario {...p} />
+    </Painel.Provider>
+  );
+}
+
+function Formulario(p: Props) {
   const router = useRouter();
+  const painel = useContext(Painel);
   const primeiro = p.pendencias[0]?.passo ?? N;
   const [passo, setPasso] = useState(p.editavel ? Math.min(primeiro, p.indicacao.category_id ? N : 1) : N);
   const [pendente, iniciar] = useTransition();
@@ -119,7 +131,7 @@ export function FormularioIndicacao(p: Props) {
             );
           })}
         </ol>
-        <Link href="/entidade" className="mt-2 hidden items-center gap-1.5 px-2.5 py-2 text-[13px] text-fundo/65 hover:text-fundo lg:flex">
+        <Link href={painel} className="mt-2 hidden items-center gap-1.5 px-2.5 py-2 text-[13px] text-fundo/65 hover:text-fundo lg:flex">
           <ArrowLeft className="size-4" /> Minhas indicações
         </Link>
       </nav>
@@ -213,6 +225,7 @@ export function FormularioIndicacao(p: Props) {
 }
 
 function Navegacao({ voltar }: { voltar?: () => void }) {
+  const painel = useContext(Painel);
   return (
     <div className="mt-7 flex flex-wrap justify-between gap-3 border-t border-fundo/10 pt-5 group-data-[leitura]:hidden">
       {voltar ? (
@@ -220,7 +233,7 @@ function Navegacao({ voltar }: { voltar?: () => void }) {
           <ArrowLeft className="size-4" /> Voltar
         </button>
       ) : (
-        <Link href="/entidade" className={btnSec}>
+        <Link href={painel} className={btnSec}>
           Sair e continuar depois
         </Link>
       )}
@@ -373,7 +386,7 @@ function PassoIndicado(p: Props & { onSubmit: (e: React.FormEvent<HTMLFormElemen
       {p.mesmoIndicadoEmOutra && (
         <div className="mt-6 grid">
           <Aviso tom="alerta" className="mb-3">
-            Sua instituição indicou o mesmo CPF/CNPJ em outra categoria. Cada indicação precisa se basear em um aspecto distinto da
+            Este mesmo CPF/CNPJ já foi indicado por você em outra categoria. Cada indicação precisa se basear em um aspecto distinto da
             atuação, com justificativa própria (art. 6º, § 2º).
           </Aviso>
           <Texto nome="aspecto_distinto" label="Aspecto distinto desta indicação" valor={i.aspecto_distinto} max={1000} linhas={3} />
@@ -712,6 +725,7 @@ function PassoEnvio(
   },
 ) {
   const router = useRouter();
+  const painel = useContext(Painel);
   const [aceite, setAceite] = useState(false);
   const i = p.indicacao;
   const cat = p.categorias.find((c) => c.id === i.category_id)?.nome;
@@ -725,10 +739,10 @@ function PassoEnvio(
         <h2 className="mt-5 text-2xl font-semibold">Indicação enviada</h2>
         <p className="mx-auto mt-2 max-w-md font-light text-fundo/70">
           Registrada em {formatarData(i.submetido_em)}{i.versao > 1 ? ` · versão ${i.versao}` : ""}. A Secretaria Executiva analisa completude e
-          elegibilidade de 26 a 28/10 e comunica a decisão preliminar.
+          elegibilidade de 26 a 30/10 e comunica a decisão preliminar.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <Link href="/entidade" className={btnPrim}>
+          <Link href={painel} className={btnPrim}>
             Minhas indicações
           </Link>
           {p.podeReabrir && (
@@ -814,7 +828,7 @@ function PassoEnvio(
                   type="button"
                   className={cn(btnSec, "text-vermelho")}
                   disabled={p.ocupado}
-                  onClick={() => confirm("Excluir este rascunho?") && p.onAcao(() => excluirIndicacao(i.id), () => router.push("/entidade"))}
+                  onClick={() => confirm("Excluir este rascunho?") && p.onAcao(() => excluirIndicacao(i.id), () => router.push(painel))}
                 >
                   <Trash2 className="size-4" /> Excluir rascunho
                 </button>

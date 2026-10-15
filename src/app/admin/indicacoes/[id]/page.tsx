@@ -29,9 +29,10 @@ export default async function DetalheIndicacao({ params }: PageProps<"/admin/ind
   if (!r) notFound();
   const { indicacao: i, documentos } = r;
   const sb = servico();
-  const [{ data: cat }, { data: ent }, { data: versoes }] = await Promise.all([
+  const [{ data: cat }, { data: ent }, { data: av }, { data: versoes }] = await Promise.all([
     i.category_id ? sb.from("categories").select("name").eq("id", i.category_id).maybeSingle() : Promise.resolve({ data: null }),
-    sb.from("entidades").select("id, razao_social, cnpj").eq("id", i.entidade_id).maybeSingle(),
+    i.entidade_id ? sb.from("entidades").select("id, razao_social, cnpj").eq("id", i.entidade_id).maybeSingle() : Promise.resolve({ data: null }),
+    i.avaliador_id ? sb.from("avaliadores").select("nome, instituicao").eq("id", i.avaliador_id).maybeSingle() : Promise.resolve({ data: null }),
     sb.from("indicacao_versoes").select("versao, criado_em, ip").eq("indicacao_id", id).order("versao"),
   ]);
   const tipo = TIPOS_INDICADO.find((t) => t.id === i.indicado_tipo)?.rotulo;
@@ -58,9 +59,15 @@ export default async function DetalheIndicacao({ params }: PageProps<"/admin/ind
         sub={
           <>
             Indicada por{" "}
-            <Link href={`/admin/entidades/${ent?.id}`} className="font-semibold text-amarelo underline underline-offset-4">
-              {ent?.razao_social ?? "instituição"}
-            </Link>
+            {av ? (
+              <span className="font-semibold text-amarelo">
+                {av.nome} (conselheiro{av.instituicao ? `, ${av.instituicao}` : ""})
+              </span>
+            ) : (
+              <Link href={`/admin/entidades/${ent?.id}`} className="font-semibold text-amarelo underline underline-offset-4">
+                {ent?.razao_social ?? "instituição"}
+              </Link>
+            )}
             {i.submetido_em && <> · primeiro envio em {formatarData(i.submetido_em)}</>}
             {i.versao > 1 && <> · versão {i.versao}</>}
           </>

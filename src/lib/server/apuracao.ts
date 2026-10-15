@@ -171,13 +171,16 @@ export async function apurarVotacao(d: DadosRodada) {
     .map((c) => ({ id: c.id, nome: c.name, votos: contagem.get(c.id) ?? 0 }))
     .sort((a, b) => b.votos - a.votos);
   const [p1, p2, p3] = linhas;
-  let resultado: { tipo: "vencedor"; id: string } | { tipo: "segunda_rodada"; ids: string[]; empateNaVaga: boolean } | { tipo: "empate" } | { tipo: "sem_votos" };
-  if (!validos) resultado = { tipo: "sem_votos" };
+  let resultado: { tipo: "vencedor"; id: string; minerva?: boolean } | { tipo: "segunda_rodada"; ids: string[]; empateNaVaga: boolean } | { tipo: "empate" } | { tipo: "sem_votos" };
+  if (!validos || !p1) resultado = { tipo: "sem_votos" };
   else if (rodada.turno === 1 && p1.votos > validos / 2) resultado = { tipo: "vencedor", id: p1.id };
   else if (rodada.turno === 1) {
     resultado = { tipo: "segunda_rodada", ids: [p1, p2].filter(Boolean).map((l) => l.id), empateNaVaga: !!p3 && !!p2 && p3.votos === p2.votos };
   } else if (!p2 || p1.votos > p2.votos) resultado = { tipo: "vencedor", id: p1.id };
-  else resultado = { tipo: "empate" };
+  // Empate na rodada final: decide o voto de minerva da Presidência, registrado no painel.
+  else if (rodada.minerva_finalist_id && [p1.id, p2.id].includes(rodada.minerva_finalist_id)) {
+    resultado = { tipo: "vencedor", id: rodada.minerva_finalist_id, minerva: true };
+  } else resultado = { tipo: "empate" };
 
   const nomeDe = new Map(candidatos.map((c) => [c.id, c.name]));
   const nominal = avaliadores

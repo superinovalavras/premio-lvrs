@@ -295,6 +295,29 @@ export async function promoverClassificados(rodadaId: string): Promise<Resultado
 }
 
 // Abre a 2ª rodada da honorária com os dois mais votados (art. 13).
+// Empate na rodada final das honorárias: a Presidência do COCITIEIS desempata (voto de minerva).
+// Só vale entre os empatados, só uma vez, e fica na trilha de auditoria.
+export async function registrarMinerva(rodadaId: string, finalistaId: string): Promise<Resultado> {
+  const admin = await exigirAdmin();
+  const dados = await carregarRodada(rodadaId);
+  if (!dados || dados.rodada.tipo !== "honoraria" || dados.rodada.turno !== 2) return { ok: false, erro: "Só vale para a rodada final das honorárias." };
+  if (estadoRodada(dados.rodada) !== "encerrada") return { ok: false, erro: "Encerre a rodada antes." };
+  if (dados.rodada.minerva_finalist_id) return { ok: false, erro: "O voto de minerva já foi registrado." };
+  const ap = await apurarVotacao(dados);
+  if (ap.resultado.tipo !== "empate") return { ok: false, erro: "Não há empate nesta rodada." };
+  const empatados = ap.linhas.filter((l) => l.votos === ap.linhas[0].votos).map((l) => l.id);
+  if (!empatados.includes(finalistaId)) return { ok: false, erro: "Escolha um dos empatados." };
+  const { error } = await servico()
+    .from("rodadas")
+    .update({ minerva_finalist_id: finalistaId, minerva_em: new Date().toISOString(), minerva_por: admin.id })
+    .eq("id", rodadaId)
+    .is("minerva_finalist_id", null);
+  if (error) return { ok: false, erro: "Não foi possível registrar. A migração 0010 já rodou?" };
+  await auditar(admin, "voto_minerva", { tipo: "rodada", id: rodadaId }, { finalista: finalistaId });
+  atualizar();
+  return { ok: true, msg: "Voto de minerva registrado." };
+}
+
 export async function abrirSegundaRodada(rodadaId: string, abre: string, fecha: string, candidatos: string[]): Promise<Resultado> {
   await exigirAdmin();
   const dados = await carregarRodada(rodadaId);

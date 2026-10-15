@@ -45,7 +45,8 @@ export type Integrante = { nome: string; cpf: string; nascimento: string };
 
 export type IndicacaoRow = {
   id: string;
-  entidade_id: string;
+  entidade_id: string | null;
+  avaliador_id: string | null; // indicação feita por conselheiro (art. 8º, caput)
   status: "rascunho" | "enviada" | "desconsiderada";
   category_id: string | null;
   indicado_nome: string | null;
@@ -81,7 +82,7 @@ export type IndicacaoRow = {
 };
 
 export const CAMPOS_INDICACAO =
-  "id, entidade_id, status, category_id, indicado_nome, indicado_tipo, indicado_documento, indicado_nascimento, integrantes, aspecto_distinto, vinculo_condicao, vinculo_descricao, titulo, resumo, problema, solucao, resultados, periodo_inicio, periodo_fim, beneficiarios, beneficiarios_qtd, contato_nome, contato_email, contato_telefone, conflito_indicador, conflito_indicador_desc, conflito_conselho, conflito_conselho_desc, conflito_relacao, conflito_relacao_desc, submetido_em, versao, criado_em, atualizado_em";
+  "id, entidade_id, avaliador_id, status, category_id, indicado_nome, indicado_tipo, indicado_documento, indicado_nascimento, integrantes, aspecto_distinto, vinculo_condicao, vinculo_descricao, titulo, resumo, problema, solucao, resultados, periodo_inicio, periodo_fim, beneficiarios, beneficiarios_qtd, contato_nome, contato_email, contato_telefone, conflito_indicador, conflito_indicador_desc, conflito_conselho, conflito_conselho_desc, conflito_relacao, conflito_relacao_desc, submetido_em, versao, criado_em, atualizado_em";
 
 export type IndDocRow = {
   id: string;

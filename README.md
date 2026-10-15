@@ -66,7 +66,10 @@ Especificação, itens 2 e 3 (Anexo II; arts. 6º a 10 e 37). Migração `supaba
 | Formulário da instituição (6 passos) | `/entidade/indicacoes/[id]` |
 | Lista por categoria e detalhe para a Secretaria | `/admin/indicacoes` |
 
-- Só instituição **deferida**, dentro do prazo de *Datas e cronograma* (relógio do servidor).
+- Indicam instituições **deferidas** e **conselheiros** (art. 8º; migração `0010`), dentro do prazo de *Datas e cronograma*
+  (relógio do servidor). O conselheiro usa o mesmo formulário, em `/avaliacao/indicacoes/[id]`, com cota própria.
+- Honorárias não entram no formulário: cada conselheiro envia uma proposta por categoria em `/avaliacao/honorarias/[slug]`
+  (art. 13), e a Secretaria a inclui na votação nominal. Empate na rodada final: voto de minerva registrado no painel.
 - Travas no envio: 2 por categoria e 6 no total (contam as enviadas), autoindicação por CPF/CNPJ,
   Jovem Inovador de 15 a 29 anos no fim do prazo, Anexo IV para menor de 18, campos do art. 9º.
 - Envio guarda o carimbo do primeiro envio (ordem de chegada), uma versão completa e o aceite do Anexo II.

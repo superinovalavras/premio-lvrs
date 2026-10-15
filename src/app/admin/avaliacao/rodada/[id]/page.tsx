@@ -9,7 +9,7 @@ import { MIN_AVALIACOES, estadoRodada, formatarNota, rotuloRodada } from "@/lib/
 import { dia, hora } from "@/lib/datas";
 import { paraBrasilia } from "@/lib/server/parametros";
 import { cn } from "@/lib/utils";
-import { AcoesLinha, AcoesRodada, Promover, SegundaRodada } from "./acoes";
+import { AcoesLinha, AcoesRodada, Minerva, Promover, SegundaRodada } from "./acoes";
 
 export const metadata: Metadata = { title: "Rodada · Avaliação · Painel do Prêmio" };
 
@@ -192,7 +192,11 @@ export default async function RodadaAdmin({ params }: PageProps<"/admin/avaliaca
                 {votacao!.resultado.tipo === "vencedor" && (
                   <>
                     <b className="text-[#8ff0bd]">{votacao!.linhas.find((l) => l.id === (votacao!.resultado as { id: string }).id)?.nome}</b>{" "}
-                    {rodada.turno === 1 ? "tem maioria simples dos votos válidos." : "é o mais votado na 2ª rodada."}
+                    {(votacao!.resultado as { minerva?: boolean }).minerva
+                      ? "vence pelo voto de minerva da Presidência (empate na rodada final)."
+                      : rodada.turno === 1
+                        ? "tem maioria simples dos votos válidos."
+                        : "é o mais votado na 2ª rodada."}
                   </>
                 )}
                 {votacao!.resultado.tipo === "segunda_rodada" && (
@@ -201,9 +205,15 @@ export default async function RodadaAdmin({ params }: PageProps<"/admin/avaliaca
                     {votacao!.resultado.empateNaVaga && <span className="text-amarelo"> Há empate na segunda vaga: decida em plenário quais seguem.</span>}
                   </>
                 )}
-                {votacao!.resultado.tipo === "empate" && <span className="text-amarelo">Empate na 2ª rodada: decisão do plenário.</span>}
+                {votacao!.resultado.tipo === "empate" && <span className="text-amarelo">Empate na rodada final: falta o voto de minerva da Presidência.</span>}
                 {votacao!.resultado.tipo === "sem_votos" && "Nenhum voto válido."}
               </p>
+              {votacao!.resultado.tipo === "empate" && (
+                <Minerva
+                  id={rodada.id}
+                  empatados={votacao!.linhas.filter((l) => l.votos === votacao!.linhas[0].votos).map((l) => ({ id: l.id, nome: l.nome }))}
+                />
+              )}
               {votacao!.resultado.tipo === "segunda_rodada" && (
                 <SegundaRodada id={rodada.id} candidatos={candidatos.map((c) => ({ id: c.id, nome: c.name }))} sugeridos={votacao!.resultado.ids} />
               )}

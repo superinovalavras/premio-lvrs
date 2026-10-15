@@ -164,7 +164,7 @@ export default async function PainelEntidade() {
             </Cartao>
           </div>
         </div>
-        {e.status === "deferido" && <PainelIndicacoes entidadeId={e.id} />}
+        {e.status === "deferido" && <PainelIndicacoes dono={{ entidadeId: e.id }} />}
       </ConteudoArea>
     </>
   );

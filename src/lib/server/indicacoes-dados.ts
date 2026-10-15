@@ -17,11 +17,19 @@ export async function carregarIndicacao(id: string) {
   return { indicacao, documentos: (docs ?? []) as IndDocRow[] };
 }
 
-export async function indicacoesDaEntidade(entidadeId: string) {
+// Quem indica: uma instituição habilitada ou um conselheiro (art. 8º, caput).
+export type DonoIndicacao = { entidadeId: string } | { avaliadorId: string };
+export const filtroDono = (d: DonoIndicacao) =>
+  "entidadeId" in d ? (["entidade_id", d.entidadeId] as const) : (["avaliador_id", d.avaliadorId] as const);
+export const donoDaIndicacao = (i: Pick<IndicacaoRow, "entidade_id" | "avaliador_id">): DonoIndicacao =>
+  i.avaliador_id ? { avaliadorId: i.avaliador_id } : { entidadeId: i.entidade_id! };
+
+export async function indicacoesDoDono(dono: DonoIndicacao) {
+  const [campo, valor] = filtroDono(dono);
   const { data } = await servico()
     .from("indicacoes")
     .select(CAMPOS_INDICACAO)
-    .eq("entidade_id", entidadeId)
+    .eq(campo, valor)
     .order("criado_em")
     .returns<IndicacaoRow[]>();
   return data ?? [];
@@ -38,6 +46,7 @@ export async function janelaIndicacoes(agora = new Date()) {
 
 export async function contextoIndicacao(i: IndicacaoRow): Promise<Contexto> {
   const sb = servico();
+  const [campo, valor] = filtroDono(donoDaIndicacao(i));
   const [{ data: cat }, janela, { data: mesmos }] = await Promise.all([
     i.category_id ? sb.from("categories").select("slug").eq("id", i.category_id).maybeSingle() : Promise.resolve({ data: null }),
     janelaIndicacoes(),
@@ -45,7 +54,7 @@ export async function contextoIndicacao(i: IndicacaoRow): Promise<Contexto> {
       ? sb
           .from("indicacoes")
           .select("id, category_id")
-          .eq("entidade_id", i.entidade_id)
+          .eq(campo, valor)
           .eq("indicado_documento", i.indicado_documento)
           .neq("id", i.id)
           .neq("status", "desconsiderada")
