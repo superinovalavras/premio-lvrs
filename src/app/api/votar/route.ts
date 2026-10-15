@@ -11,6 +11,16 @@ function erro(status: number, mensagem: string) {
   return NextResponse.json({ ok: false, mensagem }, { status });
 }
 
+// Art. 19, § 6º: o relatório divulga votos válidos e inválidos. Guarda só o motivo, sem dado pessoal.
+// Falha silenciosa: sem a migração 0011, o voto continua funcionando.
+type Recusa = "dados_invalidos" | "robo" | "finalista_invalido" | "cpf_repetido" | "idade";
+async function recusar(motivo: Recusa) {
+  try {
+    await supabaseServico()?.from("votos_recusados").insert({ motivo, is_test: MODO_TESTE });
+  } catch {}
+}
+const RECUSA: Record<string, Recusa> = { cpf_ja_votou: "cpf_repetido", idade_minima: "idade", finalista_invalido: "finalista_invalido" };
+
 const MENSAGENS: Record<string, [number, string]> = {
   fora_do_prazo: [403, "A votação popular está fora do período de votação."],
   finalista_invalido: [400, "Finalista inválido."],
@@ -36,12 +46,14 @@ export async function POST(req: NextRequest) {
 
   const parsed = votoSchema.safeParse(json);
   if (!parsed.success) {
+    await recusar("dados_invalidos");
     return erro(400, parsed.error.issues[0]?.message ?? "Dados inválidos.");
   }
   const v = parsed.data;
 
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
   if (!(await verificarTurnstile(v.turnstileToken, ip))) {
+    await recusar("robo");
     return erro(403, "Não foi possível confirmar que você não é um robô. Tente novamente.");
   }
 
@@ -50,7 +62,10 @@ export async function POST(req: NextRequest) {
 
   // Site oficial só aceita finalista oficial; o link de teste só aceita finalista de teste.
   const { data: fin } = await sb.from("finalists").select("is_test").eq("id", v.finalistaId).maybeSingle();
-  if (!fin || fin.is_test !== MODO_TESTE) return erro(...MENSAGENS.finalista_invalido);
+  if (!fin || fin.is_test !== MODO_TESTE) {
+    await recusar("finalista_invalido");
+    return erro(...MENSAGENS.finalista_invalido);
+  }
 
   let cpfHash: string;
   try {
@@ -76,6 +91,7 @@ export async function POST(req: NextRequest) {
     return erro(500, "Não foi possível registrar o voto agora. Tente novamente em instantes.");
   }
   if (data !== "ok") {
+    if (RECUSA[data as string]) await recusar(RECUSA[data as string]);
     const [status, mensagem] = MENSAGENS[data as string] ?? [400, "Voto não registrado."];
     return erro(status, mensagem);
   }

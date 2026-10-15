@@ -35,6 +35,27 @@ export async function indicacoesDoDono(dono: DonoIndicacao) {
   return data ?? [];
 }
 
+// Indicações enviadas que contam na cota de quem indica (art. 8º, §§ 3º, 5º e 7º): as da instituição com
+// assento e as dos conselheiros que a representam somam juntas. Sem vínculo, cada um tem a sua.
+// Se a migração 0011 ainda não rodou, a coluna avaliadores.entidade_id falta e vale a cota individual.
+export async function enviadasNaCota(dono: DonoIndicacao) {
+  const sb = servico();
+  let entidadeId = "entidadeId" in dono ? dono.entidadeId : null;
+  if (!entidadeId && "avaliadorId" in dono) {
+    const { data, error } = await sb.from("avaliadores").select("entidade_id").eq("id", dono.avaliadorId).maybeSingle();
+    if (!error) entidadeId = (data?.entidade_id as string | null) ?? null;
+  }
+  const avaliadores = new Set<string>("avaliadorId" in dono ? [dono.avaliadorId] : []);
+  if (entidadeId) {
+    const { data, error } = await sb.from("avaliadores").select("id").eq("entidade_id", entidadeId);
+    if (!error) for (const a of data ?? []) avaliadores.add(a.id);
+  }
+  const filtros = [entidadeId && `entidade_id.eq.${entidadeId}`, avaliadores.size && `avaliador_id.in.(${[...avaliadores].join(",")})`].filter(Boolean);
+  const { data } = await sb.from("indicacoes").select("id, category_id").eq("status", "enviada").or(filtros.join(","));
+  const conjunta = avaliadores.size + (entidadeId ? 1 : 0) > 1;
+  return { lista: (data ?? []) as { id: string; category_id: string | null }[], conjunta };
+}
+
 // Prazo de indicações (art. 8º-A, II), sempre pelo relógio do servidor.
 export async function janelaIndicacoes(agora = new Date()) {
   const par = await carregarParametros();

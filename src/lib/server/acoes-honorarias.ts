@@ -6,7 +6,7 @@ import { enviarEmail, URL_SITE } from "./email";
 import { emailsAdmins } from "./entidades-dados";
 import { janelaIndicacoes } from "./indicacoes-dados";
 import { avaliadorDoUsuario, exigirAdmin, exigirUsuario, servico } from "./sessao";
-import { CAMPOS_PROPOSTA } from "@/lib/honorarias";
+import { CAMPOS_PROPOSTA, SO_PESSOA } from "@/lib/honorarias";
 import { dia, hora } from "@/lib/datas";
 
 export type Resultado = { ok: true; msg?: string } | { ok: false; erro: string };
@@ -27,6 +27,7 @@ export async function salvarPropostaHonoraria(slug: string, fd: FormData): Promi
 
   const tipo = String(fd.get("indicado_tipo") ?? "");
   if (!["pf", "instituicao"].includes(tipo)) return { ok: false, erro: "Diga se é pessoa ou instituição." };
+  if (tipo !== "pf" && SO_PESSOA.includes(slug)) return { ok: false, erro: `${cat.name} reconhece só pessoa física (art. 6º, tabela de categorias).` };
   const campos: Record<string, string | null> = {};
   for (const c of CAMPOS_PROPOSTA) {
     const v = String(fd.get(c.id) ?? "").trim();

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, Send } from "lucide-react";
 import { Aviso, Campo, btnPrim, inputCls } from "@/components/area/ui";
 import { salvarPropostaHonoraria } from "@/lib/server/acoes-honorarias";
-import { CAMPOS_PROPOSTA, type PropostaRow } from "@/lib/honorarias";
+import { CAMPOS_PROPOSTA, SO_PESSOA, type PropostaRow } from "@/lib/honorarias";
 import { cn } from "@/lib/utils";
 
 export function FormularioProposta({ slug, proposta, editavel }: { slug: string; proposta: PropostaRow | null; editavel: boolean }) {
@@ -34,22 +34,36 @@ export function FormularioProposta({ slug, proposta, editavel }: { slug: string;
             {[
               { id: "pf", rotulo: "Pessoa" },
               { id: "instituicao", rotulo: "Instituição" },
-            ].map((o) => (
-              <label
-                key={o.id}
-                className={cn(
-                  "cursor-pointer rounded-xl border-[1.5px] px-4 py-2.5 text-sm font-medium transition",
-                  tipo === o.id ? "border-verde bg-verde/10 text-fundo" : "border-fundo/15 text-fundo/75 hover:border-fundo/40",
-                )}
-              >
-                <input type="radio" name="indicado_tipo" value={o.id} checked={tipo === o.id} onChange={() => setTipo(o.id as "pf" | "instituicao")} className="sr-only" />
-                {o.rotulo}
-              </label>
-            ))}
+            ]
+              .filter((o) => o.id === "pf" || !SO_PESSOA.includes(slug))
+              .map((o) => (
+                <label
+                  key={o.id}
+                  className={cn(
+                    "cursor-pointer rounded-xl border-[1.5px] px-4 py-2.5 text-sm font-medium transition",
+                    tipo === o.id ? "border-verde bg-verde/10 text-fundo" : "border-fundo/15 text-fundo/75 hover:border-fundo/40",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="indicado_tipo"
+                    value={o.id}
+                    checked={tipo === o.id}
+                    onChange={() => setTipo(o.id as "pf" | "instituicao")}
+                    className="sr-only"
+                  />
+                  {o.rotulo}
+                </label>
+              ))}
           </div>
         </div>
         {CAMPOS_PROPOSTA.map((c) => (
-          <Campo key={c.id} label={c.rotulo} opcional={!c.obrigatorio} dica={c.dica ?? (c.linhas > 1 ? `Até ${c.max} caracteres.` : undefined)}>
+          <Campo
+            key={c.id}
+            label={c.rotulo}
+            opcional={!c.obrigatorio}
+            dica={c.dica ?? (c.linhas > 1 ? `Até ${c.max} caracteres.` : undefined)}
+          >
             {c.linhas > 1 ? (
               <textarea
                 name={c.id}

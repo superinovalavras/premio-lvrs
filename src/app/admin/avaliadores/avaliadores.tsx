@@ -9,6 +9,7 @@ import {
   excluirAvaliador,
   gerarNovoLink,
   senhaProvisoriaAvaliador,
+  vincularEntidade,
   type ResultadoConvite,
 } from "@/lib/server/acoes-avaliadores";
 import { CartaoAdmin, btnAmarelo, btnContorno, btnPerigo, inputEscuro } from "@/components/admin/ui";
@@ -25,7 +26,10 @@ export type LinhaAvaliador = {
   acesso: "ativo" | "pendente" | "expirado" | "sem_convite";
   expira: string | null;
   fichas: number;
+  entidadeId: string | null;
 };
+
+export type EntidadeOpcao = { id: string; nome: string; assento: boolean };
 
 const ACESSO = {
   ativo: { rotulo: "Acesso criado", tom: "bg-verde/35 text-[#8ff0bd]" },
@@ -36,7 +40,7 @@ const ACESSO = {
 
 const ate = (iso: string) => new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit" }).format(new Date(iso));
 
-export function Avaliadores({ lista }: { lista: LinhaAvaliador[] }) {
+export function Avaliadores({ lista, entidades }: { lista: LinhaAvaliador[]; entidades: EntidadeOpcao[] }) {
   const [novo, setNovo] = useState(false);
   const [link, setLink] = useState<{ nome: string; email: string; url: string } | null>(null);
   const oficiais = lista.filter((a) => !a.teste);
@@ -65,7 +69,7 @@ export function Avaliadores({ lista }: { lista: LinhaAvaliador[] }) {
 
       <div className="grid gap-3">
         {lista.map((a) => (
-          <Linha key={a.id} a={a} mostrarLink={(url) => setLink({ nome: a.nome, email: a.email, url })} />
+          <Linha key={a.id} a={a} entidades={entidades} mostrarLink={(url) => setLink({ nome: a.nome, email: a.email, url })} />
         ))}
       </div>
 
@@ -83,7 +87,7 @@ export function Avaliadores({ lista }: { lista: LinhaAvaliador[] }) {
   );
 }
 
-function Linha({ a, mostrarLink }: { a: LinhaAvaliador; mostrarLink: (url: string) => void }) {
+function Linha({ a, entidades, mostrarLink }: { a: LinhaAvaliador; entidades: EntidadeOpcao[]; mostrarLink: (url: string) => void }) {
   const router = useRouter();
   const [msg, setMsg] = useState<string | null>(null);
   const [pendente, iniciar] = useTransition();
@@ -119,6 +123,26 @@ function Linha({ a, mostrarLink }: { a: LinhaAvaliador; mostrarLink: (url: strin
           </span>
           {a.fichas > 0 && <span className="rounded-lg bg-white/10 px-2.5 py-0.5 text-white/75">{a.fichas} ficha(s) enviada(s)</span>}
         </div>
+        {/* Art. 8º, § 7º: só aparece quando há instituição deferida para vincular */}
+        {!a.teste && entidades.length > 0 && (
+          <label className="mt-3 flex flex-wrap items-center gap-2 text-sm text-white/75">
+            Representa no sistema:
+            <select
+              value={a.entidadeId ?? ""}
+              disabled={pendente}
+              onChange={(e) => rodar(() => vincularEntidade(a.id, e.target.value || null))}
+              className={cn(inputEscuro, "w-auto py-1.5")}
+            >
+              <option value="">Nenhuma instituição</option>
+              {entidades.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.nome}
+                  {e.assento ? " · assento no COCITIEIS" : ""}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         {msg && <p className="mt-2 text-sm text-white/80">{msg}</p>}
       </div>
       <div className="flex flex-wrap gap-2">

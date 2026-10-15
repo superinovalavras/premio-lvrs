@@ -739,7 +739,7 @@ function PassoEnvio(
         <h2 className="mt-5 text-2xl font-semibold">Indicação enviada</h2>
         <p className="mx-auto mt-2 max-w-md font-light text-fundo/70">
           Registrada em {formatarData(i.submetido_em)}{i.versao > 1 ? ` · versão ${i.versao}` : ""}. A Secretaria Executiva analisa completude e
-          elegibilidade de 26 a 30/10 e comunica a decisão preliminar.
+          elegibilidade de 26 a 28/10 e comunica a decisão preliminar.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <Link href={painel} className={btnPrim}>
@@ -812,6 +812,12 @@ function PassoEnvio(
             p.onEnviar(new FormData(e.currentTarget));
           }}
         >
+          {i.avaliador_id && (
+            <Aviso tom="alerta" className="mb-4">
+              Ao enviar, você fica impedido de avaliar, discutir e votar em {cat ? `“${cat}”` : "esta categoria"} (art. 23, § 2º). As
+              outras categorias não mudam.
+            </Aviso>
+          )}
           <p className="text-[13px] font-semibold">Declaração do indicador (Anexo II)</p>
           <p className="text-[12.5px] text-fundo/60">O aceite fica registrado com data, hora, IP e o representante.</p>
           <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-2xl border-[1.5px] border-fundo/12 p-4 text-sm">

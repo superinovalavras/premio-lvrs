@@ -20,6 +20,10 @@ export default async function PaginaFinalistas() {
   let { data, error } = await consulta(true);
   if (error?.code === "42703") ({ data, error } = await consulta(false));
   const { count: votos } = await sb.from("votes").select("id", { count: "exact", head: true });
+  // Art. 19, § 6º: totais de votos válidos e inválidos (migração 0011; sem ela, a lista vem vazia).
+  const { data: rec } = await sb.from("votos_recusados").select("motivo").eq("is_test", false);
+  const recusados: Record<string, number> = {};
+  for (const r of rec ?? []) recusados[r.motivo] = (recusados[r.motivo] ?? 0) + 1;
 
   return (
     <>
@@ -30,6 +34,7 @@ export default async function PaginaFinalistas() {
       />
       <Finalistas
         votos={votos ?? 0}
+        recusados={recusados}
         lista={(data ?? []).map((f) => ({
           id: f.id,
           nome: f.name,

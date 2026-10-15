@@ -106,6 +106,16 @@ export async function alternarAvaliador(avaliadorId: string, ativo: boolean): Pr
   return { ok: true, msg: ativo ? "Acesso reativado." : "Acesso desativado. As fichas já enviadas continuam valendo." };
 }
 
+// Art. 8º, § 7º: liga o conselheiro à instituição que ele representa, para somar as cotas de indicação.
+export async function vincularEntidade(avaliadorId: string, entidadeId: string | null): Promise<ResultadoConvite> {
+  const admin = await exigirAdmin();
+  const { error } = await servico().from("avaliadores").update({ entidade_id: entidadeId }).eq("id", avaliadorId);
+  if (error) return { ok: false, erro: "Não foi possível salvar. A migração 0011 já rodou?" };
+  await auditar(admin, "avaliador_vinculado", { tipo: "avaliador", id: avaliadorId }, { entidade: entidadeId });
+  revalidatePath("/admin/avaliadores");
+  return { ok: true, msg: entidadeId ? "Vinculado: as indicações dele e da instituição somam na mesma cota." : "Vínculo removido." };
+}
+
 // Senha provisória (123456, 48h), igual à das instituições.
 export async function senhaProvisoriaAvaliador(avaliadorId: string): Promise<ResultadoConvite> {
   const admin = await exigirAdmin();

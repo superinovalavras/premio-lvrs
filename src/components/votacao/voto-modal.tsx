@@ -367,7 +367,7 @@ export function VotoModal({
                     {passo === 0 && (
                       <div>
                         <p className="text-white/70">
-                          Conheça os três finalistas escolhidos pela avaliação técnica. Você poderá votar em um deles.{" "}
+                          Conheça os finalistas escolhidos pela avaliação técnica. Você poderá votar em um deles.{" "}
                           <a href="/como-votar" className="text-amarelo underline underline-offset-2">
                             Como votar?
                           </a>

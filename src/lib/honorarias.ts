@@ -13,6 +13,9 @@ export const CAMPOS_PROPOSTA: CampoProposta[] = [
   { id: "link", rotulo: "Link com mais informações (opcional)", max: 500, linhas: 1, obrigatorio: false },
 ];
 
+// Tabela de categorias do art. 6º: Personalidade do Ano é só pessoa física; Paolinelli, pessoa ou instituição.
+export const SO_PESSOA = ["personalidade-do-ano"];
+
 export type PropostaRow = {
   id: string;
   avaliador_id: string;

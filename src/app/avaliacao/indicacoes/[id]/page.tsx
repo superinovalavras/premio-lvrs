@@ -19,7 +19,7 @@ export default async function IndicacaoConselheiro({ params }: PageProps<"/avali
   const [ctx, janela, { data: cats }] = await Promise.all([
     contextoIndicacao(r.indicacao),
     janelaIndicacoes(),
-    servico().from("categories").select("id, slug, name, type").neq("type", "honorary").order("sort_order"),
+    servico().from("categories").select("id, slug, name, type").eq("type", "competitive").order("sort_order"),
   ]);
   const aberta = janela.estado === "aberta";
   const editavel = aberta && r.indicacao.status === "rascunho";

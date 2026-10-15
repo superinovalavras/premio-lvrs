@@ -6,7 +6,8 @@ import { auditar } from "./auditoria";
 import { enviarEmail, URL_SITE } from "./email";
 import { avaliadorDoUsuario, ehAdmin, exigirUsuario, ipDaRequisicao, servico, userAgent } from "./sessao";
 import { carregarEntidadeDoUsuario, emailsAdmins } from "./entidades-dados";
-import { carregarIndicacao, contextoIndicacao, filtroDono, janelaIndicacoes, type DonoIndicacao } from "./indicacoes-dados";
+import { invalidarAtosNaCategoria } from "./avaliacao-dados";
+import { carregarIndicacao, contextoIndicacao, enviadasNaCota, filtroDono, janelaIndicacoes, type DonoIndicacao } from "./indicacoes-dados";
 import { dia, hora } from "@/lib/datas";
 import { cnpjValido } from "@/lib/entidades";
 import { cpfValido, somenteDigitos } from "@/lib/voto";
@@ -38,6 +39,7 @@ type Indicador = {
   emailConfirmacao: string | null;
   proibidos: Set<string>; // CPF/CNPJ que caracterizam autoindicação (art. 8º, § 2º)
   painel: "/entidade" | "/avaliacao";
+  conselheiro?: { id: string; isTest: boolean };
 };
 
 async function prazoAberto() {
@@ -83,6 +85,7 @@ async function indicadorConselheiro(): Promise<Indicador | { erro: string }> {
     emailConfirmacao: av.email,
     proibidos: new Set(),
     painel: "/avaliacao",
+    conselheiro: { id: av.id, isTest: av.is_test },
   };
 }
 
@@ -151,6 +154,7 @@ export async function salvarPassoIndicacao(id: string, passo: number, fd: FormDa
         const { data: existe } = await servico().from("categories").select("id, type").eq("id", cat).maybeSingle();
         if (!existe) return { ok: false, erro: "Categoria inválida." };
         if (existe.type === "honorary") return { ok: false, erro: "As honorárias têm formulário próprio, só para conselheiros (art. 13)." };
+        if (existe.type !== "competitive") return { ok: false, erro: "O Prêmio Lavras Lab reúne os grupos que concluíram o programa: não recebe indicação (art. 18, § 1º)." };
       }
       const tipo = String(fd.get("indicado_tipo") ?? "");
       if (tipo && !["pf", "conjunto", "instituicao"].includes(tipo)) return { ok: false, erro: "Tipo inválido." };
@@ -346,7 +350,7 @@ export async function enviarIndicacao(id: string, fd: FormData): Promise<Resulta
   if (fd.get("declaracao") !== "on") return { ok: false, erro: "Marque a declaração do indicador para enviar." };
   const { indicacao: ind, documentos, user } = c;
   const [campo, valor] = filtroDono(c.dono);
-  const quem = "entidadeId" in c.dono ? "A instituição" : "Você";
+  let quem = "entidadeId" in c.dono ? "A instituição" : "Você";
 
   const ctx = await contextoIndicacao(ind);
   const pend = pendenciasIndicacao(ind, documentos, ctx);
@@ -361,16 +365,12 @@ export async function enviarIndicacao(id: string, fd: FormData): Promise<Resulta
 
   // Limites (art. 8º, §§ 3º e 5º): contam as indicações já enviadas, na ordem de chegada.
   const sb = servico();
-  const { data: enviadas } = await sb
-    .from("indicacoes")
-    .select("id, category_id")
-    .eq(campo, valor)
-    .eq("status", "enviada")
-    .neq("id", id);
-  const outras = enviadas ?? [];
-  if (outras.length >= LIMITE_TOTAL) return { ok: false, erro: `${quem} já enviou ${LIMITE_TOTAL} indicações, o máximo da edição (art. 8º, § 5º).` };
+  const cota = await enviadasNaCota(c.dono);
+  const outras = cota.lista.filter((o) => o.id !== id);
+  if (cota.conjunta) quem = "entidadeId" in c.dono ? "A instituição, somada ao seu conselheiro," : "Você, somado à instituição que representa,";
+  if (outras.length >= LIMITE_TOTAL) return { ok: false, erro: `${quem} já enviou ${LIMITE_TOTAL} indicações, o máximo da edição (art. 8º, §§ 5º e 7º).` };
   if (outras.filter((o) => o.category_id === ind.category_id).length >= LIMITE_POR_CATEGORIA) {
-    return { ok: false, erro: `${quem} já enviou ${LIMITE_POR_CATEGORIA} indicações nesta categoria, o máximo permitido (art. 8º, § 3º).` };
+    return { ok: false, erro: `${quem} já enviou ${LIMITE_POR_CATEGORIA} indicações nesta categoria, o máximo permitido (art. 8º, §§ 3º e 7º).` };
   }
 
   const agora = new Date().toISOString();
@@ -398,6 +398,27 @@ export async function enviarIndicacao(id: string, fd: FormData): Promise<Resulta
     ip,
     user_agent: await userAgent(),
   });
+  // Art. 23, § 2º: quem indica fica impedido de avaliar, discutir e votar em toda a categoria.
+  // Vale só para as categorias com indicação (as honorárias têm proposta própria, art. 13).
+  if (c.conselheiro && ind.category_id) {
+    const { error: e } = await sb.from("declaracoes_avaliador").upsert(
+      {
+        avaliador_id: c.conselheiro.id,
+        category_id: ind.category_id,
+        is_test: c.conselheiro.isTest,
+        impedido: true,
+        hipotese: "indicou",
+        motivo: `Indicou ${ind.indicado_nome} nesta categoria.`,
+        origem: "avaliador",
+        declarado_em: agora,
+        ip,
+        user_agent: await userAgent(),
+      },
+      { onConflict: "avaliador_id,category_id,is_test" },
+    );
+    if (e) console.error("impedimento automático", e.message);
+    await invalidarAtosNaCategoria(c.conselheiro.id, ind.category_id, c.conselheiro.isTest, "Apresentou indicação na categoria (art. 23, § 2º)");
+  }
   await auditar(user, versao > 1 ? "indicacao_reenviada" : "indicacao_enviada", { tipo: "indicacao", id }, { versao, categoria: ind.category_id });
 
   const { data: cat } = await sb.from("categories").select("name").eq("id", ind.category_id!).maybeSingle();
@@ -423,7 +444,7 @@ export async function enviarIndicacao(id: string, fd: FormData): Promise<Resulta
       titulo: "Indicação recebida",
       paragrafos: [
         `A indicação de ${ind.indicado_nome} na categoria ${cat?.name ?? ""} foi registrada em ${dia(agora)}, às ${hora(agora)}.`,
-        "A Secretaria Executiva analisa completude e elegibilidade de 26 a 30/10 e comunica a decisão preliminar.",
+        "A Secretaria Executiva analisa completude e elegibilidade de 26 a 28/10 e comunica a decisão preliminar.",
       ],
       botao: { texto: "Acompanhar", url: `${URL_SITE}${c.painel}` },
     });

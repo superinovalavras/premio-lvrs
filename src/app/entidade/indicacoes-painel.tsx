@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Aviso, Cartao } from "@/components/area/ui";
 import { servico } from "@/lib/server/sessao";
-import { indicacoesDoDono, janelaIndicacoes, type DonoIndicacao } from "@/lib/server/indicacoes-dados";
+import { enviadasNaCota, indicacoesDoDono, janelaIndicacoes, type DonoIndicacao } from "@/lib/server/indicacoes-dados";
 import { LIMITE_POR_CATEGORIA, LIMITE_TOTAL, STATUS_INDICACAO } from "@/lib/indicacoes";
 import { formatarData } from "@/lib/entidades";
 import { dia, hora } from "@/lib/datas";
@@ -11,13 +11,18 @@ import { NovaIndicacao } from "./nova-indicacao";
 
 // Lista de indicações de quem indica (instituição deferida ou conselheiro), com as cotas do art. 8º.
 export async function PainelIndicacoes({ dono, base = "/entidade" }: { dono: DonoIndicacao; base?: "/entidade" | "/avaliacao" }) {
-  const [lista, janela, { data: cats }] = await Promise.all([
+  const [lista, janela, { data: cats }, cota] = await Promise.all([
     indicacoesDoDono(dono),
     janelaIndicacoes(),
     servico().from("categories").select("id, name"),
+    enviadasNaCota(dono),
   ]);
   const nomeCat = new Map((cats ?? []).map((c) => [c.id, c.name as string]));
-  const enviadas = lista.filter((i) => i.status === "enviada");
+  // Decisão preliminar (art. 10, § 2º), lida à parte para funcionar antes da migração 0011.
+  const { data: analises } = await servico().from("indicacoes").select("id, analise").in("id", lista.map((i) => i.id).concat("00000000-0000-0000-0000-000000000000"));
+  const analise = new Map((analises ?? []).map((a) => [a.id as string, a.analise as "apta" | "inapta" | null]));
+  // Art. 8º, § 7º: a cota pode ser conjunta (instituição com assento + seus conselheiros).
+  const enviadas = cota.lista;
   const porCategoria = new Map<string, number>();
   for (const i of enviadas) if (i.category_id) porCategoria.set(i.category_id, (porCategoria.get(i.category_id) ?? 0) + 1);
   const cheias = [...porCategoria.entries()].filter(([, n]) => n >= LIMITE_POR_CATEGORIA).map(([id]) => nomeCat.get(id));
@@ -30,6 +35,11 @@ export async function PainelIndicacoes({ dono, base = "/entidade" }: { dono: Don
           <h2 className="text-xl font-semibold">
             {enviadas.length} de {LIMITE_TOTAL} enviadas
           </h2>
+          {cota.conjunta && (
+            <p className="mt-0.5 text-[13px] text-fundo/60">
+              Cota somada com {"entidadeId" in dono ? "o seu representante no COCITIEIS" : "a instituição que você representa"} (art. 8º, § 7º).
+            </p>
+          )}
         </div>
         {janela.estado === "aberta" && enviadas.length < LIMITE_TOTAL && <NovaIndicacao origem={"entidadeId" in dono ? "entidade" : "conselheiro"} base={base} />}
       </div>
@@ -60,10 +70,22 @@ export async function PainelIndicacoes({ dono, base = "/entidade" }: { dono: Don
                 <span
                   className={cn(
                     "rounded-lg px-2.5 py-1 text-xs font-semibold",
-                    i.status === "enviada" ? "bg-verde/10 text-verde" : i.status === "rascunho" ? "bg-amarelo/25 text-fundo" : "bg-nevoa text-fundo/60",
+                    analise.get(i.id) === "inapta"
+                      ? "bg-vermelho/10 text-vermelho"
+                      : i.status === "enviada"
+                        ? "bg-verde/10 text-verde"
+                        : i.status === "rascunho"
+                          ? "bg-amarelo/25 text-fundo"
+                          : "bg-nevoa text-fundo/60",
                   )}
                 >
-                  {i.status === "rascunho" && i.submetido_em ? "Em edição" : STATUS_INDICACAO[i.status]}
+                  {i.status === "rascunho" && i.submetido_em
+                    ? "Em edição"
+                    : i.status === "enviada" && analise.get(i.id)
+                      ? analise.get(i.id) === "apta"
+                        ? "Apta"
+                        : "Inapta"
+                      : STATUS_INDICACAO[i.status]}
                 </span>
                 <ChevronRight className="size-4 text-fundo/40 group-hover:text-fundo" />
               </Link>

@@ -7,11 +7,16 @@ export const metadata: Metadata = { title: "Avaliadores · Painel do Prêmio" };
 
 export default async function PaginaAvaliadores() {
   const sb = servico();
-  const [{ data: lista, error }, { data: convites }, { data: fichas }] = await Promise.all([
+  const [{ data: lista, error }, { data: convites }, { data: fichas }, { data: vinculos }, { data: ents }] = await Promise.all([
     sb.from("avaliadores").select("id, nome, email, papel, instituicao, ativo, is_test, user_id, criado_em").order("is_test").order("nome"),
     sb.from("convites_avaliador").select("avaliador_id, expira_em, usado_em, revogado_em, criado_em").order("criado_em", { ascending: false }),
     sb.from("fichas").select("avaliador_id").eq("status", "enviada"),
+    // separado: até a migração 0011 rodar, a coluna não existe e a lista continua funcionando
+    sb.from("avaliadores").select("id, entidade_id"),
+    sb.from("entidades").select("id, razao_social, assento_cocitieis").eq("status", "deferido").order("razao_social"),
   ]);
+  const vinculo = new Map((vinculos ?? []).map((v) => [v.id, v.entidade_id as string | null]));
+  const entidades = (ents ?? []).map((e) => ({ id: e.id as string, nome: (e.razao_social as string | null) ?? "Instituição", assento: !!e.assento_cocitieis }));
 
   const ultimo = new Map<string, { expira_em: string; usado_em: string | null; revogado_em: string | null }>();
   for (const c of convites ?? []) if (!ultimo.has(c.avaliador_id)) ultimo.set(c.avaliador_id, c);
@@ -38,6 +43,7 @@ export default async function PaginaAvaliadores() {
       acesso,
       expira: c && !a.user_id ? c.expira_em : null,
       fichas: enviadas.get(a.id) ?? 0,
+      entidadeId: vinculo.get(a.id) ?? null,
     };
   });
 
@@ -54,7 +60,7 @@ export default async function PaginaAvaliadores() {
           supabase/migrations/0008_avaliacao_conselho.sql.
         </p>
       ) : (
-        <Avaliadores lista={linhas} />
+        <Avaliadores lista={linhas} entidades={vinculos ? entidades : []} />
       )}
     </>
   );

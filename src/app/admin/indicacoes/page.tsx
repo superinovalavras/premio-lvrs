@@ -21,6 +21,9 @@ export default async function PaginaIndicacoes() {
     janelaIndicacoes(),
   ]);
   const { count: emEdicao } = await sb.from("indicacoes").select("id", { count: "exact", head: true }).eq("status", "rascunho");
+  // Análise de elegibilidade (migração 0011): lida à parte, para a lista funcionar antes da migração.
+  const { data: analises } = await sb.from("indicacoes").select("id, analise, reconsideracao, reconsideracao_decisao, finalist_id").neq("status", "rascunho");
+  const analise = new Map((analises ?? []).map((a) => [a.id as string, a]));
   const nomeEnt = new Map((ents ?? []).map((e) => [e.id, e.razao_social as string | null]));
   const nomeAv = new Map((avs ?? []).map((a) => [a.id, a.nome as string]));
   const indicador = (i: IndicacaoRow) =>
@@ -95,6 +98,15 @@ export default async function PaginaIndicacoes() {
                               </p>
                             </div>
                             <div className="flex flex-wrap gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em]">
+                              {(() => {
+                                const a = analise.get(i.id);
+                                if (!a || i.status !== "enviada") return null;
+                                if (a.finalist_id) return <span className="rounded-lg bg-verde/35 px-2 py-0.5 text-[#8ff0bd]">Concorrente</span>;
+                                if (a.reconsideracao && !a.reconsideracao_decisao) return <span className="rounded-lg bg-amarelo/15 px-2 py-0.5 text-amarelo">Reconsideração</span>;
+                                if (a.analise === "apta") return <span className="rounded-lg bg-verde/35 px-2 py-0.5 text-[#8ff0bd]">Apta</span>;
+                                if (a.analise === "inapta") return <span className="rounded-lg bg-vermelho/25 px-2 py-0.5 text-[#ff8a8f]">Inapta</span>;
+                                return <span className="rounded-lg bg-white/10 px-2 py-0.5 text-white/75">A analisar</span>;
+                              })()}
                               {conflito(i) && <span className="rounded-lg bg-amarelo/15 px-2 py-0.5 text-amarelo">Conflito declarado</span>}
                               {repetido(i) && <span className="rounded-lg bg-amarelo/15 px-2 py-0.5 text-amarelo">Em 2+ categorias</span>}
                               {menores(i).length > 0 && <span className="rounded-lg bg-white/10 px-2 py-0.5 text-white/75">Menor · Anexo IV</span>}

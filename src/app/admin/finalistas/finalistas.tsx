@@ -22,7 +22,15 @@ function Logo({ f, grande }: { f: Pick<F, "nome" | "imagem">; grande?: boolean }
   );
 }
 
-export function Finalistas({ lista, votos }: { lista: F[]; votos: number }) {
+const MOTIVO_RECUSA: Record<string, string> = {
+  cpf_repetido: "CPF que já tinha votado",
+  idade: "abaixo da idade mínima",
+  robo: "anti-robô não confirmou",
+  finalista_invalido: "finalista inválido",
+  dados_invalidos: "dados inválidos",
+};
+
+export function Finalistas({ lista, votos, recusados }: { lista: F[]; votos: number; recusados: Record<string, number> }) {
   const [editando, setEditando] = useState<F | null>(null);
   const oficiais = lista.filter((f) => !f.teste);
   const testes = lista.filter((f) => f.teste);
@@ -32,7 +40,7 @@ export function Finalistas({ lista, votos }: { lista: F[]; votos: number }) {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-white/70">
           {oficiais.length} oficiais{testes.length ? ` · ${testes.length} de teste` : ""}
-          {oficiais.length !== 3 && <span className="text-amarelo"> · a votação prevê 3 finalistas</span>}
+          {oficiais.length > 3 && <span className="text-amarelo"> · o regulamento prevê até 3 finalistas</span>}
         </p>
         <button type="button" className={btnAmarelo} onClick={() => setEditando({ ...VAZIO, ordem: lista.length + 1 })}>
           <Plus className="size-4" /> Adicionar finalista
@@ -67,6 +75,7 @@ export function Finalistas({ lista, votos }: { lista: F[]; votos: number }) {
         ))}
       </div>
 
+      <RelatorioVotos validos={votos} recusados={recusados} />
       <ZerarVotacao n={votos} />
 
       {editando && <Gaveta inicial={editando} fechar={() => setEditando(null)} />}
@@ -180,6 +189,34 @@ function Gaveta({ inicial, fechar }: { inicial: F; fechar: () => void }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// Art. 19, § 6º: totais de votos válidos e inválidos para o relatório de apuração (sem dado pessoal).
+function RelatorioVotos({ validos, recusados }: { validos: number; recusados: Record<string, number> }) {
+  const invalidos = Object.values(recusados).reduce((s, n) => s + n, 0);
+  return (
+    <CartaoAdmin className="mt-6">
+      <h2 className="font-semibold">Relatório da votação popular</h2>
+      <p className="mt-1 text-[13px] text-white/65">Totais para o relatório de apuração (art. 19, § 6º). Nenhum CPF ou dado pessoal aparece aqui.</p>
+      <div className="mt-3 flex flex-wrap gap-6">
+        <p>
+          <span className="text-2xl font-semibold text-[#8ff0bd]">{validos}</span> <span className="text-sm text-white/70">válidos</span>
+        </p>
+        <p>
+          <span className="text-2xl font-semibold text-[#ff8a8f]">{invalidos}</span> <span className="text-sm text-white/70">recusados</span>
+        </p>
+      </div>
+      {invalidos > 0 && (
+        <ul className="mt-2 grid gap-1 text-sm text-white/75">
+          {Object.entries(recusados).map(([m, n]) => (
+            <li key={m}>
+              {n} · {MOTIVO_RECUSA[m] ?? m}
+            </li>
+          ))}
+        </ul>
+      )}
+    </CartaoAdmin>
   );
 }
 

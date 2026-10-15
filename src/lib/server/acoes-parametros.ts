@@ -274,6 +274,7 @@ export async function zerarVotacao(confirmacao: string): Promise<Resultado> {
   const { count } = await sb.from("votes").select("id", { count: "exact", head: true });
   const { error } = await sb.from("votes").delete().not("id", "is", null);
   if (error) return { ok: false, erro: "Não foi possível zerar a votação." };
+  await sb.from("votos_recusados").delete().not("id", "is", null); // os recusados do teste também saem do relatório
   await auditar(admin, "votacao_zerada", { tipo: "premio", id: "votacao" }, { votos_apagados: count ?? 0 });
   return { ok: true, msg: `${count ?? 0} voto(s) apagado(s). A votação está zerada.` };
 }

@@ -95,7 +95,7 @@ export const CATEGORIAS: Categoria[] = [
     nome: "Agro e/ou Food e/ou Tech do Ano",
     tipo: "competitive",
     resumo:
-      "A solução do ano na cadeia do futuro do alimento — do campo ao prato, passando pela tecnologia. A única categoria com voto popular.",
+      "Iniciativas do agronegócio, da cadeia de alimentos ou de tecnologia, isoladas ou combinadas. A única categoria com voto popular.",
     votoPopular: true,
     destaque: true,
   },
@@ -158,7 +158,7 @@ export type Etapa = {
   destaque?: boolean;
 };
 
-// Só as duas datas em destaque estão confirmadas. As demais: preencher com o regulamento.
+// Art. 8º-A do Regulamento (versão final de 15/10/2026). Reserva: o site lê o cronograma do banco.
 export const CRONOGRAMA: Etapa[] = [
   {
     titulo: "Cadastro das instituições indicadoras",
@@ -168,16 +168,34 @@ export const CRONOGRAMA: Etapa[] = [
   {
     titulo: "Indicações",
     data: "12 a 23/10/2026",
-    texto: "Instituições habilitadas indicam até 2 nomes por categoria e 6 no total.",
+    texto: "Membros do COCITIEIS e instituições habilitadas indicam até 2 nomes por categoria e 6 no total.",
     destaque: true,
   },
-  { titulo: "Avaliação técnica", data: "A confirmar", texto: "O COCITIEIS avalia as indicações e define os finalistas." },
-  { titulo: "Divulgação dos finalistas", data: "A confirmar", texto: "Os três finalistas de cada categoria são anunciados." },
+  {
+    titulo: "Análise das indicações",
+    data: "26 a 28/10/2026",
+    texto: "A Secretaria Executiva confere completude e elegibilidade e comunica a decisão preliminar. Pedidos de reconsideração de 29/10 a 03/11.",
+  },
+  {
+    titulo: "Pré-seleção",
+    data: "29/10 a 03/11/2026",
+    texto: "Com mais de três indicações aptas na categoria, o COCITIEIS classifica os três maiores resultados com 60 pontos ou mais.",
+  },
+  {
+    titulo: "Divulgação dos finalistas",
+    data: "04 a 06/11/2026",
+    texto: "Até três finalistas por categoria. Os nomes são publicados depois do aceite de cada finalista.",
+  },
   {
     titulo: "Votação Popular",
     data: "06 a 11/11/2026",
     texto: "Aberta apenas para a categoria Agro e/ou Food e/ou Tech do Ano. Um voto por CPF.",
     destaque: true,
+  },
+  {
+    titulo: "Avaliação técnica",
+    data: "06 a 12/11/2026",
+    texto: "O COCITIEIS avalia os finalistas. O resultado é homologado até 13/11.",
   },
   {
     titulo: "Cerimônia de Entrega",
