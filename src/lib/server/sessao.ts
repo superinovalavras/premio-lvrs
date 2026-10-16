@@ -96,6 +96,8 @@ export async function destinoDoUsuario(userId: string) {
 }
 
 export async function exigirAvaliador() {
+  // Conselheiro sem sessão volta para a entrada do Conselho (login pelo nome), não para o /entrar.
+  if (!(await usuarioAtual())) redirect("/conselho");
   const u = await exigirUsuario();
   const av = await avaliadorDoUsuario(u.id);
   if (!av?.ativo) redirect(await destinoDoUsuario(u.id));

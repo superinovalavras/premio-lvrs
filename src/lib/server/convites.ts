@@ -7,7 +7,13 @@ export const hashToken = (token: string) => createHash("sha256").update(token).d
 
 export type Convite =
   | { estado: "invalido" | "expirado" | "usado" | "inativo" }
-  | { estado: "ok"; conviteId: string; avaliador: { id: string; nome: string; email: string; user_id: string | null } };
+  | {
+      estado: "ok";
+      // primeiro: ainda não tem conta (cria a senha); redefinir: já tem conta (cria uma senha nova)
+      modo: "primeiro" | "redefinir";
+      conviteId: string;
+      avaliador: { id: string; nome: string; email: string | null; user_id: string | null };
+    };
 
 export async function carregarConvite(token: string): Promise<Convite> {
   if (!/^[A-Za-z0-9_-]{40,60}$/.test(token)) return { estado: "invalido" };
@@ -27,6 +33,10 @@ export async function carregarConvite(token: string): Promise<Convite> {
     .maybeSingle();
   if (!av) return { estado: "invalido" };
   if (!av.ativo) return { estado: "inativo" };
-  if (av.user_id) return { estado: "usado" };
-  return { estado: "ok", conviteId: c.id, avaliador: { id: av.id, nome: av.nome, email: av.email, user_id: av.user_id } };
+  return {
+    estado: "ok",
+    modo: av.user_id ? "redefinir" : "primeiro",
+    conviteId: c.id,
+    avaliador: { id: av.id, nome: av.nome, email: av.email, user_id: av.user_id },
+  };
 }

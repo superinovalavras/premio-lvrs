@@ -52,7 +52,7 @@ export default async function PaginaAvaliadores() {
       <TopoAdmin
         selo="Avaliação do Conselho"
         titulo={<span className="enfase">Avaliadores</span>}
-        sub="Membros do COCITIEIS e suplentes que avaliam pelo sistema. Cada pessoa recebe um link pessoal, de uso único, que vale 7 dias, para criar a própria senha."
+        sub="Membros do COCITIEIS e suplentes. Cada pessoa recebe um link pessoal (vale 30 dias) para criar a senha; depois entra em premio.lvrs.com.br/conselho com o nome completo e a senha. O e-mail é opcional e serve para o “esqueci a senha”."
       />
       {error ? (
         <p className="rounded-2xl border border-amarelo/60 bg-amarelo/10 px-4 py-3 text-sm">

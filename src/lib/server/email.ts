@@ -17,6 +17,33 @@ export async function enviarEmail(m: {
   const remetente = process.env.EMAIL_REMETENTE ?? "Prêmio Lavras de Inovação <premio@lvrs.com.br>";
   const registro = { para: m.para, assunto: m.assunto, tipo: m.tipo, entidade_id: m.entidadeId ?? null };
 
+  // Gmail (senha de app do Google) tem prioridade: dispensa mexer no DNS do lvrs.com.br.
+  const gmail = process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD;
+  if (gmail) {
+    try {
+      const { createTransport } = await import("nodemailer");
+      const t = createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD!.replace(/\s/g, "") },
+      });
+      const info = await t.sendMail({
+        from: `Prêmio Lavras de Inovação <${process.env.GMAIL_USER}>`,
+        to: m.para,
+        subject: m.assunto,
+        html: html(m),
+        text: texto(m),
+      });
+      await servico().from("emails_enviados").insert({ ...registro, status: "enviado", provedor_id: info.messageId ?? null });
+      return { ok: true };
+    } catch (e) {
+      // Sem a mensagem completa: pode conter credencial.
+      await servico().from("emails_enviados").insert({ ...registro, status: "falhou", erro: `gmail: ${(e as { code?: string }).code ?? "erro"}` });
+      return { ok: false as const };
+    }
+  }
+
   if (!chave) {
     await servico().from("emails_enviados").insert({ ...registro, status: "sem_configuracao" });
     return { ok: false as const };

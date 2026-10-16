@@ -1,50 +1,17 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
-import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { auditar } from "./auditoria";
-import { credencialProvisoria, exigirAdmin, servico } from "./sessao";
-import { hashToken } from "./convites";
+import { exigirAdmin, servico } from "./sessao";
+import { conselheirosPorNome, emitirLinkConselho } from "./conselho";
 
 export type ResultadoConvite = { ok: true; msg: string; link?: string } | { ok: false; erro: string };
 
-const VALIDADE_DIAS = 7;
-
-// O link usa o endereço por onde o painel foi aberto: funciona no site oficial, no deploy de teste e em localhost.
-async function origem() {
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  if (!host) return process.env.NEXT_PUBLIC_SITE_URL ?? "https://premio.lvrs.com.br";
-  const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
-  return `${proto}://${host}`;
-}
-
-// Gera um token novo e revoga os anteriores ainda válidos. Só o hash fica no banco:
-// o link aparece uma única vez, para a Secretaria copiar e mandar.
-async function emitirConvite(avaliadorId: string, adminId: string) {
-  const sb = servico();
-  await sb
-    .from("convites_avaliador")
-    .update({ revogado_em: new Date().toISOString() })
-    .eq("avaliador_id", avaliadorId)
-    .is("usado_em", null)
-    .is("revogado_em", null);
-  const token = randomBytes(32).toString("base64url");
-  const { error } = await sb.from("convites_avaliador").insert({
-    avaliador_id: avaliadorId,
-    token_hash: hashToken(token),
-    expira_em: new Date(Date.now() + VALIDADE_DIAS * 86_400_000).toISOString(),
-    criado_por: adminId,
-  });
-  if (error) return null;
-  return `${await origem()}/convite/${token}`;
-}
-
+// Link pessoal do conselheiro: primeiro acesso ou senha nova, 30 dias (ver lib/server/conselho.ts).
 const novoSchema = z.object({
   nome: z.string().trim().min(5, "Informe o nome completo.").max(160),
-  email: z.string().trim().toLowerCase().email("E-mail inválido.").max(160),
+  email: z.union([z.literal(""), z.string().trim().toLowerCase().email("E-mail inválido.").max(160)]),
   papel: z.enum(["titular", "suplente"]),
   instituicao: z.string().trim().max(200),
   teste: z.boolean(),
@@ -62,12 +29,14 @@ export async function convidarAvaliador(fd: FormData): Promise<ResultadoConvite>
   if (!v.success) return { ok: false, erro: v.error.issues[0].message };
   const d = v.data;
   const sb = servico();
+  // O login é pelo nome: dois ativos com o mesmo nome não conseguiriam entrar.
+  if ((await conselheirosPorNome(d.nome)).length) return { ok: false, erro: "Já existe um avaliador ativo com este nome. Diferencie (ex.: nome do meio)." };
 
   const { data: av, error } = await sb
     .from("avaliadores")
     .insert({
       nome: d.nome,
-      email: d.email,
+      email: d.email || null,
       papel: d.papel,
       instituicao: d.instituicao || null,
       is_test: d.teste,
@@ -78,9 +47,9 @@ export async function convidarAvaliador(fd: FormData): Promise<ResultadoConvite>
   if (error || !av) {
     return { ok: false, erro: error?.code === "23505" ? "Já existe um avaliador com este e-mail." : "Não foi possível cadastrar." };
   }
-  const link = await emitirConvite(av.id, admin.id);
+  const link = await emitirLinkConselho(av.id, admin.id);
   if (!link) return { ok: false, erro: "Avaliador cadastrado, mas o link falhou. Use “Gerar novo link”." };
-  await auditar(admin, "avaliador_convidado", { tipo: "avaliador", id: av.id }, { email: d.email, papel: d.papel, teste: d.teste });
+  await auditar(admin, "avaliador_convidado", { tipo: "avaliador", id: av.id }, { email: d.email || null, papel: d.papel, teste: d.teste });
   revalidatePath("/admin/avaliadores");
   return { ok: true, msg: `Convite criado para ${d.nome}.`, link };
 }
@@ -89,12 +58,17 @@ export async function gerarNovoLink(avaliadorId: string): Promise<ResultadoConvi
   const admin = await exigirAdmin();
   const { data: av } = await servico().from("avaliadores").select("nome, user_id").eq("id", avaliadorId).maybeSingle();
   if (!av) return { ok: false, erro: "Avaliador não encontrado." };
-  if (av.user_id) return { ok: false, erro: "Este avaliador já criou o acesso. Para senha esquecida, use “Nova senha provisória”." };
-  const link = await emitirConvite(avaliadorId, admin.id);
+  const link = await emitirLinkConselho(avaliadorId, admin.id);
   if (!link) return { ok: false, erro: "Não foi possível gerar o link." };
-  await auditar(admin, "convite_reemitido", { tipo: "avaliador", id: avaliadorId });
+  await auditar(admin, av.user_id ? "link_nova_senha" : "convite_reemitido", { tipo: "avaliador", id: avaliadorId });
   revalidatePath("/admin/avaliadores");
-  return { ok: true, msg: `Novo link para ${av.nome}. O anterior deixou de valer.`, link };
+  return {
+    ok: true,
+    msg: av.user_id
+      ? `Link para ${av.nome} criar uma senha nova (vale 30 dias). Os links anteriores deixaram de valer.`
+      : `Novo link de primeiro acesso para ${av.nome}. O anterior deixou de valer.`,
+    link,
+  };
 }
 
 export async function alternarAvaliador(avaliadorId: string, ativo: boolean): Promise<ResultadoConvite> {
@@ -106,6 +80,18 @@ export async function alternarAvaliador(avaliadorId: string, ativo: boolean): Pr
   return { ok: true, msg: ativo ? "Acesso reativado." : "Acesso desativado. As fichas já enviadas continuam valendo." };
 }
 
+// E-mail do perfil: opcional, serve para o "esqueci a senha" mandar o link.
+export async function definirEmailAvaliador(avaliadorId: string, email: string): Promise<ResultadoConvite> {
+  const admin = await exigirAdmin();
+  const e = email.trim().toLowerCase();
+  if (e && !z.string().email().safeParse(e).success) return { ok: false, erro: "E-mail inválido." };
+  const { error } = await servico().from("avaliadores").update({ email: e || null }).eq("id", avaliadorId);
+  if (error) return { ok: false, erro: error.code === "23505" ? "Outro avaliador já usa este e-mail." : "Não foi possível salvar. A migração 0012 já rodou?" };
+  await auditar(admin, "avaliador_email", { tipo: "avaliador", id: avaliadorId });
+  revalidatePath("/admin/avaliadores");
+  return { ok: true, msg: e ? "E-mail salvo: o “esqueci a senha” já funciona para esta pessoa." : "E-mail removido." };
+}
+
 // Art. 8º, § 7º: liga o conselheiro à instituição que ele representa, para somar as cotas de indicação.
 export async function vincularEntidade(avaliadorId: string, entidadeId: string | null): Promise<ResultadoConvite> {
   const admin = await exigirAdmin();
@@ -114,17 +100,6 @@ export async function vincularEntidade(avaliadorId: string, entidadeId: string |
   await auditar(admin, "avaliador_vinculado", { tipo: "avaliador", id: avaliadorId }, { entidade: entidadeId });
   revalidatePath("/admin/avaliadores");
   return { ok: true, msg: entidadeId ? "Vinculado: as indicações dele e da instituição somam na mesma cota." : "Vínculo removido." };
-}
-
-// Senha provisória (123456, 48h), igual à das instituições.
-export async function senhaProvisoriaAvaliador(avaliadorId: string): Promise<ResultadoConvite> {
-  const admin = await exigirAdmin();
-  const { data: av } = await servico().from("avaliadores").select("user_id").eq("id", avaliadorId).maybeSingle();
-  if (!av?.user_id) return { ok: false, erro: "Este avaliador ainda não criou o acesso: gere um novo link." };
-  const { error } = await servico().auth.admin.updateUserById(av.user_id, credencialProvisoria());
-  if (error) return { ok: false, erro: "Não foi possível redefinir a senha." };
-  await auditar(admin, "senha_redefinida", { tipo: "avaliador", id: avaliadorId });
-  return { ok: true, msg: "Senha provisória 123456 ativa por 48 horas. Avise o avaliador." };
 }
 
 // Só some quem nunca avaliou; quem já tem ficha ou voto fica no histórico (desative em vez de excluir).

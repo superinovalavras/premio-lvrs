@@ -129,6 +129,9 @@ export async function trocarSenha(_: EstadoForm, fd: FormData): Promise<EstadoFo
 
 export async function sair() {
   const sb = await supabaseSessao();
+  const { data } = await sb.auth.getUser();
+  // Conselheiro (conta técnica) volta para a entrada do Conselho, onde entra pelo nome.
+  const conselheiro = data.user?.email?.endsWith("@conselho.premio.invalid");
   await sb.auth.signOut();
-  redirect("/entrar");
+  redirect(conselheiro ? "/conselho" : "/entrar");
 }

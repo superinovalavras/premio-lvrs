@@ -2,13 +2,13 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Copy, KeyRound, Link2, Loader2, Mail, Plus, Power, Trash2, X } from "lucide-react";
+import { Check, Copy, KeyRound, Link2, Loader2, Mail, MessageCircle, Plus, Power, Trash2, X } from "lucide-react";
 import {
   alternarAvaliador,
   convidarAvaliador,
   excluirAvaliador,
   gerarNovoLink,
-  senhaProvisoriaAvaliador,
+  definirEmailAvaliador,
   vincularEntidade,
   type ResultadoConvite,
 } from "@/lib/server/acoes-avaliadores";
@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 export type LinhaAvaliador = {
   id: string;
   nome: string;
-  email: string;
+  email: string | null;
   papel: string;
   instituicao: string | null;
   ativo: boolean;
@@ -42,7 +42,7 @@ const ate = (iso: string) => new Intl.DateTimeFormat("pt-BR", { timeZone: "Ameri
 
 export function Avaliadores({ lista, entidades }: { lista: LinhaAvaliador[]; entidades: EntidadeOpcao[] }) {
   const [novo, setNovo] = useState(false);
-  const [link, setLink] = useState<{ nome: string; email: string; url: string } | null>(null);
+  const [link, setLink] = useState<{ nome: string; email: string | null; url: string; novaSenha?: boolean } | null>(null);
   const oficiais = lista.filter((a) => !a.teste);
   const testes = lista.filter((a) => a.teste);
 
@@ -69,7 +69,7 @@ export function Avaliadores({ lista, entidades }: { lista: LinhaAvaliador[]; ent
 
       <div className="grid gap-3">
         {lista.map((a) => (
-          <Linha key={a.id} a={a} entidades={entidades} mostrarLink={(url) => setLink({ nome: a.nome, email: a.email, url })} />
+          <Linha key={a.id} a={a} entidades={entidades} mostrarLink={(url) => setLink({ nome: a.nome, email: a.email, url, novaSenha: a.acesso === "ativo" })} />
         ))}
       </div>
 
@@ -111,7 +111,7 @@ function Linha({ a, entidades, mostrarLink }: { a: LinhaAvaliador; entidades: En
           {a.nome} <span className="text-sm font-normal text-white/55">· {a.papel === "suplente" ? "Suplente" : "Titular"}</span>
         </h3>
         <p className="mt-0.5 truncate text-sm text-white/70">
-          {a.email}
+          {a.email ?? <span className="text-amarelo">sem e-mail (o “esqueci a senha” não funciona)</span>}
           {a.instituicao ? ` · ${a.instituicao}` : ""}
         </p>
         <div className="mt-2 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.1em]">
@@ -157,11 +157,22 @@ function Linha({ a, entidades, mostrarLink }: { a: LinhaAvaliador; entidades: En
             type="button"
             className={btnContorno}
             disabled={pendente}
-            onClick={() => rodar(() => senhaProvisoriaAvaliador(a.id), `Gerar senha provisória para ${a.nome}?`)}
+            onClick={() => rodar(() => gerarNovoLink(a.id), `Gerar um link para ${a.nome} criar uma senha nova?`)}
           >
-            <KeyRound className="size-4" /> Senha provisória
+            <KeyRound className="size-4" /> Link de nova senha
           </button>
         )}
+        <button
+          type="button"
+          className={btnContorno}
+          disabled={pendente}
+          onClick={() => {
+            const e = prompt(`E-mail de ${a.nome} (para o “esqueci a senha”). Deixe vazio para remover:`, a.email ?? "");
+            if (e !== null) rodar(() => definirEmailAvaliador(a.id, e));
+          }}
+        >
+          <Mail className="size-4" /> E-mail
+        </button>
         <button
           type="button"
           className={btnContorno}
@@ -218,8 +229,8 @@ function NovoAvaliador({ fechar, criado }: { fechar: () => void; criado: (nome: 
             <input name="nome" required minLength={5} className={inputEscuro} />
           </label>
           <label>
-            <span className="mb-1.5 block text-[12.5px] font-medium text-white/85">E-mail</span>
-            <input name="email" type="email" required className={inputEscuro} />
+            <span className="mb-1.5 block text-[12.5px] font-medium text-white/85">E-mail (opcional: para o “esqueci a senha”)</span>
+            <input name="email" type="email" className={inputEscuro} />
             <span className="mt-1 block text-[11.5px] text-white/50">Vira o login. Não dá para trocar depois.</span>
           </label>
           <div className="grid grid-cols-2 gap-3">
@@ -253,12 +264,22 @@ function NovoAvaliador({ fechar, criado }: { fechar: () => void; criado: (nome: 
 }
 
 // O link só aparece aqui: o banco guarda apenas o hash. Perdeu? "Gerar novo link".
-function JanelaLink({ nome, email, url, fechar }: { nome: string; email: string; url: string; fechar: () => void }) {
+function JanelaLink({ nome, email, url, novaSenha, fechar }: { nome: string; email: string | null; url: string; novaSenha?: boolean; fechar: () => void }) {
   const [copiado, setCopiado] = useState(false);
   const campo = useRef<HTMLInputElement>(null);
   const primeiro = nome.split(" ")[0];
-  const texto = `Olá, ${primeiro}! Você foi convidado(a) para avaliar os concorrentes do Prêmio Lavras de Inovação 2026 como membro do COCITIEIS. Crie a sua senha por este link pessoal (vale 7 dias e só pode ser usado uma vez): ${url}`;
-  const mailto = `mailto:${email}?subject=${encodeURIComponent("Prêmio Lavras de Inovação 2026 · Seu acesso de avaliador")}&body=${encodeURIComponent(texto)}`;
+  const texto = novaSenha
+    ? `Olá, ${primeiro}! Segue o link para criar uma senha nova no Prêmio Lavras de Inovação 2026: ${url}
+Depois, entre com o seu nome completo e a senha nova. O link é pessoal: não repasse.`
+    : `Olá, ${primeiro}! Você foi convidado(a) como membro do COCITIEIS para indicar e avaliar no Prêmio Lavras de Inovação 2026.
+
+1. Abra o seu link pessoal: ${url}
+2. Crie a sua senha.
+3. Guarde esta mensagem: para entrar das próximas vezes, use o mesmo link, com o seu nome completo e a senha.
+
+As indicações vão até 23/10. O link é pessoal: não repasse.`;
+  const whatsapp = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+  const mailto = email ? `mailto:${email}?subject=${encodeURIComponent("Prêmio Lavras de Inovação 2026 · Seu acesso ao Conselho")}&body=${encodeURIComponent(texto)}` : null;
 
   const copiar = async (t: string) => {
     try {
@@ -281,8 +302,8 @@ function JanelaLink({ nome, email, url, fechar }: { nome: string; email: string;
           </button>
         </div>
         <p className="text-sm text-white/75">
-          Mande este link só para {nome}. Ele vale 7 dias e funciona uma vez. <b className="text-amarelo">Copie agora:</b> por segurança,
-          ele não aparece de novo (se perder, gere outro).
+          Mande este link só para {nome}. {novaSenha ? "Ele serve para criar uma senha nova." : "No primeiro uso, a pessoa cria a senha; depois, o mesmo link vira a página de entrada."} Vale 30 dias.{" "}
+          <b className="text-amarelo">Copie agora:</b> por segurança, ele não aparece de novo (se perder, gere outro).
         </p>
         <input ref={campo} readOnly value={url} onFocus={(e) => e.target.select()} className={`${inputEscuro} mt-4 font-mono text-[12.5px]`} />
         <div className="mt-4 flex flex-wrap gap-2">
@@ -292,9 +313,14 @@ function JanelaLink({ nome, email, url, fechar }: { nome: string; email: string;
           <button type="button" className={btnContorno} onClick={() => copiar(texto)}>
             <Copy className="size-4" /> Copiar mensagem pronta
           </button>
-          <a href={mailto} className={btnContorno}>
-            <Mail className="size-4" /> Abrir no e-mail
+          <a href={whatsapp} target="_blank" rel="noreferrer" className={btnContorno}>
+            <MessageCircle className="size-4" /> Abrir no WhatsApp
           </a>
+          {mailto && (
+            <a href={mailto} className={btnContorno}>
+              <Mail className="size-4" /> Abrir no e-mail
+            </a>
+          )}
         </div>
       </div>
     </div>
