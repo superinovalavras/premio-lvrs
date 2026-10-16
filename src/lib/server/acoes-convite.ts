@@ -78,9 +78,13 @@ export async function aceitarConvite(token: string, _: EstadoConvite, fd: FormDa
 export async function entrarConselho(_: EstadoConvite, fd: FormData): Promise<EstadoConvite> {
   const nome = String(fd.get("nome") ?? "");
   const senha = String(fd.get("senha") ?? "");
-  const ERRO = { erro: "Nome ou senha incorretos." };
-  if (!nome.trim() || !senha) return { erro: "Informe o nome completo e a senha." };
-  const achados = (await conselheirosPorNome(nome)).filter((a) => a.user_id);
+  const ERRO = { erro: "Nome (ou e-mail) ou senha incorretos." };
+  if (!nome.trim() || !senha) return { erro: "Informe o nome completo (ou e-mail) e a senha." };
+  // Aceita o nome completo ou o e-mail do cadastro.
+  const porEmail = nome.includes("@");
+  const achados = porEmail
+    ? ((await servico().from("avaliadores").select("id, nome, email, user_id, ativo").eq("ativo", true).ilike("email", nome.trim().replace(/[\\%_]/g, "\\$&"))).data ?? []).filter((a) => a.user_id)
+    : (await conselheirosPorNome(nome)).filter((a) => a.user_id);
   if (achados.length > 1) return { erro: "Há mais de um conselheiro com este nome. Fale com a Secretaria do Prêmio." };
   if (!achados.length) return ERRO;
   const { data: u } = await servico().auth.admin.getUserById(achados[0].user_id!);
@@ -92,37 +96,57 @@ export async function entrarConselho(_: EstadoConvite, fd: FormData): Promise<Es
   redirect("/avaliacao");
 }
 
-// "Esqueci a senha": manda um link novo para o e-mail cadastrado no perfil. A resposta é a mesma em qualquer caso.
-export async function pedirNovaSenha(_: EstadoConvite, fd: FormData): Promise<EstadoConvite> {
+// Mostra o e-mail sem entregá-lo: "ra••••••12@gmail.com". A pessoa reconhece o dela; quem digitar outro nome, não descobre.
+function mascarar(email: string) {
+  const [u, d] = email.split("@");
+  if (!d) return "•••";
+  const vis = u.length <= 3 ? u.slice(0, 1) : u.slice(0, 2);
+  const fim = u.length > 5 ? u.slice(-2) : "";
+  return `${vis}${"•".repeat(Math.max(3, u.length - vis.length - fim.length))}${fim}@${d}`;
+}
+
+// Primeiro acesso e "esqueci a senha" pelo link do grupo: o link para criar a senha vai para o e-mail do cadastro.
+// Só quem tem acesso àquele e-mail cria a senha. No máximo um pedido a cada 10 minutos por conselheiro.
+export async function pedirLinkPorEmail(_: EstadoConvite, fd: FormData): Promise<EstadoConvite> {
   const nome = String(fd.get("nome") ?? "");
+  const primeiroAcesso = fd.get("tipo") === "primeiro";
   if (!nome.trim()) return { erro: "Informe o nome completo." };
-  const RESPOSTA = {
-    msg: "Se o nome estiver cadastrado com e-mail, enviamos um link para criar uma senha nova. Confira a caixa de entrada e o spam. Sem e-mail no cadastro, fale com a Secretaria do Prêmio.",
-  };
   const achados = await conselheirosPorNome(nome);
-  if (achados.length !== 1 || !achados[0].email) return RESPOSTA;
+  if (achados.length > 1) return { erro: "Há mais de um conselheiro com este nome. Fale com a Secretaria do Prêmio." };
+  if (!achados.length) return { erro: "Não encontramos este nome no cadastro do Conselho. Confira como está escrito (nome completo) ou fale com a Secretaria do Prêmio." };
   const av = achados[0];
-  // No máximo um pedido a cada 10 minutos por conselheiro.
+  if (primeiroAcesso && av.user_id) return { erro: "Você já criou o seu acesso. Entre com o nome e a senha, ou use “Esqueci a senha”." };
+  if (!av.email) return { erro: "O seu cadastro ainda não tem e-mail. Fale com a Secretaria do Prêmio, que envia o link pelo WhatsApp." };
+  const destino = mascarar(av.email);
+
   const { count } = await servico()
     .from("convites_avaliador")
     .select("id", { count: "exact", head: true })
     .eq("avaliador_id", av.id)
     .is("criado_por", null)
     .gte("criado_em", new Date(Date.now() - 10 * 60_000).toISOString());
-  if ((count ?? 0) > 0) return RESPOSTA;
-  const link = await emitirLinkConselho(av.id, null, false, 1); // vale 24 horas
-  if (!link) return RESPOSTA;
-  await enviarEmail({
-    para: av.email!,
-    assunto: "Prêmio Lavras de Inovação — crie uma senha nova",
-    tipo: "senha_conselho",
-    titulo: "Crie uma senha nova",
-    paragrafos: [
-      `Olá, ${av.nome.split(" ")[0]}. Recebemos um pedido para trocar a senha do seu acesso ao Conselho no Prêmio Lavras de Inovação.`,
-      "O link abaixo é pessoal, vale por 24 horas e para uma única troca. Se não foi você, ignore esta mensagem: a senha atual continua valendo.",
-    ],
-    botao: { texto: "Criar senha nova", url: link },
+  if ((count ?? 0) > 0) return { msg: `Já enviamos um link para ${destino} há poucos minutos. Confira a caixa de entrada e o spam.` };
+
+  const link = await emitirLinkConselho(av.id, null, false, 1); // vale 24 horas; não anula o link do WhatsApp
+  if (!link) return { erro: "Não foi possível gerar o link agora. Tente novamente em instantes." };
+  const envio = await enviarEmail({
+    para: av.email,
+    assunto: av.user_id ? "Prêmio Lavras de Inovação — crie uma senha nova" : "Prêmio Lavras de Inovação — crie o seu acesso ao Conselho",
+    tipo: av.user_id ? "senha_conselho" : "primeiro_acesso_conselho",
+    titulo: av.user_id ? "Crie uma senha nova" : "Crie o seu acesso",
+    paragrafos: av.user_id
+      ? [
+          `Olá, ${av.nome.split(" ")[0]}. Recebemos um pedido para trocar a senha do seu acesso ao Conselho no Prêmio Lavras de Inovação.`,
+          "O link abaixo é pessoal, vale por 24 horas e para uma única troca. Se não foi você, ignore esta mensagem: a senha atual continua valendo.",
+        ]
+      : [
+          `Olá, ${av.nome.split(" ")[0]}. Este é o seu primeiro acesso à área do Conselho no Prêmio Lavras de Inovação 2026.`,
+          "Clique no botão para criar a sua senha. Depois, entre em premio.lvrs.com.br/conselho com o seu nome completo (ou este e-mail) e a senha.",
+          "O link é pessoal e vale por 24 horas. Se não foi você, ignore esta mensagem.",
+        ],
+    botao: { texto: av.user_id ? "Criar senha nova" : "Criar minha senha", url: link },
   });
-  await auditar(null, "senha_conselho_pedida", { tipo: "avaliador", id: av.id });
-  return RESPOSTA;
+  await auditar(null, av.user_id ? "senha_conselho_pedida" : "primeiro_acesso_pedido", { tipo: "avaliador", id: av.id }, { enviado: envio.ok });
+  if (!envio.ok) return { erro: "Não conseguimos enviar o e-mail agora. Tente de novo em alguns minutos ou fale com a Secretaria do Prêmio." };
+  return { msg: `Enviamos um link para ${destino}. Abra o e-mail (confira também o spam) e clique em “${av.user_id ? "Criar senha nova" : "Criar minha senha"}”. O link vale 24 horas.` };
 }

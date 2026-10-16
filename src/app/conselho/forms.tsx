@@ -3,42 +3,51 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
-import { aceitarConvite, entrarConselho, pedirNovaSenha } from "@/lib/server/acoes-convite";
-import { Aviso, Campo, btnPrim, inputCls } from "@/components/area/ui";
+import { aceitarConvite, entrarConselho, pedirLinkPorEmail } from "@/lib/server/acoes-convite";
+import { Aviso, Campo, btnPrim, btnSec, inputCls } from "@/components/area/ui";
 import { DECLARACAO_ANEXO_III } from "@/lib/avaliacao";
 
 const ROMANOS = ["I", "II", "III", "IV", "V", "VI"];
 
-// Entrar pelo nome completo + "Esqueci a senha" (link novo no e-mail do perfil).
+// Link do grupo: entrar (nome ou e-mail + senha), primeiro acesso e esqueci a senha.
+// Nos dois últimos, o link para criar a senha vai para o e-mail do cadastro (mostrado parcialmente).
 export function FormEntrarConselho({ aviso }: { aviso?: string }) {
-  const [esqueci, setEsqueci] = useState(false);
+  const [modo, setModo] = useState<"entrar" | "primeiro" | "esqueci">("entrar");
+  // Controlado: o formulário é limpo depois de cada envio, e o nome não deve sumir se der erro.
+  const [nome, setNome] = useState("");
   const [estado, acao, pendente] = useActionState(entrarConselho, undefined);
-  const [estadoE, acaoE, pendenteE] = useActionState(pedirNovaSenha, undefined);
+  const [estadoL, acaoL, pendenteL] = useActionState(pedirLinkPorEmail, undefined);
 
-  if (esqueci) {
+  if (modo !== "entrar") {
+    const primeiro = modo === "primeiro";
     return (
-      <form action={acaoE}>
-        <h2 className="text-xl font-semibold">Esqueci a senha</h2>
-        <p className="mt-1.5 font-light text-fundo/70">Enviamos um link para criar uma senha nova no e-mail do seu cadastro.</p>
+      <form action={acaoL} key={modo}>
+        <input type="hidden" name="tipo" value={modo} />
+        <h2 className="text-xl font-semibold">{primeiro ? "Primeiro acesso" : "Esqueci a senha"}</h2>
+        <p className="mt-1.5 font-light text-fundo/70">
+          {primeiro
+            ? "Digite o seu nome completo. Enviamos para o e-mail do seu cadastro um link para você criar a senha."
+            : "Digite o seu nome completo. Enviamos para o e-mail do seu cadastro um link para criar uma senha nova."}
+        </p>
         <div className="mt-7 space-y-4">
-          <Campo label="Nome completo">
-            <input name="nome" autoComplete="name" required className={inputCls} />
+          <Campo label="Nome completo" dica="Acentos e maiúsculas não importam.">
+            <input name="nome" autoComplete="name" required value={nome} onChange={(e) => setNome(e.target.value)} className={inputCls} />
           </Campo>
         </div>
-        {estadoE?.erro && (
+        {estadoL?.erro && (
           <Aviso tom="erro" className="mt-4">
-            {estadoE.erro}
+            {estadoL.erro}
           </Aviso>
         )}
-        {estadoE?.msg && (
+        {estadoL?.msg && (
           <Aviso tom="ok" className="mt-4">
-            {estadoE.msg}
+            {estadoL.msg}
           </Aviso>
         )}
-        <button className={`${btnPrim} mt-6 w-full`} disabled={pendenteE}>
-          {pendenteE && <Loader2 className="size-4 animate-spin" />} Enviar link
+        <button className={`${btnPrim} mt-6 w-full`} disabled={pendenteL}>
+          {pendenteL && <Loader2 className="size-4 animate-spin" />} Enviar link para o meu e-mail
         </button>
-        <button type="button" onClick={() => setEsqueci(false)} className="mt-4 w-full text-center text-sm font-semibold text-verde underline underline-offset-4">
+        <button type="button" onClick={() => setModo("entrar")} className="mt-4 w-full text-center text-sm font-semibold text-verde underline underline-offset-4">
           Voltar para entrar
         </button>
       </form>
@@ -48,15 +57,15 @@ export function FormEntrarConselho({ aviso }: { aviso?: string }) {
   return (
     <form action={acao}>
       <h2 className="text-xl font-semibold">Entrar</h2>
-      <p className="mt-1.5 font-light text-fundo/70">Use o seu nome completo e a senha que você criou.</p>
+      <p className="mt-1.5 font-light text-fundo/70">Use o seu nome completo (ou e-mail) e a senha que você criou.</p>
       {aviso && (
         <Aviso tom="info" className="mt-4">
           {aviso}
         </Aviso>
       )}
       <div className="mt-7 space-y-4">
-        <Campo label="Nome completo" dica="Como está no cadastro do Conselho. Acentos e maiúsculas não importam.">
-          <input name="nome" autoComplete="name" required className={inputCls} />
+        <Campo label="Nome completo ou e-mail" dica="Acentos e maiúsculas não importam.">
+          <input name="nome" autoComplete="username" required value={nome} onChange={(e) => setNome(e.target.value)} className={inputCls} />
         </Campo>
         <Campo label="Senha">
           <input name="senha" type="password" autoComplete="current-password" required className={inputCls} />
@@ -70,9 +79,15 @@ export function FormEntrarConselho({ aviso }: { aviso?: string }) {
       <button className={`${btnPrim} mt-6 w-full`} disabled={pendente}>
         {pendente && <Loader2 className="size-4 animate-spin" />} Entrar
       </button>
-      <button type="button" onClick={() => setEsqueci(true)} className="mt-4 w-full text-center text-sm font-semibold text-verde underline underline-offset-4">
+      <button type="button" onClick={() => setModo("esqueci")} className="mt-4 w-full text-center text-sm font-semibold text-verde underline underline-offset-4">
         Esqueci a senha
       </button>
+      <div className="mt-8 border-t border-fundo/10 pt-6">
+        <p className="text-sm font-medium">É a sua primeira vez aqui?</p>
+        <button type="button" onClick={() => setModo("primeiro")} className={`${btnSec} mt-3 w-full`}>
+          Primeiro acesso: criar minha senha
+        </button>
+      </div>
     </form>
   );
 }
@@ -89,7 +104,7 @@ export function FormSenhaConselho({ token, nome, modo }: { token: string; nome: 
     <form action={acao}>
       <h2 className="text-xl font-semibold">{primeiro ? "Crie a sua senha" : "Crie uma senha nova"}</h2>
       <p className="mt-1.5 font-light text-fundo/70">
-        {primeiro ? "Depois, para entrar, use o seu nome completo e esta senha. Guarde este link: ele vira a sua página de entrada." : "A senha anterior deixa de valer."}
+        {primeiro ? "Depois, para entrar, use o seu nome completo (ou e-mail) e esta senha, em premio.lvrs.com.br/conselho." : "A senha anterior deixa de valer."}
       </p>
       <div className="mt-6 space-y-4">
         <Campo label="Nome completo">
