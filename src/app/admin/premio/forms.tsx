@@ -46,7 +46,7 @@ export function FormDatas({ valores }: { valores: Record<string, string> }) {
     >
       <CartaoAdmin>
         <h2 className="font-semibold">Indicações</h2>
-        <p className="mb-4 mt-1 text-[13px] text-white/60">Período em que instituições deferidas indicam (art. 8º-A, II).</p>
+        <p className="mb-4 mt-1 text-[13px] text-white/60">Período em que conselheiros e instituições deferidas indicam (art. 8º-A, II).</p>
         <div className="grid gap-3">
           {campo("indicacoes_abrem", "Abrem em")}
           {campo("indicacoes_fecham", "Encerram em")}

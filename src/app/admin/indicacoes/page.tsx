@@ -46,7 +46,7 @@ export default async function PaginaIndicacoes() {
         titulo={<span className="enfase">Indicações</span>}
         sub={
           <>
-            Indicações enviadas pelas instituições, na ordem de chegada (carimbo do servidor). Prazo: {dia(janela.abre)}, {hora(janela.abre)}, a{" "}
+            Indicações enviadas pelas instituições e pelos conselheiros, na ordem de chegada (carimbo do servidor). Prazo: {dia(janela.abre)}, {hora(janela.abre)}, a{" "}
             {dia(janela.fecha)}, {hora(janela.fecha)} · <b className="font-semibold text-white">{janela.estado === "aberta" ? "aberto" : janela.estado === "antes" ? "ainda não abriu" : "encerrado"}</b>.
           </>
         }

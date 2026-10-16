@@ -40,7 +40,7 @@ export function Indicar() {
                   Sua instituição pode <span className="enfase">indicar</span>
                 </>
               }
-              texto="Quem indica são as instituições de Lavras habilitadas pela Secretaria Executiva do Prêmio, por meio de um representante designado."
+              texto="Indicam os membros do COCITIEIS e as instituições de Lavras habilitadas pela Secretaria Executiva do Prêmio, por meio de um representante designado."
             />
             <ul className="mt-6 flex flex-wrap gap-2">
               {QUEM.map((q) => (

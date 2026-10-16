@@ -232,19 +232,19 @@ export const FINALISTAS_EXEMPLO: Finalista[] = [
   {
     id: "00000000-0000-4000-8000-000000000001",
     nome: "Finalista 1",
-    resumo: "Os finalistas serão divulgados após a avaliação técnica do COCITIEIS.",
+    resumo: "Os finalistas são divulgados de 04 a 06/11, depois da aprovação do COCITIEIS.",
     imagem: null,
   },
   {
     id: "00000000-0000-4000-8000-000000000002",
     nome: "Finalista 2",
-    resumo: "Os finalistas serão divulgados após a avaliação técnica do COCITIEIS.",
+    resumo: "Os finalistas são divulgados de 04 a 06/11, depois da aprovação do COCITIEIS.",
     imagem: null,
   },
   {
     id: "00000000-0000-4000-8000-000000000003",
     nome: "Finalista 3",
-    resumo: "Os finalistas serão divulgados após a avaliação técnica do COCITIEIS.",
+    resumo: "Os finalistas são divulgados de 04 a 06/11, depois da aprovação do COCITIEIS.",
     imagem: null,
   },
 ];

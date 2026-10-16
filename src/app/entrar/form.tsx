@@ -29,7 +29,7 @@ export function FormEntrar() {
         {pendente && <Loader2 className="size-4 animate-spin" />} Entrar
       </button>
       <p className="mt-4 text-center text-[13px] text-fundo/70">
-        Esqueceu a senha? Fale com a Secretaria do Prêmio, que gera uma nova senha provisória.
+        Esqueceu a senha? Escreva para superinovalavras@gmail.com: a Secretaria do Prêmio gera uma nova senha provisória.
       </p>
       <div className="mt-8 border-t border-fundo/10 pt-6">
         <p className="text-sm font-medium">Sua instituição ainda não tem cadastro?</p>
