@@ -147,6 +147,17 @@ export async function pedirLinkPorEmail(_: EstadoConvite, fd: FormData): Promise
     botao: { texto: av.user_id ? "Criar senha nova" : "Criar minha senha", url: link },
   });
   await auditar(null, av.user_id ? "senha_conselho_pedida" : "primeiro_acesso_pedido", { tipo: "avaliador", id: av.id }, { enviado: envio.ok });
-  if (!envio.ok) return { erro: "Não conseguimos enviar o e-mail agora. Tente de novo em alguns minutos ou fale com a Secretaria do Prêmio." };
+  if (!envio.ok) {
+    // O link não chegou: anula, para não contar na trava de 10 minutos nem ficar valendo sem dono.
+    await servico()
+      .from("convites_avaliador")
+      .update({ revogado_em: new Date().toISOString() })
+      .eq("avaliador_id", av.id)
+      .is("criado_por", null)
+      .is("usado_em", null)
+      .is("revogado_em", null)
+      .gte("criado_em", new Date(Date.now() - 2 * 60_000).toISOString());
+    return { erro: "Não conseguimos enviar o e-mail agora. Tente de novo em alguns minutos ou fale com a Secretaria do Prêmio." };
+  }
   return { msg: `Enviamos um link para ${destino}. Abra o e-mail (confira também o spam) e clique em “${av.user_id ? "Criar senha nova" : "Criar minha senha"}”. O link vale 24 horas.` };
 }
