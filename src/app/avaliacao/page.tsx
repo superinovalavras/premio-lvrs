@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CheckCircle2, CircleDashed, Clock, Lock, PenLine, XCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, CircleDashed, CircleHelp, Clock, Lock, PenLine, XCircle } from "lucide-react";
 import { CabecalhoArea, ConteudoArea } from "@/components/area/cabecalho";
 import { Aviso, Cartao, btnPrim, btnSec } from "@/components/area/ui";
 import { exigirAvaliador, servico } from "@/lib/server/sessao";
@@ -123,6 +123,7 @@ export default async function PainelAvaliador() {
       <ConteudoArea>
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
           <div className="grid content-start gap-4">
+            <AjudaDestaque className="lg:hidden" />
             {/* Membros do COCITIEIS também indicam (art. 8º) e propõem as honorárias (art. 13). */}
             <PainelIndicacoes dono={{ avaliadorId: avaliador.id }} base="/avaliacao" />
             <PainelHonorarias avaliadorId={avaliador.id} />
@@ -130,8 +131,7 @@ export default async function PainelAvaliador() {
             {!lista.length && (
               <Cartao>
                 <p className="font-light text-fundo/75">
-                  Ainda não há rodadas. Pelo cronograma, a pré-seleção vai de 29/10 a 03/11 e a avaliação dos finalistas, de
-                  06 a 12/11.
+                  Ainda não há rodadas. Pelo cronograma, a pré-seleção vai de 29/10 a 03/11 e a avaliação dos finalistas, de 06 a 12/11.
                 </p>
               </Cartao>
             )}
@@ -143,6 +143,7 @@ export default async function PainelAvaliador() {
           </div>
 
           <div className="grid content-start gap-4">
+            <AjudaDestaque className="hidden lg:flex" />
             <Cartao className="p-6">
               <h3 className="font-semibold">Como funciona</h3>
               <ul className="mt-2 space-y-2 text-sm font-light text-fundo/75">
@@ -152,9 +153,6 @@ export default async function PainelAvaliador() {
                 <li>· Você pode salvar e voltar. Depois de enviada, a ficha não muda mais.</li>
                 <li>· Ninguém vê as notas dos outros conselheiros nem resultados parciais.</li>
               </ul>
-              <Link href="/avaliacao/como-avaliar" className={cn(btnSec, "mt-4 w-full")}>
-                Passo a passo com imagens
-              </Link>
             </Cartao>
             <Cartao className="p-6">
               <h3 className="font-semibold">Escala de pontuação</h3>
@@ -172,5 +170,27 @@ export default async function PainelAvaliador() {
         </div>
       </ConteudoArea>
     </>
+  );
+}
+
+// Ajuda em destaque: no celular, no topo da página; no computador, no topo da coluna da direita.
+function AjudaDestaque({ className }: { className?: string }) {
+  return (
+    <Link
+      href="/avaliacao/como-avaliar"
+      className={cn(
+        "group flex items-center gap-3 rounded-[22px] bg-amarelo p-5 text-fundo shadow-[0_12px_32px_-14px_rgba(255,205,0,.9)] transition hover:-translate-y-0.5",
+        className,
+      )}
+    >
+      <span className="grid size-11 shrink-0 place-items-center rounded-full bg-fundo text-amarelo">
+        <CircleHelp className="size-6" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-semibold">Passo a passo com imagens</span>
+        <span className="block text-sm text-fundo/75">Como indicar, propor e avaliar</span>
+      </span>
+      <ArrowRight className="size-5 shrink-0 transition group-hover:translate-x-0.5" />
+    </Link>
   );
 }
