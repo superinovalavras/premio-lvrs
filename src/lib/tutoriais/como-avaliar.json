@@ -95,7 +95,7 @@
   },
   {
     "id": "indicar",
-    "titulo": "Indique até 23/10",
+    "titulo": "Indique no prazo",
     "aviso": "Até 2 indicações por categoria e 6 no total. O formulário mostra o que falta antes de enviar.",
     "telas": [
       {
@@ -106,7 +106,7 @@
             "y": 36.62,
             "w": 13.16,
             "h": 5.32,
-            "legenda": "Até 23/10: comece uma indicação",
+            "legenda": "Comece uma indicação",
             "lado": "esquerda"
           },
           {

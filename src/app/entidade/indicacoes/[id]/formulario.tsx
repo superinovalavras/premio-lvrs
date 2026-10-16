@@ -771,12 +771,11 @@ function PassoEnvio(
       {p.pendencias.length > 0 ? (
         <Aviso tom="alerta" className="mt-5">
           <p className="font-semibold">{p.pendencias.length === 1 ? "Falta 1 item" : `Faltam ${p.pendencias.length} itens`} para enviar:</p>
-          <ul className="mt-2 space-y-1">
+          <ul className="mt-1">
             {p.pendencias.map((x) => (
               <li key={x.texto}>
-                ·{" "}
-                <button type="button" onClick={() => p.ir(x.passo)} className="text-left underline underline-offset-2">
-                  {x.texto}
+                <button type="button" onClick={() => p.ir(x.passo)} className="py-1.5 text-left underline underline-offset-2">
+                  · {x.texto}
                 </button>
               </li>
             ))}

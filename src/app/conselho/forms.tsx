@@ -47,7 +47,7 @@ export function FormEntrarConselho({ aviso }: { aviso?: string }) {
         <button className={`${btnPrim} mt-6 w-full`} disabled={pendenteL}>
           {pendenteL && <Loader2 className="size-4 animate-spin" />} Enviar link para o meu e-mail
         </button>
-        <button type="button" onClick={() => setModo("entrar")} className="mt-4 w-full text-center text-sm font-semibold text-verde underline underline-offset-4">
+        <button type="button" onClick={() => setModo("entrar")} className="mt-2 w-full py-2.5 text-center text-sm font-semibold text-verde underline underline-offset-4">
           Voltar para entrar
         </button>
       </form>
@@ -79,7 +79,7 @@ export function FormEntrarConselho({ aviso }: { aviso?: string }) {
       <button className={`${btnPrim} mt-6 w-full`} disabled={pendente}>
         {pendente && <Loader2 className="size-4 animate-spin" />} Entrar
       </button>
-      <button type="button" onClick={() => setModo("esqueci")} className="mt-4 w-full text-center text-sm font-semibold text-verde underline underline-offset-4">
+      <button type="button" onClick={() => setModo("esqueci")} className="mt-2 w-full py-2.5 text-center text-sm font-semibold text-verde underline underline-offset-4">
         Esqueci a senha
       </button>
       <div className="mt-8 border-t border-fundo/10 pt-6">
@@ -87,7 +87,7 @@ export function FormEntrarConselho({ aviso }: { aviso?: string }) {
         <button type="button" onClick={() => setModo("primeiro")} className={`${btnSec} mt-3 w-full`}>
           Primeiro acesso: criar minha senha
         </button>
-        <Link href="/conselho/ajuda" className="mt-4 block text-center text-sm font-semibold text-verde underline underline-offset-4">
+        <Link href="/conselho/ajuda" className="mt-2 block py-2.5 text-center text-sm font-semibold text-verde underline underline-offset-4">
           Passo a passo com imagens
         </Link>
       </div>

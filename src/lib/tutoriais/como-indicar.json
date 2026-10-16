@@ -94,7 +94,7 @@
   },
   {
     "id": "indicar",
-    "titulo": "Indique até 23/10",
+    "titulo": "Indique no prazo",
     "aviso": "Até 2 indicações por categoria e 6 no total. Pessoa indicada precisa ter 18 anos ou mais (art. 7º). O formulário mostra o que falta antes de enviar.",
     "telas": [
       {
@@ -163,7 +163,7 @@
             "y": 84.67,
             "w": 11.93,
             "h": 5.32,
-            "legenda": "Envie até 23/10, às 23h59",
+            "legenda": "Envie até o fim do prazo",
             "lado": "direita"
           }
         ]

@@ -28,7 +28,7 @@ export default async function PerfilConselho() {
         <Link href="/avaliacao" className="mb-6 inline-flex items-center gap-1.5 rounded-lg bg-papel px-3 py-2 text-sm font-semibold text-fundo shadow-sm">
           <ArrowLeft className="size-4" /> Área do conselho
         </Link>
-        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <Cartao>
             <FormPerfil nome={avaliador.nome} email={avaliador.email ?? ""} />
           </Cartao>

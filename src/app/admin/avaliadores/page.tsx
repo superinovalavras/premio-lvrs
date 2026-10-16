@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { TopoAdmin } from "@/components/admin/ui";
 import { servico } from "@/lib/server/sessao";
+import { carregarParametros } from "@/lib/server/parametros";
+import { diaCurto } from "@/lib/datas";
 import { Avaliadores, type LinhaAvaliador } from "./avaliadores";
 
 export const metadata: Metadata = { title: "Avaliadores · Painel do Prêmio" };
 
 export default async function PaginaAvaliadores() {
   const sb = servico();
+  const par = await carregarParametros();
   const [{ data: lista, error }, { data: convites }, { data: fichas }, { data: vinculos }, { data: ents }] = await Promise.all([
     sb.from("avaliadores").select("id, nome, email, papel, instituicao, ativo, is_test, user_id, criado_em").order("is_test").order("nome"),
     sb.from("convites_avaliador").select("avaliador_id, expira_em, usado_em, revogado_em, criado_em").order("criado_em", { ascending: false }),
@@ -60,7 +63,7 @@ export default async function PaginaAvaliadores() {
           supabase/migrations/0008_avaliacao_conselho.sql.
         </p>
       ) : (
-        <Avaliadores lista={linhas} entidades={vinculos ? entidades : []} />
+        <Avaliadores lista={linhas} entidades={vinculos ? entidades : []} prazo={diaCurto(par.indicacoesFecham)} />
       )}
     </>
   );

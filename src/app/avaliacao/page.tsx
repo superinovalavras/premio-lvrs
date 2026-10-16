@@ -121,8 +121,8 @@ export default async function PainelAvaliador() {
         }
       />
       <ConteudoArea>
-        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-          <div className="grid content-start gap-4">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="grid min-w-0 content-start gap-4 [&>*]:min-w-0">
             <AjudaDestaque className="lg:hidden" />
             {/* Membros do COCITIEIS também indicam (art. 8º) e propõem as honorárias (art. 13). */}
             <PainelIndicacoes dono={{ avaliadorId: avaliador.id }} base="/avaliacao" />
@@ -142,7 +142,7 @@ export default async function PainelAvaliador() {
             {encerradas.map(card)}
           </div>
 
-          <div className="grid content-start gap-4">
+          <div className="grid min-w-0 content-start gap-4 [&>*]:min-w-0">
             <AjudaDestaque className="hidden lg:flex" />
             <Cartao className="p-6">
               <h3 className="font-semibold">Como funciona</h3>

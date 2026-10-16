@@ -40,7 +40,7 @@ const ACESSO = {
 
 const ate = (iso: string) => new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit" }).format(new Date(iso));
 
-export function Avaliadores({ lista, entidades }: { lista: LinhaAvaliador[]; entidades: EntidadeOpcao[] }) {
+export function Avaliadores({ lista, entidades, prazo }: { lista: LinhaAvaliador[]; entidades: EntidadeOpcao[]; prazo: string }) {
   const [novo, setNovo] = useState(false);
   const [link, setLink] = useState<{ nome: string; email: string | null; url: string; novaSenha?: boolean } | null>(null);
   const oficiais = lista.filter((a) => !a.teste);
@@ -82,7 +82,7 @@ export function Avaliadores({ lista, entidades }: { lista: LinhaAvaliador[]; ent
           }}
         />
       )}
-      {link && <JanelaLink {...link} fechar={() => setLink(null)} />}
+      {link && <JanelaLink {...link} prazo={prazo} fechar={() => setLink(null)} />}
     </>
   );
 }
@@ -264,7 +264,7 @@ function NovoAvaliador({ fechar, criado }: { fechar: () => void; criado: (nome: 
 }
 
 // O link só aparece aqui: o banco guarda apenas o hash. Perdeu? "Gerar novo link".
-function JanelaLink({ nome, email, url, novaSenha, fechar }: { nome: string; email: string | null; url: string; novaSenha?: boolean; fechar: () => void }) {
+function JanelaLink({ nome, email, url, novaSenha, prazo, fechar }: { nome: string; email: string | null; url: string; novaSenha?: boolean; prazo: string; fechar: () => void }) {
   const [copiado, setCopiado] = useState(false);
   const campo = useRef<HTMLInputElement>(null);
   const primeiro = nome.split(" ")[0];
@@ -277,7 +277,7 @@ Depois, entre com o seu nome completo e a senha nova. O link é pessoal: não re
 2. Crie a sua senha.
 3. Guarde esta mensagem: para entrar das próximas vezes, use o mesmo link, com o seu nome completo e a senha.
 
-As indicações vão até 23/10. O link é pessoal: não repasse.`;
+As indicações vão até ${prazo}. O link é pessoal: não repasse.`;
   const whatsapp = `https://wa.me/?text=${encodeURIComponent(texto)}`;
   const mailto = email ? `mailto:${email}?subject=${encodeURIComponent("Prêmio Lavras de Inovação 2026 · Seu acesso ao Conselho")}&body=${encodeURIComponent(texto)}` : null;
 

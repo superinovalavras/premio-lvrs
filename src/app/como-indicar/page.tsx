@@ -4,6 +4,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Mais } from "@/components/marca";
 import { Tutorial, type Topico } from "@/components/tutorial-visual";
+import { carregarParametros } from "@/lib/server/parametros";
+import { diaCurto } from "@/lib/datas";
 import topicos from "@/lib/tutoriais/como-indicar.json";
 
 export const metadata: Metadata = {
@@ -12,7 +14,8 @@ export const metadata: Metadata = {
 };
 
 // Pública: a instituição vê o caminho antes de criar o acesso. Prints gerados por script de captura.
-export default function ComoIndicar() {
+export default async function ComoIndicar() {
+  const par = await carregarParametros();
   return (
     <main className="min-h-[100svh] bg-fundo text-white">
       <header className="border-b border-white/10">
@@ -33,7 +36,12 @@ export default function ComoIndicar() {
           Como <span className="enfase">indicar</span>
         </h1>
         <ul className="mt-4 flex flex-wrap gap-2 text-sm">
-          {["Instituições de Lavras (art. 2º-B)", "Cadastro analisado em até 1 dia útil", "Indicações de 12 a 23/10", "Até 2 por categoria, 6 no total"].map((t) => (
+          {[
+            "Instituições de Lavras (art. 2º-B)",
+            "Cadastro analisado em até 1 dia útil",
+            `Indicações de ${diaCurto(par.indicacoesAbrem)} a ${diaCurto(par.indicacoesFecham)}`,
+            "Até 2 por categoria, 6 no total",
+          ].map((t) => (
             <li key={t} className="rounded-lg border border-white/15 px-3 py-1.5 text-white/85">
               {t}
             </li>
@@ -43,10 +51,16 @@ export default function ComoIndicar() {
           <Tutorial topicos={topicos as Topico[]} />
         </div>
         <div className="mt-10 flex flex-wrap gap-3">
-          <Link href="/cadastro" className="inline-flex h-12 items-center rounded-xl bg-amarelo px-6 font-semibold text-fundo transition hover:-translate-y-0.5">
+          <Link
+            href="/cadastro"
+            className="inline-flex h-12 items-center rounded-xl bg-amarelo px-6 font-semibold text-fundo transition hover:-translate-y-0.5"
+          >
             Criar o acesso da instituição
           </Link>
-          <Link href="/entrar" className="inline-flex h-12 items-center rounded-xl border-2 border-white/25 px-6 font-semibold text-white transition hover:border-amarelo hover:text-amarelo">
+          <Link
+            href="/entrar"
+            className="inline-flex h-12 items-center rounded-xl border-2 border-white/25 px-6 font-semibold text-white transition hover:border-amarelo hover:text-amarelo"
+          >
             Já tenho acesso
           </Link>
         </div>

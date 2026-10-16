@@ -26,6 +26,6 @@ export const PENDENCIAS_REGULAMENTO: Pendencia[] = [
 ];
 
 export const PENDENCIAS_TECNICAS: string[] = [
-  "Convidar os conselheiros e suplentes em Avaliação do Conselho → Avaliadores: é por esse acesso que eles indicam até 23/10.",
+  "Convidar os conselheiros e suplentes em Avaliação do Conselho → Avaliadores: é por esse acesso que eles indicam até o fim do prazo.",
   "E-mails automáticos (deferimento e indeferimento de cadastro) ainda não saem: falta configurar o envio.",
 ];

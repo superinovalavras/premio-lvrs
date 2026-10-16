@@ -10,7 +10,7 @@ export const CAMPOS_PROPOSTA: CampoProposta[] = [
   { id: "relevancia", rotulo: "Relevância pública", dica: "Quem se beneficia e por que isso importa.", max: 1500, linhas: 3, obrigatorio: true },
   { id: "justificativa", rotulo: "Por que merece o reconhecimento", dica: "É o texto que os conselheiros leem antes de votar.", max: 600, linhas: 3, obrigatorio: true },
   { id: "contato", rotulo: "Contato do indicado (telefone ou e-mail)", dica: "Para a Secretaria comunicar antes de divulgar o nome (art. 10, § 1º).", max: 200, linhas: 1, obrigatorio: false },
-  { id: "link", rotulo: "Link com mais informações (opcional)", max: 500, linhas: 1, obrigatorio: false },
+  { id: "link", rotulo: "Link com mais informações", max: 500, linhas: 1, obrigatorio: false },
 ];
 
 // Tabela de categorias do art. 6º: Personalidade do Ano é só pessoa física; Paolinelli, pessoa ou instituição.

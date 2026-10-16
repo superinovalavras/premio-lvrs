@@ -38,7 +38,7 @@ export function CabecalhoArea({
     <header className="relative isolate overflow-hidden bg-fundo text-white">
       <Arcos className="-right-24 -top-24 -z-10 hidden size-96 sm:block" />
       <div className="mx-auto flex max-w-[1080px] items-center gap-4 px-4 py-4 sm:px-6">
-        <Link href={inicio} className="flex items-center gap-3.5">
+        <Link href={inicio} className="flex min-h-10 items-center gap-3.5">
           <Image src="/marca/lvrs-pacto.png" alt="LVRS+" width={900} height={520} className="h-8 w-auto" />
           <span className="hidden border-l border-white/20 pl-3.5 text-[10px] uppercase leading-snug tracking-[0.2em] text-white/80 sm:block">
             {area}
@@ -50,7 +50,7 @@ export function CabecalhoArea({
           {perfil ? (
             <Link href={perfil} title="Meu perfil" className="group flex items-center gap-3 rounded-full hover:text-amarelo">
               {pessoa}
-              <span className="flex items-center gap-1 rounded-lg border border-white/20 px-2 py-1 text-white/80 group-hover:border-amarelo group-hover:text-amarelo">
+              <span className="flex h-10 items-center gap-1 rounded-lg border border-white/20 px-2.5 text-white/80 group-hover:border-amarelo group-hover:text-amarelo">
                 <UserRound className="size-3.5" /> Meu perfil
               </span>
             </Link>
@@ -58,7 +58,7 @@ export function CabecalhoArea({
             pessoa
           )}
           <form action={sair}>
-            <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-white/75 hover:text-amarelo" title="Sair">
+            <button className="flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-lg px-2 text-white/75 hover:text-amarelo" title="Sair" aria-label="Sair">
               <LogOut className="size-4" /> <span className="hidden sm:inline">Sair</span>
             </button>
           </form>

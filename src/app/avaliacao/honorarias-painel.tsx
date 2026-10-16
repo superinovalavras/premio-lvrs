@@ -31,7 +31,7 @@ export async function PainelHonorarias({ avaliadorId }: { avaliadorId: string })
               <Link href={`/avaliacao/honorarias/${c.slug}`} className="group flex items-center gap-4 py-3.5">
                 {p ? <CheckCircle2 className="size-5 shrink-0 text-verde" /> : <CircleDashed className="size-5 shrink-0 text-fundo/40" />}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{c.name}</p>
+                  <p className="font-medium">{c.name}</p>
                   <p className="truncate text-sm text-fundo/60">
                     {p
                       ? `${p.indicado_nome} · ${p.finalist_id ? "na votação" : `enviada em ${formatarData(p.atualizada_em)}`}`
