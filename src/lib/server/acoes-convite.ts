@@ -124,6 +124,7 @@ export async function pedirLinkPorEmail(_: EstadoConvite, fd: FormData): Promise
     .select("id", { count: "exact", head: true })
     .eq("avaliador_id", av.id)
     .is("criado_por", null)
+    .is("revogado_em", null) // link anulado (envio falhou) não conta
     .gte("criado_em", new Date(Date.now() - 10 * 60_000).toISOString());
   if ((count ?? 0) > 0) return { msg: `Já enviamos um link para ${destino} há poucos minutos. Confira a caixa de entrada e o spam.` };
 
