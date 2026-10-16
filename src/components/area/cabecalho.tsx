@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { LogOut } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
 import { Arcos, Mais } from "@/components/marca";
 import { sair } from "@/lib/server/acoes-conta";
 
@@ -26,6 +26,14 @@ export function CabecalhoArea({
     .slice(0, 2)
     .map((p) => p[0]?.toUpperCase())
     .join("");
+  // Na área do Conselho, nome e iniciais levam ao "Meu perfil" (nome de login, e-mail e senha).
+  const perfil = inicio === "/avaliacao" ? "/avaliacao/perfil" : null;
+  const pessoa = (
+    <>
+      <span className="hidden text-white/85 sm:inline">{nome}</span>
+      <span className="grid size-9 place-items-center rounded-full bg-verde text-[13px] font-semibold">{iniciais}</span>
+    </>
+  );
   return (
     <header className="relative isolate overflow-hidden bg-fundo text-white">
       <Arcos className="-right-24 -top-24 -z-10 hidden size-96 sm:block" />
@@ -39,8 +47,16 @@ export function CabecalhoArea({
           </span>
         </Link>
         <div className="ml-auto flex items-center gap-3 text-[13px]">
-          <span className="hidden text-white/85 sm:inline">{nome}</span>
-          <span className="grid size-9 place-items-center rounded-full bg-verde text-[13px] font-semibold">{iniciais}</span>
+          {perfil ? (
+            <Link href={perfil} title="Meu perfil" className="group flex items-center gap-3 rounded-full hover:text-amarelo">
+              {pessoa}
+              <span className="flex items-center gap-1 rounded-lg border border-white/20 px-2 py-1 text-white/80 group-hover:border-amarelo group-hover:text-amarelo">
+                <UserRound className="size-3.5" /> Meu perfil
+              </span>
+            </Link>
+          ) : (
+            pessoa
+          )}
           <form action={sair}>
             <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-white/75 hover:text-amarelo" title="Sair">
               <LogOut className="size-4" /> <span className="hidden sm:inline">Sair</span>
