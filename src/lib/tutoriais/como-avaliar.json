@@ -1,31 +1,93 @@
 [
   {
-    "id": "convite",
-    "titulo": "Primeiro acesso pelo convite",
+    "id": "primeiro-acesso",
+    "titulo": "Primeiro acesso",
+    "aviso": "Entre pelo link enviado no grupo do Conselho (premio.lvrs.com.br/conselho). Na primeira vez, o link para criar a senha chega no seu e-mail e vale 24 horas. Depois, é só nome completo e senha.",
     "telas": [
       {
-        "imagem": "/tutorial/17-convite.png",
+        "imagem": "/tutorial/c1-conselho.png",
         "pontos": [
           {
             "x": 75.61,
-            "y": 44.14,
+            "y": 35.31,
             "w": 29.28,
             "h": 5.81,
-            "legenda": "Crie a sua senha"
+            "legenda": "Nome completo (ou e-mail)",
+            "lado": "esquerda"
           },
           {
             "x": 75.61,
-            "y": 76.06,
+            "y": 48.5,
             "w": 29.28,
-            "h": 4.65,
-            "legenda": "Aceite a declaração (Anexo III)"
+            "h": 5.81,
+            "legenda": "Senha",
+            "lado": "esquerda"
           },
           {
             "x": 75.61,
-            "y": 89.88,
+            "y": 62.54,
+            "w": 29.28,
+            "h": 2.33,
+            "legenda": "Esqueceu? Link novo no seu e-mail",
+            "lado": "esquerda"
+          },
+          {
+            "x": 75.61,
+            "y": 76.73,
+            "w": 29.28,
+            "h": 4.88,
+            "legenda": "Primeira vez? Comece aqui",
+            "lado": "esquerda"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/c2-primeiro-acesso.png",
+        "pontos": [
+          {
+            "x": 75.61,
+            "y": 51.73,
+            "w": 29.28,
+            "h": 5.81,
+            "legenda": "Seu nome completo",
+            "lado": "esquerda"
+          },
+          {
+            "x": 75.61,
+            "y": 62.65,
             "w": 29.28,
             "h": 5.32,
-            "legenda": "Entre"
+            "legenda": "O link chega no e-mail do cadastro",
+            "lado": "esquerda"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/c3-criar-senha.png",
+        "pontos": [
+          {
+            "x": 75.61,
+            "y": 41.61,
+            "w": 29.28,
+            "h": 5.81,
+            "legenda": "Crie a senha",
+            "lado": "esquerda"
+          },
+          {
+            "x": 75.61,
+            "y": 73.53,
+            "w": 29.28,
+            "h": 4.65,
+            "legenda": "Aceite a declaração (Anexo III)",
+            "lado": "esquerda"
+          },
+          {
+            "x": 75.61,
+            "y": 87.35,
+            "w": 29.28,
+            "h": 5.32,
+            "legenda": "Pronto: você entra na área do Conselho",
+            "lado": "esquerda"
           }
         ]
       }

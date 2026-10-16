@@ -322,6 +322,100 @@
     ]
   },
   {
+    "id": "acesso-conselheiros",
+    "titulo": "Dar acesso aos conselheiros",
+    "aviso": "Cadastre os conselheiros com nome completo e e-mail. Depois mande no grupo o link premio.lvrs.com.br/conselho: cada um clica em “Primeiro acesso” e recebe no e-mail o link para criar a senha. Quem não tiver e-mail recebe o link pessoal pelo WhatsApp.",
+    "telas": [
+      {
+        "imagem": "/tutorial/30-avaliadores.png",
+        "pontos": [
+          {
+            "x": 90.45,
+            "y": 32.61,
+            "w": 13.84,
+            "h": 4.68,
+            "legenda": "Cadastre cada conselheiro",
+            "lado": "esquerda"
+          },
+          {
+            "x": 78.47,
+            "y": 43.58,
+            "w": 7.46,
+            "h": 4.68,
+            "legenda": "E-mail: inclua ou troque",
+            "lado": "baixo"
+          },
+          {
+            "x": 67.29,
+            "y": 43.58,
+            "w": 13.71,
+            "h": 4.68,
+            "legenda": "Esqueceu a senha? Gere um link",
+            "lado": "baixo"
+          },
+          {
+            "x": 68.3,
+            "y": 58.52,
+            "w": 11.69,
+            "h": 4.68,
+            "legenda": "Link pessoal (alternativa ao grupo)",
+            "lado": "baixo"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/31-convidar.png",
+        "pontos": [
+          {
+            "x": 83.2,
+            "y": 14.39,
+            "w": 30.09,
+            "h": 5.35,
+            "legenda": "Nome completo: é o login dele",
+            "lado": "esquerda"
+          },
+          {
+            "x": 83.2,
+            "y": 24.48,
+            "w": 30.09,
+            "h": 5.35,
+            "legenda": "E-mail: recebe o link de senha",
+            "lado": "esquerda"
+          },
+          {
+            "x": 72.56,
+            "y": 56.15,
+            "w": 8.82,
+            "h": 4.68,
+            "legenda": "Cadastre",
+            "lado": "esquerda"
+          }
+        ]
+      },
+      {
+        "imagem": "/tutorial/32-link-whatsapp.png",
+        "pontos": [
+          {
+            "x": 50.04,
+            "y": 58.63,
+            "w": 17.2,
+            "h": 4.68,
+            "legenda": "Mensagem pronta, com o link",
+            "lado": "baixo"
+          },
+          {
+            "x": 38.14,
+            "y": 64.24,
+            "w": 13.61,
+            "h": 4.68,
+            "legenda": "Ou abra direto no WhatsApp",
+            "lado": "baixo"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "analisar-indicacoes",
     "titulo": "Analisar indicações (26 a 28/10)",
     "aviso": "Abra cada indicação em Indicações. Apta segue para a avaliação com o botão “Incluir como concorrente”; inapta pode pedir reconsideração em 2 dias úteis.",
@@ -682,54 +776,52 @@
     "aviso": "Tudo que é marcado como teste fica separado do oficial: avaliador de teste só vê rodada de teste, e nada disso aparece no site.",
     "telas": [
       {
-        "imagem": "/tutorial/13-avaliadores.png",
+        "imagem": "/tutorial/30-avaliadores.png",
         "pontos": [
           {
-            "x": 9.04,
-            "y": 70.88,
-            "w": 16.03,
-            "h": 4.68,
-            "legenda": "Entre em Avaliadores"
-          },
-          {
             "x": 90.45,
-            "y": 21.68,
+            "y": 32.61,
             "w": 13.84,
             "h": 4.68,
-            "legenda": "Convidar avaliador"
+            "legenda": "Convidar avaliador (de teste)",
+            "lado": "esquerda"
           }
         ]
       },
       {
-        "imagem": "/tutorial/14-convidar.png",
+        "imagem": "/tutorial/31b-convidar-teste.png",
         "pontos": [
           {
             "x": 83.2,
             "y": 14.39,
             "w": 30.09,
             "h": 5.35,
-            "legenda": "Um nome que lembre teste"
+            "legenda": "Um nome que lembre teste",
+            "lado": "esquerda"
           },
           {
             "x": 83.2,
             "y": 24.48,
             "w": 30.09,
             "h": 5.35,
-            "legenda": "Pode ser o seu próprio e-mail"
+            "legenda": "E-mail: pode ser o seu",
+            "lado": "esquerda"
           },
           {
             "x": 83.2,
             "y": 46.35,
             "w": 30.09,
             "h": 9.34,
-            "legenda": "Marque “Avaliador de teste”"
+            "legenda": "Marque “Avaliador de teste”",
+            "lado": "esquerda"
           },
           {
             "x": 72.56,
             "y": 56.15,
             "w": 8.82,
             "h": 4.68,
-            "legenda": "Crie e copie o link"
+            "legenda": "Crie e copie o link",
+            "lado": "esquerda"
           }
         ]
       },
@@ -800,31 +892,34 @@
   {
     "id": "teste-avaliacao-avaliar",
     "titulo": "Testar a avaliação: avaliar",
-    "aviso": "Abra o link do convite neste mesmo navegador. Se você convidou o seu próprio e-mail, o site pede a senha que você já usa e junta as duas funções na mesma conta. Para voltar à área de avaliação depois, entre em premio.lvrs.com.br/avaliacao.",
+    "aviso": "Abra o link gerado numa janela anônima (Ctrl+Shift+N), para não sair da sua conta de administrador. Crie a senha e avalie como um conselheiro.",
     "telas": [
       {
-        "imagem": "/tutorial/17-convite.png",
+        "imagem": "/tutorial/c3-criar-senha.png",
         "pontos": [
           {
             "x": 75.61,
-            "y": 44.14,
+            "y": 41.61,
             "w": 29.28,
             "h": 5.81,
-            "legenda": "Crie a senha (se o e-mail já tem conta, o site pede a senha atual)"
+            "legenda": "Crie a senha do avaliador de teste",
+            "lado": "esquerda"
           },
           {
             "x": 75.61,
-            "y": 76.06,
+            "y": 73.53,
             "w": 29.28,
             "h": 4.65,
-            "legenda": "Aceite a declaração (Anexo III)"
+            "legenda": "Aceite a declaração (Anexo III)",
+            "lado": "esquerda"
           },
           {
             "x": 75.61,
-            "y": 89.88,
+            "y": 87.35,
             "w": 29.28,
             "h": 5.32,
-            "legenda": "Entre"
+            "legenda": "Entre",
+            "lado": "esquerda"
           }
         ]
       },
@@ -899,7 +994,7 @@
   {
     "id": "teste-avaliacao-conferir",
     "titulo": "Testar a avaliação: conferir e limpar",
-    "aviso": "Com menos de 5 avaliações válidas, o resultado aparece como “suspenso”. Não é erro: é a regra do art. 15, § 4º. Ao terminar, exclua a rodada de teste e, por último, o avaliador de teste.",
+    "aviso": "Com menos de 5 avaliações válidas, o resultado aparece como “suspenso”. Não é erro: é a regra do art. 15, § 4º. Ao terminar, exclua a rodada de teste e, por último, o avaliador de teste. Por último, exclua o avaliador de teste em Avaliadores (ícone da lixeira). Por último, exclua o avaliador de teste em Avaliadores (ícone da lixeira). Por último, exclua o avaliador de teste em Avaliadores (ícone da lixeira). Por último, exclua o avaliador de teste em Avaliadores (ícone da lixeira).",
     "telas": [
       {
         "imagem": "/tutorial/20-rodada-aberta.png",
@@ -940,19 +1035,6 @@
             "h": 3.95,
             "lado": "esquerda",
             "legenda": "Exclua a rodada de teste (digite EXCLUIR)"
-          }
-        ]
-      },
-      {
-        "imagem": "/tutorial/13-avaliadores.png",
-        "pontos": [
-          {
-            "x": 94.07,
-            "y": 32.65,
-            "w": 3.51,
-            "h": 4.68,
-            "legenda": "Por último, exclua o avaliador de teste",
-            "lado": "esquerda"
           }
         ]
       }

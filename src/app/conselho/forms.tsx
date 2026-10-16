@@ -87,6 +87,9 @@ export function FormEntrarConselho({ aviso }: { aviso?: string }) {
         <button type="button" onClick={() => setModo("primeiro")} className={`${btnSec} mt-3 w-full`}>
           Primeiro acesso: criar minha senha
         </button>
+        <Link href="/conselho/ajuda" className="mt-4 block text-center text-sm font-semibold text-verde underline underline-offset-4">
+          Passo a passo com imagens
+        </Link>
       </div>
     </form>
   );

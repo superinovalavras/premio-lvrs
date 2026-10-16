@@ -18,7 +18,7 @@ export default async function Entrar() {
           Prêmio Lavras de <span className="enfase">Inovação</span>
         </>
       }
-      texto="Acesso das instituições indicadoras, dos conselheiros avaliadores e da Secretaria Executiva do Prêmio."
+      texto="Acesso das instituições indicadoras e da Secretaria Executiva do Prêmio. Conselheiros do COCITIEIS: usem o link enviado no grupo do Conselho."
     >
       <FormEntrar />
     </TelaDividida>
