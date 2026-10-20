@@ -175,10 +175,6 @@ export default async function PainelEntidade() {
             <Cartao className="border-amarelo bg-amarelo p-6 text-fundo">
               <h3 className="font-bold">Como funciona</h3>
               <ul className="mt-2 space-y-1.5 text-sm font-semibold">
-                <li>
-                  · <span className="rounded-lg bg-fundo px-2 py-0.5 font-bold text-white">Só 6 indicações no total</span>, até 2 por
-                  categoria. Escolha com atenção.
-                </li>
                 <li>· Só cadastros deferidos indicam.</li>
                 <li>
                   · A análise do cadastro leva até 1 dia útil — pedidos enviados nas últimas 24 horas do prazo podem não ser analisados a
