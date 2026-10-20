@@ -39,7 +39,6 @@ export default async function AjudaConselho() {
             "Entrada: premio.lvrs.com.br/conselho",
             `Indicações até ${diaCurto(par.indicacoesFecham)}`,
             "Até 2 por categoria, 6 no total",
-            "Uma proposta honorária por categoria",
           ].map((t) => (
             <li key={t} className="rounded-lg border border-white/15 px-3 py-1.5 text-white/85">
               {t}

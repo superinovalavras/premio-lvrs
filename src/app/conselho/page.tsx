@@ -21,7 +21,7 @@ export default async function Conselho() {
           Área do <span className="enfase">Conselho</span>
         </>
       }
-      texto="Indicações, propostas honorárias e avaliação do COCITIEIS no Prêmio Lavras de Inovação 2026."
+      texto="Indicações e avaliação do COCITIEIS no Prêmio Lavras de Inovação 2026."
     >
       <FormEntrarConselho />
     </TelaDividida>

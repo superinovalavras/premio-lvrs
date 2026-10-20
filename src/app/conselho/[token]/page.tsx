@@ -53,7 +53,7 @@ export default async function LinkConselho({ params }: PageProps<"/conselho/[tok
           Área do <span className="enfase">Conselho</span>
         </>
       }
-      texto="Indicações, propostas honorárias e avaliação do COCITIEIS no Prêmio Lavras de Inovação 2026."
+      texto="Indicações e avaliação do COCITIEIS no Prêmio Lavras de Inovação 2026."
     >
       <FormEntrarConselho aviso={AVISO[convite.estado] || undefined} />
     </TelaDividida>

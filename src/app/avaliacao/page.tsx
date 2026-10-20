@@ -9,7 +9,6 @@ import { ESCALA, estadoRodada, rotuloRodada } from "@/lib/avaliacao";
 import { dia, hora } from "@/lib/datas";
 import { cn } from "@/lib/utils";
 import { PainelIndicacoes } from "@/app/entidade/indicacoes-painel";
-import { PainelHonorarias } from "./honorarias-painel";
 
 export const metadata: Metadata = { title: "Avaliação do Conselho · Prêmio Lavras de Inovação 2026" };
 
@@ -124,9 +123,8 @@ export default async function PainelAvaliador() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="grid min-w-0 content-start gap-4 [&>*]:min-w-0">
             <AjudaDestaque className="lg:hidden" />
-            {/* Membros do COCITIEIS também indicam (art. 8º) e propõem as honorárias (art. 13). */}
+            {/* Membros do COCITIEIS também indicam (art. 8º). As honorárias são decididas internamente pelo Conselho. */}
             <PainelIndicacoes dono={{ avaliadorId: avaliador.id }} base="/avaliacao" />
-            <PainelHonorarias avaliadorId={avaliador.id} />
             <h2 className="mt-4 text-sm font-semibold uppercase tracking-[0.14em] text-fundo/60">Avaliação</h2>
             {!lista.length && (
               <Cartao>
@@ -188,7 +186,7 @@ function AjudaDestaque({ className }: { className?: string }) {
       </span>
       <span className="min-w-0 flex-1">
         <span className="block font-semibold">Passo a passo com imagens</span>
-        <span className="block text-sm text-fundo/75">Como indicar, propor e avaliar</span>
+        <span className="block text-sm text-fundo/75">Como indicar e avaliar</span>
       </span>
       <ArrowRight className="size-5 shrink-0 transition group-hover:translate-x-0.5" />
     </Link>

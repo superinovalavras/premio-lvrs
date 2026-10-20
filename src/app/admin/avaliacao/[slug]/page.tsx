@@ -47,7 +47,7 @@ export default async function CategoriaAvaliacao({ params }: PageProps<"/admin/a
         titulo={cat.name}
         sub={
           honoraria
-            ? "Os conselheiros enviam as propostas pela área do conselho. Inclua cada uma na votação e abra a rodada: vence quem tiver maioria simples dos votos válidos; senão, as duas mais votadas vão para a rodada final. Empate na rodada final: voto de minerva da Presidência."
+            ? "Decidida internamente pelo COCITIEIS. Registre aqui o homenageado escolhido, em “Adicionar proposta”."
             : `Cadastre as indicações aptas como “Indicado”. Com mais de 3, abra a pré-seleção: os 3 maiores resultados com 60 ou mais viram finalistas. Com 3 ou menos, cadastre direto como “Finalista”.${cat.has_popular_vote ? " Os finalistas desta categoria também aparecem na votação popular do site." : ""}`
         }
       />
@@ -68,7 +68,7 @@ export default async function CategoriaAvaliacao({ params }: PageProps<"/admin/a
         </CartaoAdmin>
       )}
 
-      {honoraria && (
+      {honoraria && !!propostas?.length && (
         <>
           <h2 className="mb-3 text-lg font-semibold">Propostas dos conselheiros</h2>
           <Propostas lista={(propostas ?? []).map((p) => ({ ...p, conselheiro: nomeAv.get(p.avaliador_id) ?? "—" }))} />
