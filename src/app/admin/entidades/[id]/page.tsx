@@ -44,7 +44,7 @@ export default async function AnaliseEntidade({ params }: PageProps<"/admin/enti
   ]);
 
   const itensDoc = [
-    ...documentosExigidos(e.inciso, !!suplente).map((d) => ({ tipo: d.id, nome: d.nome })),
+    ...documentosExigidos(e.inciso).map((d) => ({ tipo: d.id, nome: d.nome })),
     ...(e.inciso === "VII"
       ? e.criterios_vii.map((c) => ({
           tipo: tipoCriterio(c),

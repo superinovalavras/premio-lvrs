@@ -15,8 +15,7 @@ export type Inciso = {
   enderecoObrigatorio: boolean;
 };
 
-// Tabela do item 1.1. O ato de designação do representante é exigido de todos (item 1.4),
-// por isso não se repete aqui.
+// Documentos exigidos por inciso. Órgãos e entidades do Município (I e II) não anexam nada.
 export const INCISOS: Inciso[] = [
   {
     id: "I_II",
@@ -164,29 +163,13 @@ export const STATUS: Record<StatusEntidade, { rotulo: string; explica: string }>
   indeferido: { rotulo: "Indeferido", explica: "O cadastro não foi aprovado. Veja o motivo abaixo." },
 };
 
-export const DOC_ATO_TITULAR: Documento = {
-  id: "ato_designacao_titular",
-  nome: "Ato de designação do representante",
-  dica: "Ofício ou carta assinada pelo dirigente da entidade",
-};
-export const DOC_ATO_SUPLENTE: Documento = {
-  id: "ato_designacao_suplente",
-  nome: "Ato de designação do suplente",
-  dica: "Ofício ou carta assinada pelo dirigente da entidade",
-};
-
 export function incisoPorId(id: string | null | undefined) {
   return INCISOS.find((i) => i.id === id) ?? null;
 }
 
 // Lista completa do que precisa estar anexado para enviar.
-export function documentosExigidos(inciso: IncisoId | null, temSuplente: boolean): Documento[] {
-  const i = incisoPorId(inciso);
-  const atoTitular =
-    inciso === "I_II"
-      ? { ...DOC_ATO_TITULAR, dica: "Assinado pelo titular da pasta" }
-      : DOC_ATO_TITULAR;
-  return [...(i?.documentos ?? []), atoTitular, ...(temSuplente ? [DOC_ATO_SUPLENTE] : [])];
+export function documentosExigidos(inciso: IncisoId | null): Documento[] {
+  return incisoPorId(inciso)?.documentos ?? [];
 }
 
 export function cnpjValido(valor: string) {
@@ -346,16 +329,16 @@ export function calcularPendencias(
     if (!rs.success) p.push({ passo: 3, texto: `Suplente: ${rs.error.issues[0].message}` });
   }
 
-  for (const d of documentosExigidos(e.inciso, !!suplente)) {
+  for (const d of documentosExigidos(e.inciso)) {
     if (!tem(d.id)) p.push({ passo: 4, texto: d.nome });
   }
   return p;
 }
 
 // Tipos de documento que esta entidade pode anexar (o servidor recusa qualquer outro).
-export function tiposPermitidos(e: Pick<EntidadeRow, "inciso" | "criterios_vii">, temSuplente: boolean) {
+export function tiposPermitidos(e: Pick<EntidadeRow, "inciso" | "criterios_vii">) {
   return new Set([
-    ...documentosExigidos(e.inciso, temSuplente).map((d) => d.id),
+    ...documentosExigidos(e.inciso).map((d) => d.id),
     ...(e.inciso === "VII" ? e.criterios_vii.map(tipoCriterio) : []),
   ]);
 }

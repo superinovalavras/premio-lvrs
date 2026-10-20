@@ -138,8 +138,6 @@ export async function salvarRepresentantes(fd: FormData): Promise<Resultado> {
       });
   } else {
     await sb.from("representantes").delete().eq("entidade_id", dados.entidade.id).eq("papel", "suplente");
-    const atos = dados.documentos.filter((d) => d.tipo === "ato_designacao_suplente");
-    if (atos.length) await removerArquivos(atos.map((d) => d.id));
   }
   await auditar(user, "entidade_representantes", { tipo: "entidade", id: dados.entidade.id });
   revalidatePath("/entidade", "layout");
@@ -153,7 +151,7 @@ export async function salvarRepresentantes(fd: FormData): Promise<Resultado> {
 export async function prepararUpload(tipo: string, nome: string, tamanho: number, mime: string) {
   const { dados, bloqueado } = await minhaEntidadeEditavel();
   if (bloqueado) return { ok: false as const, erro: bloqueado };
-  if (!tiposPermitidos(dados.entidade, !!dados.suplente).has(tipo)) {
+  if (!tiposPermitidos(dados.entidade).has(tipo)) {
     return { ok: false as const, erro: "Documento não previsto para o seu enquadramento." };
   }
   if (tamanho > LIMITE) return { ok: false as const, erro: "O arquivo passa de 10 MB." };
@@ -170,7 +168,7 @@ export async function confirmarUpload(tipo: string, caminho: string, nome: strin
   const { user, dados, bloqueado } = await minhaEntidadeEditavel();
   if (bloqueado) return { ok: false, erro: bloqueado };
   if (!caminho.startsWith(`${dados.entidade.id}/`)) return { ok: false, erro: "Envio inválido." };
-  if (!tiposPermitidos(dados.entidade, !!dados.suplente).has(tipo)) return { ok: false, erro: "Documento inválido." };
+  if (!tiposPermitidos(dados.entidade).has(tipo)) return { ok: false, erro: "Documento inválido." };
 
   const anteriores = dados.documentos.filter((d) => d.tipo === tipo).map((d) => d.id);
   const { error } = await servico()
@@ -186,7 +184,7 @@ export async function confirmarUpload(tipo: string, caminho: string, nome: strin
 export async function salvarLink(tipo: string, link: string): Promise<Resultado> {
   const { user, dados, bloqueado } = await minhaEntidadeEditavel();
   if (bloqueado) return { ok: false, erro: bloqueado };
-  if (!tipo.startsWith("criterio:") || !tiposPermitidos(dados.entidade, !!dados.suplente).has(tipo)) {
+  if (!tipo.startsWith("criterio:") || !tiposPermitidos(dados.entidade).has(tipo)) {
     return { ok: false, erro: "Link não previsto para este item." };
   }
   let url: URL;

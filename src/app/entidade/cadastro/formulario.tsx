@@ -308,8 +308,11 @@ function PassoEnquadramento({ entidade, onSubmit }: { entidade: EntidadeRow; onS
       {inciso && (
         <div className="mt-6 rounded-2xl bg-nevoa p-4 text-sm">
           <p className="font-semibold">Documentos que serão pedidos</p>
+          {!documentosExigidos(inciso as EntidadeRow["inciso"]).length && inciso !== "VII" && (
+            <p className="mt-1.5 text-fundo/75">Nenhum: este enquadramento não exige documentos.</p>
+          )}
           <ul className="mt-1.5 list-disc pl-5 text-fundo/75">
-            {documentosExigidos(inciso as EntidadeRow["inciso"], false).map((d) => (
+            {documentosExigidos(inciso as EntidadeRow["inciso"]).map((d) => (
               <li key={d.id}>
                 {d.nome}
                 {d.dica && <span className="text-fundo/55"> — {d.dica}</span>}
@@ -475,8 +478,7 @@ function PassoRepresentantes({
     <form action={onSubmit}>
       <h2 className="text-xl font-semibold">Representante designado</h2>
       <p className="mt-1 text-sm font-light text-fundo/70">
-        A indicação é ato da instituição, exercido pela pessoa designada. O ato de designação é pedido no passo
-        Documentos.
+        A indicação é ato da instituição, exercido pela pessoa designada.
       </p>
       <div className="mt-5">
         <CamposPessoa prefixo="titular" r={titular} emailFixo />
@@ -519,7 +521,7 @@ function PassoDocumentos(
 ) {
   const itens: Item[] = useMemo(
     () => [
-      ...documentosExigidos(p.entidade.inciso, !!p.suplente).map((d) => ({
+      ...documentosExigidos(p.entidade.inciso).map((d) => ({
         tipo: d.id,
         nome: d.nome,
         dica: d.dica,
@@ -532,7 +534,7 @@ function PassoDocumentos(
           })
         : []),
     ],
-    [p.entidade, p.suplente],
+    [p.entidade],
   );
 
   if (!p.entidade.inciso) {
@@ -543,6 +545,7 @@ function PassoDocumentos(
     <div>
       <h2 className="text-xl font-semibold">Documentos comprobatórios</h2>
       <p className="mt-1 text-sm font-light text-fundo/70">PDF (ou imagem PNG/JPG), até 10 MB por arquivo.</p>
+      {!itens.length && <Aviso className="mt-5">Este enquadramento não exige documentos. Siga para a revisão.</Aviso>}
       <ul className="mt-5 divide-y divide-fundo/10">
         {itens.map((it) => (
           <LinhaDocumento key={it.tipo} item={it} doc={p.documentos.find((d) => d.tipo === it.tipo)} {...p} />
