@@ -3,10 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Mais } from "@/components/marca";
-import { Tutorial, type Topico } from "@/components/tutorial-visual";
+import { Tutorial } from "@/components/tutorial-visual";
 import { carregarParametros } from "@/lib/server/parametros";
 import { diaCurto } from "@/lib/datas";
-import topicos from "@/lib/tutoriais/como-avaliar.json";
+import { topicosConselho } from "@/lib/tutoriais/conselho";
 
 export const metadata: Metadata = {
   title: "Ajuda do Conselho · Prêmio Lavras de Inovação 2026",
@@ -46,7 +46,7 @@ export default async function AjudaConselho() {
           ))}
         </ul>
         <div className="mt-8">
-          <Tutorial topicos={topicos as Topico[]} />
+          <Tutorial topicos={topicosConselho} />
         </div>
       </div>
     </main>

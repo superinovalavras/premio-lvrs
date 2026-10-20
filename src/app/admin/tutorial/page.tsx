@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import { TopoAdmin } from "@/components/admin/ui";
 import { Tutorial, type Topico } from "@/components/tutorial-visual";
 import topicos from "./topicos.json";
-import { INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
+import { INDICACAO_POR_INSTITUICAO, PROPOSTAS_HONORARIAS } from "@/lib/edicao";
 
 // Tópicos das instituições indicadoras: guardados, aparecem de novo quando a indicação por instituições voltar.
 const SO_INSTITUICOES = ["instituicoes", "pre", "vincular-conselheiro", "teste-cadastro"];
-const visiveis = (topicos as Topico[]).filter((t) => INDICACAO_POR_INSTITUICAO || !SO_INSTITUICOES.includes(t.id));
+// Propostas honorárias pelo site: guardadas, aparecem de novo quando forem religadas.
+const SO_HONORARIAS = ["propostas-honorarias", "minerva"];
+const visiveis = (topicos as Topico[]).filter(
+  (t) => (INDICACAO_POR_INSTITUICAO || !SO_INSTITUICOES.includes(t.id)) && (PROPOSTAS_HONORARIAS || !SO_HONORARIAS.includes(t.id)),
+);
 
 export const metadata: Metadata = { title: "Tutorial · Painel do Prêmio" };
 

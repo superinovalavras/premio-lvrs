@@ -9,6 +9,8 @@ import { ESCALA, estadoRodada, rotuloRodada } from "@/lib/avaliacao";
 import { dia, hora } from "@/lib/datas";
 import { cn } from "@/lib/utils";
 import { PainelIndicacoes } from "@/app/entidade/indicacoes-painel";
+import { PainelHonorarias } from "./honorarias-painel";
+import { PROPOSTAS_HONORARIAS } from "@/lib/edicao";
 
 export const metadata: Metadata = { title: "Avaliação do Conselho · Prêmio Lavras de Inovação 2026" };
 
@@ -123,8 +125,9 @@ export default async function PainelAvaliador() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="grid min-w-0 content-start gap-4 [&>*]:min-w-0">
             <AjudaDestaque className="lg:hidden" />
-            {/* Membros do COCITIEIS também indicam (art. 8º). As honorárias são decididas internamente pelo Conselho. */}
+            {/* Membros do COCITIEIS também indicam (art. 8º) e, quando ligado, propõem as honorárias (art. 13). */}
             <PainelIndicacoes dono={{ avaliadorId: avaliador.id }} base="/avaliacao" />
+            {PROPOSTAS_HONORARIAS && <PainelHonorarias avaliadorId={avaliador.id} />}
             <h2 className="mt-4 text-sm font-semibold uppercase tracking-[0.14em] text-fundo/60">Avaliação</h2>
             {!lista.length && (
               <Cartao>

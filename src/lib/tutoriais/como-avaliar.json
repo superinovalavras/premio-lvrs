@@ -180,6 +180,41 @@
     ]
   },
   {
+    "id": "propor",
+    "titulo": "Proponha uma honorária",
+    "telas": [
+      {
+        "imagem": "/tutorial/a9-honoraria.png",
+        "pontos": [
+          {
+            "x": 37.41,
+            "y": 15.71,
+            "w": 46.12,
+            "h": 5.81,
+            "legenda": "Quem você propõe",
+            "lado": "esquerda"
+          },
+          {
+            "x": 37.41,
+            "y": 31,
+            "w": 46.12,
+            "h": 14.19,
+            "legenda": "Trajetória, contribuição, vínculo e relevância",
+            "lado": "esquerda"
+          },
+          {
+            "x": 76.06,
+            "y": 19.66,
+            "w": 23.43,
+            "h": 46.51,
+            "legenda": "Escolha por votação nominal; empate: minerva",
+            "lado": "direita"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "rodadas",
     "titulo": "Suas rodadas",
     "telas": [
@@ -300,6 +335,33 @@
             "h": 5.32,
             "legenda": "Todas as notas? Envie (não muda depois)",
             "lado": "cima"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "honoraria",
+    "titulo": "Honorárias: vote em um nome",
+    "telas": [
+      {
+        "imagem": "/tutorial/a6-voto.png",
+        "pontos": [
+          {
+            "x": 50,
+            "y": 39.78,
+            "w": 75.55,
+            "h": 11.63,
+            "legenda": "Escolha um nome (ou abstenha-se)",
+            "lado": "esquerda"
+          },
+          {
+            "x": 18.35,
+            "y": 76.16,
+            "w": 12.26,
+            "h": 5.32,
+            "legenda": "Registre o voto (não muda depois)",
+            "lado": "direita"
           }
         ]
       }
