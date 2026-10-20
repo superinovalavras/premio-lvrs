@@ -7,6 +7,8 @@ import { Tutorial, type Topico } from "@/components/tutorial-visual";
 import { carregarParametros } from "@/lib/server/parametros";
 import { diaCurto } from "@/lib/datas";
 import topicos from "@/lib/tutoriais/como-indicar.json";
+import { INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
+import { Fechado } from "@/app/cadastro/fechado";
 
 export const metadata: Metadata = {
   title: "Como indicar · Prêmio Lavras de Inovação 2026",
@@ -15,6 +17,7 @@ export const metadata: Metadata = {
 
 // Pública: a instituição vê o caminho antes de criar o acesso. Prints gerados por script de captura.
 export default async function ComoIndicar() {
+  if (!INDICACAO_POR_INSTITUICAO) return <Fechado />;
   const par = await carregarParametros();
   return (
     <main className="min-h-[100svh] bg-fundo text-white">

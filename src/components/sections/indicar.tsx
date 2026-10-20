@@ -7,6 +7,7 @@ import { Titulo } from "@/components/titulo";
 import { buttonVariants } from "@/components/ui/button";
 import { useParametros } from "@/components/parametros-context";
 import { periodo } from "@/lib/datas";
+import { INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
 
 const passos = (janela: string) => [
   { n: "1", t: "Peça o cadastro", d: "A instituição informa o enquadramento no art. 2º-B da Lei nº 3.813/2011 e anexa os documentos." },
@@ -23,11 +24,32 @@ const QUEM = [
   "Empresas de base tecnológica e inovadoras",
 ];
 
+// Edição 2026: indicam só os membros do COCITIEIS (12 assentos, titular e suplente).
+const passosConselho = (janela: string) => [
+  { n: "1", t: `Indicação · ${janela}`, d: "Cada membro indica até 6 nomes, no máximo 2 por categoria, com evidências da realização." },
+  { n: "2", t: "Análise da Secretaria", d: "A Secretaria Executiva confere a completude e a elegibilidade de cada indicação." },
+  { n: "3", t: "Avaliação do COCITIEIS", d: "Pré-seleção, quando necessária, e escolha de até 3 finalistas por categoria." },
+];
+
+const ASSENTOS = [
+  "Superintendência de CT&I",
+  "Secretarias municipais",
+  "SEDE/MG",
+  "UFLA",
+  "UNILAVRAS",
+  "FADMINAS",
+  "FAGAMMON",
+  "SEBRAE/MG",
+  "ACIL",
+  "CDL",
+];
+
 // Linha que se acende passo a passo — efeito próprio desta seção.
 export function Indicar() {
   const { indicacoesAbrem, indicacoesFecham } = useParametros();
   const janela = periodo(indicacoesAbrem, indicacoesFecham);
-  const PASSOS = passos(janela);
+  const instituicoes = INDICACAO_POR_INSTITUICAO;
+  const PASSOS = instituicoes ? passos(janela) : passosConselho(janela);
   return (
     <section id="indicar" className="relative py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -36,30 +58,42 @@ export function Indicar() {
             <Titulo
               selo={`Indicações · ${janela}`}
               titulo={
-                <>
-                  Sua instituição pode <span className="enfase">indicar</span>
-                </>
+                instituicoes ? (
+                  <>
+                    Sua instituição pode <span className="enfase">indicar</span>
+                  </>
+                ) : (
+                  <>
+                    Quem <span className="enfase">indica</span>
+                  </>
+                )
               }
-              texto="Indicam os membros do COCITIEIS e as instituições de Lavras habilitadas pela Secretaria Executiva do Prêmio, por meio de um representante designado."
+              texto={
+                instituicoes
+                  ? "Indicam os membros do COCITIEIS e as instituições de Lavras habilitadas pela Secretaria Executiva do Prêmio, por meio de um representante designado."
+                  : "Nesta edição, indicam os 24 membros do COCITIEIS, titulares e suplentes dos 12 assentos do Conselho. A indicação por instituições volta na próxima edição."
+              }
             />
             <ul className="mt-6 flex flex-wrap gap-2">
-              {QUEM.map((q) => (
+              {(instituicoes ? QUEM : ASSENTOS).map((q) => (
                 <li key={q} className="rounded-lg border border-white/15 px-3 py-1.5 text-[13px] text-white/80">
                   {q}
                 </li>
               ))}
             </ul>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/cadastro" className={buttonVariants({ size: "lg" })}>
-                Pedir cadastro <ArrowRight className="size-4" />
-              </Link>
-              <Link href="/entrar" className={buttonVariants({ variant: "outline", size: "lg" })}>
-                Já tenho acesso
-              </Link>
-              <Link href="/como-indicar" className={buttonVariants({ variant: "ajuda", size: "lg" })}>
-                <CircleHelp className="size-4" /> Como indicar?
-              </Link>
-            </div>
+            {instituicoes && (
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link href="/cadastro" className={buttonVariants({ size: "lg" })}>
+                  Pedir cadastro <ArrowRight className="size-4" />
+                </Link>
+                <Link href="/entrar" className={buttonVariants({ variant: "outline", size: "lg" })}>
+                  Já tenho acesso
+                </Link>
+                <Link href="/como-indicar" className={buttonVariants({ variant: "ajuda", size: "lg" })}>
+                  <CircleHelp className="size-4" /> Como indicar?
+                </Link>
+              </div>
+            )}
           </div>
 
           <ol className="relative grid gap-3">

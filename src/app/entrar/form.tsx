@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { entrar } from "@/lib/server/acoes-conta";
@@ -31,12 +32,14 @@ export function FormEntrar() {
       <p className="mt-4 text-center text-[13px] text-fundo/70">
         Esqueceu a senha? Escreva para superinovalavras@gmail.com: a Secretaria do Prêmio gera uma nova senha provisória.
       </p>
-      <div className="mt-8 border-t border-fundo/10 pt-6">
-        <p className="text-sm font-medium">Sua instituição ainda não tem cadastro?</p>
-        <Link href="/cadastro" className="mt-2 inline-block text-sm font-semibold text-verde underline underline-offset-4">
-          Pedir cadastro para indicar →
-        </Link>
-      </div>
+      {INDICACAO_POR_INSTITUICAO && (
+        <div className="mt-8 border-t border-fundo/10 pt-6">
+          <p className="text-sm font-medium">Sua instituição ainda não tem cadastro?</p>
+          <Link href="/cadastro" className="mt-2 inline-block text-sm font-semibold text-verde underline underline-offset-4">
+            Pedir cadastro para indicar →
+          </Link>
+        </div>
+      )}
     </form>
   );
 }

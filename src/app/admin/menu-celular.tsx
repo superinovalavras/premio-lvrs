@@ -35,7 +35,7 @@ export function MenuCelular({ telas, children }: { telas: { href: string; rotulo
   return (
     <div className="lg:hidden">
       <div className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-white/10 bg-chrome px-4">
-        <Link href="/admin/entidades" aria-label="Início do painel" className="flex min-h-10 items-center">
+        <Link href="/admin" aria-label="Início do painel" className="flex min-h-10 items-center">
           <Image src="/marca/lvrs-pacto.png" alt="LVRS+" width={900} height={520} className="h-7 w-auto" />
         </Link>
         <span className="min-w-0 flex-1 truncate text-sm font-medium text-white/85">{atual ?? "Painel do Prêmio"}</span>

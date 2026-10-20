@@ -15,6 +15,7 @@ import {
   usuarioAtual,
 } from "./sessao";
 import { DECLARACOES } from "@/lib/entidades";
+import { AVISO_INSTITUICOES, INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
 
 export type EstadoForm = { erro?: string; campos?: Record<string, string> } | undefined;
 
@@ -50,6 +51,7 @@ const contaSchema = z
 
 // Autocadastro: o representante cria a conta e a entidade nasce em rascunho.
 export async function criarConta(_: EstadoForm, fd: FormData): Promise<EstadoForm> {
+  if (!INDICACAO_POR_INSTITUICAO) return { erro: AVISO_INSTITUICOES };
   const bruto = Object.fromEntries(fd) as Record<string, string>;
   const v = contaSchema.safeParse(bruto);
   if (!v.success) return { erro: v.error.issues[0].message, campos: { nome: bruto.nome, email: bruto.email } };

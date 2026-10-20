@@ -10,6 +10,7 @@ import { invalidarAtosNaCategoria } from "./avaliacao-dados";
 import { carregarIndicacao, contextoIndicacao, enviadasNaCota, filtroDono, janelaIndicacoes, type DonoIndicacao } from "./indicacoes-dados";
 import { dia, hora } from "@/lib/datas";
 import { cnpjValido } from "@/lib/entidades";
+import { AVISO_INSTITUICOES, INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
 import { cpfValido, somenteDigitos } from "@/lib/voto";
 import {
   CONFLITOS,
@@ -50,6 +51,7 @@ async function prazoAberto() {
 }
 
 async function indicadorEntidade(): Promise<Indicador | { erro: string }> {
+  if (!INDICACAO_POR_INSTITUICAO) return { erro: AVISO_INSTITUICOES };
   const user = await exigirUsuario();
   const dados = await carregarEntidadeDoUsuario(user.id);
   if (!dados) return { erro: "Cadastro não encontrado." };

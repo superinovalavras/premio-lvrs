@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { carregarParametros } from "@/lib/server/parametros";
 import { dia, hora, periodo } from "@/lib/datas";
 import { PainelIndicacoes } from "./indicacoes-painel";
+import { AVISO_INSTITUICOES, INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
 
 export const metadata: Metadata = { title: "Minha instituição · Prêmio Lavras de Inovação 2026" };
 
@@ -50,6 +51,31 @@ export default async function PainelEntidade() {
   }
   const { entidade: e, titular } = dados;
   const nome = titular?.nome ?? (user.user_metadata?.nome as string) ?? user.email ?? "";
+  if (!INDICACAO_POR_INSTITUICAO) {
+    return (
+      <>
+        <CabecalhoArea
+          nome={nome}
+          selo="Indicações 2026"
+          titulo={
+            <>
+              Volta na próxima <span className="enfase">edição</span>
+            </>
+          }
+          texto={e.razao_social ?? "Instituição indicadora"}
+        />
+        <ConteudoArea>
+          <Cartao>
+            <Aviso tom="alerta">{AVISO_INSTITUICOES}</Aviso>
+            <p className="mt-4 font-light text-fundo/75">
+              O cadastro da sua instituição fica guardado para a próxima edição. Se você também é membro do COCITIEIS, indique pelo seu
+              acesso de conselheiro, no link enviado no grupo do Conselho.
+            </p>
+          </Cartao>
+        </ConteudoArea>
+      </>
+    );
+  }
   const st = STATUS[e.status];
   const Icone = ICONE[e.status];
   const pend = calcularPendencias(e, dados.representantes, dados.documentos);

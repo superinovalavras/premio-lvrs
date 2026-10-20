@@ -1,20 +1,35 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BarChart3, BookOpen, Building2, CalendarDays, ClipboardCheck, FileSpreadsheet, FileText, Home, Inbox, LayoutGrid, LogOut, Medal, UserPlus, Users } from "lucide-react";
+import {
+  BarChart3,
+  BookOpen,
+  Building2,
+  CalendarDays,
+  ClipboardCheck,
+  FileSpreadsheet,
+  FileText,
+  Home,
+  Inbox,
+  LayoutGrid,
+  LogOut,
+  Medal,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { exigirAdmin, servico } from "@/lib/server/sessao";
 import { sair } from "@/lib/server/acoes-conta";
 import { NavAdmin } from "./nav";
 import { AvisoPendencias } from "./aviso-pendencias";
 import { MenuCelular } from "./menu-celular";
+import { INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
 
 export default async function LayoutAdmin({ children }: { children: React.ReactNode }) {
   const admin = await exigirAdmin();
-  const { count } = await servico()
-    .from("entidades")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "em_analise");
+  const { count } = await servico().from("entidades").select("id", { count: "exact", head: true }).eq("status", "em_analise");
 
-  const itens = [
+  // Telas das instituições indicadoras: fora do menu enquanto a indicação por instituições estiver desligada.
+  const SO_INSTITUICOES = ["/admin/entidades", "/admin/entidades/nova", "/admin/entidades/importar"];
+  const todos = [
     { href: "/admin/tutorial", rotulo: "Tutorial", icone: <BookOpen className="size-[18px]" /> },
     { grupo: "Prêmio" },
     { href: "/admin/premio", rotulo: "Datas e cronograma", icone: <CalendarDays className="size-[18px]" /> },
@@ -32,11 +47,12 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
     { grupo: "Em breve" },
     { rotulo: "Votação ao vivo", icone: <BarChart3 className="size-[18px]" /> },
   ];
+  const itens = INDICACAO_POR_INSTITUICAO ? todos : todos.filter((x) => !("href" in x && x.href && SO_INSTITUICOES.includes(x.href)));
 
   // O mesmo conteúdo serve ao menu lateral (computador) e à gaveta do celular.
   const conteudoMenu = (
     <>
-      <Link href="/admin/entidades" className="mb-4 flex items-center gap-2.5 border-b border-white/10 px-2 pb-4">
+      <Link href="/admin" className="mb-4 flex items-center gap-2.5 border-b border-white/10 px-2 pb-4">
         <Image src="/marca/lvrs-pacto.png" alt="LVRS+" width={900} height={520} className="h-[30px] w-auto" />
         <span className="text-[9.5px] uppercase leading-snug tracking-[0.2em] text-white/75">
           Painel do Prêmio
@@ -71,8 +87,8 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
       <main className="min-w-0 px-4 py-7 sm:px-9 sm:pb-16">
         {!process.env.TURNSTILE_SECRET_KEY && (
           <p className="mb-6 rounded-2xl border border-amarelo/60 bg-amarelo/10 px-4 py-3 text-sm">
-            <b className="font-semibold text-amarelo">Anti-robô desligado.</b> A votação funciona, mas sem proteção contra
-            robôs. Configure o Cloudflare Turnstile antes da votação oficial.
+            <b className="font-semibold text-amarelo">Anti-robô desligado.</b> A votação funciona, mas sem proteção contra robôs. Configure
+            o Cloudflare Turnstile antes da votação oficial.
           </p>
         )}
         {children}

@@ -3,10 +3,13 @@ import { redirect } from "next/navigation";
 import { TelaDividida } from "@/components/area/tela-dividida";
 import { FormCadastro } from "./form";
 import { usuarioAtual } from "@/lib/server/sessao";
+import { INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
+import { Fechado } from "./fechado";
 
 export const metadata: Metadata = { title: "Pedir cadastro · Prêmio Lavras de Inovação 2026" };
 
 export default async function Cadastro() {
+  if (!INDICACAO_POR_INSTITUICAO) return <Fechado />;
   if (await usuarioAtual()) redirect("/entidade");
   return (
     <TelaDividida
