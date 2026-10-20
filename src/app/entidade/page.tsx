@@ -16,7 +16,6 @@ import { PainelIndicacoes } from "./indicacoes-painel";
 
 export const metadata: Metadata = { title: "Minha instituição · Prêmio Lavras de Inovação 2026" };
 
-
 const ICONE = {
   rascunho: CircleDashed,
   em_analise: Hourglass,
@@ -33,7 +32,15 @@ export default async function PainelEntidade() {
     if (destino !== "/entidade") redirect(destino);
     // Conta sem instituição e sem outro perfil (ex.: avaliador desativado): avisa em vez de voltar ao login em ciclo.
     return (
-      <TelaDividida selo="Área restrita" titulo={<>Acesso <span className="enfase">indisponível</span></>} texto="Esta conta não tem cadastro de instituição nem acesso de avaliador ativo.">
+      <TelaDividida
+        selo="Área restrita"
+        titulo={
+          <>
+            Acesso <span className="enfase">indisponível</span>
+          </>
+        }
+        texto="Esta conta não tem cadastro de instituição nem acesso de avaliador ativo."
+      >
         <Aviso>Fale com a Secretaria do Prêmio para revisar o seu acesso.</Aviso>
         <form action={sair} className="mt-6">
           <button className={btnPrim}>Sair</button>
@@ -81,7 +88,11 @@ export default async function PainelEntidade() {
               <span
                 className={cn(
                   "grid size-11 place-items-center rounded-2xl",
-                  e.status === "deferido" ? "bg-verde text-white" : e.status === "indeferido" ? "bg-vermelho text-white" : "bg-amarelo text-fundo",
+                  e.status === "deferido"
+                    ? "bg-verde text-white"
+                    : e.status === "indeferido"
+                      ? "bg-vermelho text-white"
+                      : "bg-amarelo text-fundo",
                 )}
               >
                 <Icone className="size-5" />
@@ -151,7 +162,11 @@ export default async function PainelEntidade() {
                 <CalendarClock className="size-4" /> Período de indicações
               </p>
               <p className="mt-2 text-3xl font-semibold">
-                {agora < INDICACOES_ABREM ? `Abre em ${dias} ${dias === 1 ? "dia" : "dias"}` : agora <= INDICACOES_FECHAM ? "Aberto" : "Encerrado"}
+                {agora < INDICACOES_ABREM
+                  ? `Abre em ${dias} ${dias === 1 ? "dia" : "dias"}`
+                  : agora <= INDICACOES_FECHAM
+                    ? "Aberto"
+                    : "Encerrado"}
               </p>
               <p className="mt-1 text-sm text-white/85">
                 {dia(par.indicacoesAbrem)}, à {hora(par.indicacoesAbrem)}, até {dia(par.indicacoesFecham)}, às {hora(par.indicacoesFecham)}
@@ -160,9 +175,14 @@ export default async function PainelEntidade() {
             <Cartao className="border-amarelo bg-amarelo p-6 text-fundo">
               <h3 className="font-bold">Como funciona</h3>
               <ul className="mt-2 space-y-1.5 text-sm font-semibold">
-                <li>· Sua instituição tem apenas 6 indicações em toda a edição, no máximo 2 por categoria. Cada uma conta: reserve-as para quem mais se destaca.</li>
+                <li>
+                  · <span className="font-extrabold">Só 6 indicações no total</span>, até 2 por categoria. Escolha com atenção.
+                </li>
                 <li>· Só cadastros deferidos indicam.</li>
-                <li>· A análise do cadastro leva até 1 dia útil — pedidos enviados nas últimas 24 horas do prazo podem não ser analisados a tempo.</li>
+                <li>
+                  · A análise do cadastro leva até 1 dia útil — pedidos enviados nas últimas 24 horas do prazo podem não ser analisados a
+                  tempo.
+                </li>
               </ul>
             </Cartao>
           </div>

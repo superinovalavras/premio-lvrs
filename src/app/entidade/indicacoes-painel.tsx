@@ -19,7 +19,10 @@ export async function PainelIndicacoes({ dono, base = "/entidade" }: { dono: Don
   ]);
   const nomeCat = new Map((cats ?? []).map((c) => [c.id, c.name as string]));
   // Decisão preliminar (art. 10, § 2º), lida à parte para funcionar antes da migração 0011.
-  const { data: analises } = await servico().from("indicacoes").select("id, analise").in("id", lista.map((i) => i.id).concat("00000000-0000-0000-0000-000000000000"));
+  const { data: analises } = await servico()
+    .from("indicacoes")
+    .select("id, analise")
+    .in("id", lista.map((i) => i.id).concat("00000000-0000-0000-0000-000000000000"));
   const analise = new Map((analises ?? []).map((a) => [a.id as string, a.analise as "apta" | "inapta" | null]));
   // Art. 8º, § 7º: a cota pode ser conjunta (instituição com assento + seus conselheiros).
   const enviadas = cota.lista;
@@ -37,28 +40,27 @@ export async function PainelIndicacoes({ dono, base = "/entidade" }: { dono: Don
           </h2>
           {cota.conjunta && (
             <p className="mt-0.5 text-[13px] text-fundo/60">
-              Cota somada com {"entidadeId" in dono ? "o seu representante no COCITIEIS" : "a instituição que você representa"} (art. 8º, § 7º).
+              Cota somada com {"entidadeId" in dono ? "o seu representante no COCITIEIS" : "a instituição que você representa"} (art. 8º, §
+              7º).
             </p>
           )}
         </div>
-        {janela.estado === "aberta" && enviadas.length < LIMITE_TOTAL && <NovaIndicacao origem={"entidadeId" in dono ? "entidade" : "conselheiro"} base={base} />}
+        {janela.estado === "aberta" && enviadas.length < LIMITE_TOTAL && (
+          <NovaIndicacao origem={"entidadeId" in dono ? "entidade" : "conselheiro"} base={base} />
+        )}
       </div>
       {janela.estado === "aberta" && enviadas.length < LIMITE_TOTAL && (
-        <div className="mt-4 rounded-2xl border border-amarelo bg-amarelo/15 px-4 py-3 text-sm text-fundo/85">
-          <p className="font-semibold text-fundo">
-            {enviadas.length
-              ? `Restam apenas ${LIMITE_TOTAL - enviadas.length} ${LIMITE_TOTAL - enviadas.length === 1 ? "indicação" : "indicações"} para toda a edição.`
-              : `São apenas ${LIMITE_TOTAL} indicações para toda a edição.`}
-          </p>
-          <p className="mt-0.5">
-            No máximo 2 por categoria. Antes de enviar, compare os candidatos e priorize os de maior impacto: a indicação
-            enviada ocupa a vaga e não pode ser excluída.
-          </p>
-        </div>
+        <p className="mt-4 rounded-2xl bg-amarelo px-4 py-3 font-bold text-fundo">
+          {enviadas.length
+            ? `Restam ${LIMITE_TOTAL - enviadas.length} de ${LIMITE_TOTAL} indicações.`
+            : `Só ${LIMITE_TOTAL} indicações no total.`}{" "}
+          Escolha com atenção.
+        </p>
       )}
       {janela.estado === "antes" && (
         <Aviso className="mt-4">
-          O formulário abre em {dia(janela.abre)}, à {hora(janela.abre)}, e fica disponível até {dia(janela.fecha)}, às {hora(janela.fecha)}.
+          O formulário abre em {dia(janela.abre)}, à {hora(janela.abre)}, e fica disponível até {dia(janela.fecha)}, às {hora(janela.fecha)}
+          .
         </Aviso>
       )}
       {janela.estado === "encerrada" && <Aviso className="mt-4">O prazo de indicações terminou em {dia(janela.fecha)}.</Aviso>}
