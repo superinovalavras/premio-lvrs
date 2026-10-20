@@ -51,9 +51,11 @@ export async function PainelIndicacoes({ dono, base = "/entidade" }: { dono: Don
       </div>
       {janela.estado === "aberta" && enviadas.length < LIMITE_TOTAL && (
         <p className="mt-4 rounded-2xl bg-amarelo px-4 py-3 font-bold text-fundo">
-          {enviadas.length
-            ? `Restam ${LIMITE_TOTAL - enviadas.length} de ${LIMITE_TOTAL} indicações.`
-            : `Só ${LIMITE_TOTAL} indicações no total.`}{" "}
+          <span className="rounded-lg bg-fundo px-2 py-0.5 text-white">
+            {enviadas.length
+              ? `Restam ${LIMITE_TOTAL - enviadas.length} de ${LIMITE_TOTAL} indicações`
+              : `Só ${LIMITE_TOTAL} indicações no total`}
+          </span>{" "}
           Escolha com atenção.
         </p>
       )}

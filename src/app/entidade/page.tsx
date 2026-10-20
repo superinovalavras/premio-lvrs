@@ -176,7 +176,8 @@ export default async function PainelEntidade() {
               <h3 className="font-bold">Como funciona</h3>
               <ul className="mt-2 space-y-1.5 text-sm font-semibold">
                 <li>
-                  · <span className="font-extrabold">Só 6 indicações no total</span>, até 2 por categoria. Escolha com atenção.
+                  · <span className="rounded-lg bg-fundo px-2 py-0.5 font-bold text-white">Só 6 indicações no total</span>, até 2 por
+                  categoria. Escolha com atenção.
                 </li>
                 <li>· Só cadastros deferidos indicam.</li>
                 <li>
