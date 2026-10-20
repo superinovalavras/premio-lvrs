@@ -47,12 +47,12 @@ export async function PainelIndicacoes({ dono, base = "/entidade" }: { dono: Don
         <div className="mt-4 rounded-2xl border border-amarelo bg-amarelo/15 px-4 py-3 text-sm text-fundo/85">
           <p className="font-semibold text-fundo">
             {enviadas.length
-              ? `Restam ${LIMITE_TOTAL - enviadas.length} ${LIMITE_TOTAL - enviadas.length === 1 ? "indicação" : "indicações"} para toda a edição.`
-              : `São ${LIMITE_TOTAL} indicações para toda a edição.`}
+              ? `Restam apenas ${LIMITE_TOTAL - enviadas.length} ${LIMITE_TOTAL - enviadas.length === 1 ? "indicação" : "indicações"} para toda a edição.`
+              : `São apenas ${LIMITE_TOTAL} indicações para toda a edição.`}
           </p>
           <p className="mt-0.5">
-            No máximo 2 por categoria. Escolha com atenção: depois de enviada, a indicação ocupa a vaga e não pode ser
-            excluída.
+            No máximo 2 por categoria. Antes de enviar, compare os candidatos e priorize os de maior impacto: a indicação
+            enviada ocupa a vaga e não pode ser excluída.
           </p>
         </div>
       )}

@@ -160,7 +160,7 @@ export default async function PainelEntidade() {
             <Cartao className="border-amarelo bg-amarelo p-6 text-fundo">
               <h3 className="font-bold">Como funciona</h3>
               <ul className="mt-2 space-y-1.5 text-sm font-semibold">
-                <li>· 6 indicações para toda a edição, no máximo 2 por categoria.</li>
+                <li>· Sua instituição tem apenas 6 indicações em toda a edição, no máximo 2 por categoria. Cada uma conta: reserve-as para quem mais se destaca.</li>
                 <li>· Só cadastros deferidos indicam.</li>
                 <li>· A análise do cadastro leva até 1 dia útil — pedidos enviados nas últimas 24 horas do prazo podem não ser analisados a tempo.</li>
               </ul>
