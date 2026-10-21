@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, Loader2, Plus, Trash2 } from "lucide-react";
 import { salvarCronograma, salvarDatas } from "@/lib/server/acoes-parametros";
@@ -46,7 +47,7 @@ export function FormDatas({ valores }: { valores: Record<string, string> }) {
     >
       <CartaoAdmin>
         <h2 className="font-semibold">Indicações</h2>
-        <p className="mb-4 mt-1 text-[13px] text-white/60">Período em que conselheiros e instituições deferidas indicam (art. 8º-A, II).</p>
+        <p className="mb-4 mt-1 text-[13px] text-white/60">{INDICACAO_POR_INSTITUICAO ? "Período em que conselheiros e instituições deferidas indicam (art. 8º-A, II)." : "Período em que os conselheiros indicam (art. 8º-A, II)."}</p>
         <div className="grid gap-3">
           {campo("indicacoes_abrem", "Abrem em")}
           {campo("indicacoes_fecham", "Encerram em")}

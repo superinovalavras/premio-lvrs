@@ -8,6 +8,7 @@ import { CAMPOS_INDICACAO, menores, type IndicacaoRow } from "@/lib/indicacoes";
 import { formatarData } from "@/lib/entidades";
 import { dia, hora } from "@/lib/datas";
 import { cn } from "@/lib/utils";
+import { INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
 
 export const metadata: Metadata = { title: "Indicações · Painel do Prêmio" };
 
@@ -46,7 +47,7 @@ export default async function PaginaIndicacoes() {
         titulo={<span className="enfase">Indicações</span>}
         sub={
           <>
-            Indicações enviadas pelas instituições e pelos conselheiros, na ordem de chegada (carimbo do servidor). Prazo: {dia(janela.abre)}, {hora(janela.abre)}, a{" "}
+            Indicações enviadas {INDICACAO_POR_INSTITUICAO ? "pelas instituições e pelos conselheiros" : "pelos conselheiros"}, na ordem de chegada (carimbo do servidor). Prazo: {dia(janela.abre)}, {hora(janela.abre)}, a{" "}
             {dia(janela.fecha)}, {hora(janela.fecha)} · <b className="font-semibold text-white">{janela.estado === "aberta" ? "aberto" : janela.estado === "antes" ? "ainda não abriu" : "encerrado"}</b>.
           </>
         }
