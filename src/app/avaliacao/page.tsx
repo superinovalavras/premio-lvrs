@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, CircleDashed, CircleHelp, Clock, Lock, PenLine, XCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, CircleDashed, CircleHelp, Clock, ExternalLink, FileText, Lock, PenLine, XCircle } from "lucide-react";
 import { CabecalhoArea, ConteudoArea } from "@/components/area/cabecalho";
 import { Aviso, Cartao, btnPrim, btnSec } from "@/components/area/ui";
 import { exigirAvaliador, servico } from "@/lib/server/sessao";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { PainelIndicacoes } from "@/app/entidade/indicacoes-painel";
 import { PainelHonorarias } from "./honorarias-painel";
 import { PROPOSTAS_HONORARIAS } from "@/lib/edicao";
+import { carregarParametros } from "@/lib/server/parametros";
 
 export const metadata: Metadata = { title: "Avaliação do Conselho · Prêmio Lavras de Inovação 2026" };
 
@@ -21,6 +22,8 @@ const prazo = (iso: string) => `${dia(iso).slice(0, 5)}, ${hora(iso)}`;
 export default async function PainelAvaliador() {
   const { avaliador } = await exigirAvaliador();
   const sb = servico();
+  const par = await carregarParametros();
+  const regulamento = par.documentos.find((d) => /regulamento/i.test(d.titulo) && d.href)?.href ?? null;
   const [{ data: rodadas }, { data: cats }, { data: decl }, { data: fichas }, { data: votos }] = await Promise.all([
     sb.from("rodadas").select(CAMPOS_RODADA).eq("is_test", avaliador.is_test).returns<Rodada[]>(),
     sb.from("categories").select("id, name, sort_order"),
@@ -125,6 +128,7 @@ export default async function PainelAvaliador() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="grid min-w-0 content-start gap-4 [&>*]:min-w-0">
             <AjudaDestaque className="lg:hidden" />
+            {regulamento && <BotaoRegulamento href={regulamento} className="lg:hidden" />}
             {/* Membros do COCITIEIS também indicam (art. 8º) e, quando ligado, propõem as honorárias (art. 13). */}
             <PainelIndicacoes dono={{ avaliadorId: avaliador.id }} base="/avaliacao" />
             {PROPOSTAS_HONORARIAS && <PainelHonorarias avaliadorId={avaliador.id} />}
@@ -145,6 +149,7 @@ export default async function PainelAvaliador() {
 
           <div className="grid min-w-0 content-start gap-4 [&>*]:min-w-0">
             <AjudaDestaque className="hidden lg:flex" />
+            {regulamento && <BotaoRegulamento href={regulamento} className="hidden lg:flex" />}
             <Cartao className="p-6">
               <h3 className="font-semibold">Como funciona</h3>
               <ul className="mt-2 space-y-2 text-sm font-light text-fundo/75">
@@ -175,6 +180,30 @@ export default async function PainelAvaliador() {
 }
 
 // Ajuda em destaque: no celular, no topo da página; no computador, no topo da coluna da direita.
+// O regulamento publicado em Documentos (painel), aberto em outra aba.
+function BotaoRegulamento({ href, className }: { href: string; className?: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        "group flex items-center gap-3 rounded-[22px] bg-fundo p-5 text-white transition hover:-translate-y-0.5",
+        className,
+      )}
+    >
+      <span className="grid size-11 shrink-0 place-items-center rounded-full bg-amarelo text-fundo">
+        <FileText className="size-6" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-semibold">Regulamento do Prêmio</span>
+        <span className="block text-sm text-white/70">Edital assinado, em PDF</span>
+      </span>
+      <ExternalLink className="size-5 shrink-0 text-white/70" />
+    </a>
+  );
+}
+
 function AjudaDestaque({ className }: { className?: string }) {
   return (
     <Link
