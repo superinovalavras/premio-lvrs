@@ -14,9 +14,10 @@ import {
   LogOut,
   Medal,
   UserPlus,
+  UserRound,
   Users,
 } from "lucide-react";
-import { exigirAdmin, servico } from "@/lib/server/sessao";
+import { avaliadorDoUsuario, exigirAdmin, servico } from "@/lib/server/sessao";
 import { sair } from "@/lib/server/acoes-conta";
 import { NavAdmin } from "./nav";
 import { AvisoPendencias } from "./aviso-pendencias";
@@ -25,6 +26,9 @@ import { INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
 
 export default async function LayoutAdmin({ children }: { children: React.ReactNode }) {
   const admin = await exigirAdmin();
+  // Admin que também é conselheiro: mostra o nome e o atalho para a área do conselho.
+  const conselheiro = await avaliadorDoUsuario(admin.id);
+  const souConselheiro = !!conselheiro?.ativo;
   const { count } = await servico().from("entidades").select("id", { count: "exact", head: true }).eq("status", "em_analise");
 
   // Telas das instituições indicadoras: fora do menu enquanto a indicação por instituições estiver desligada.
@@ -62,9 +66,14 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
       </Link>
       <NavAdmin itens={itens} />
       <div className="mt-5 space-y-1 border-t border-white/10 px-2.5 pt-4 text-xs text-white/60">
-        <p className="truncate" title={admin.email}>
-          {admin.email}
+        <p className="truncate" title={souConselheiro ? conselheiro!.nome : admin.email}>
+          {souConselheiro ? conselheiro!.nome : admin.email}
         </p>
+        {souConselheiro && (
+          <Link href="/avaliacao" className="flex min-h-9 items-center gap-1.5 font-semibold text-amarelo hover:underline">
+            <UserRound className="size-3.5" /> Área do conselheiro
+          </Link>
+        )}
         <Link href="/" className="flex min-h-9 items-center gap-1.5 hover:text-amarelo">
           <Home className="size-3.5" /> Ver o site
         </Link>

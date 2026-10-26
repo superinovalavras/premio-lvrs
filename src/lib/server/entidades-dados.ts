@@ -45,5 +45,6 @@ export async function carregarEntidade(id: string) {
 
 export async function emailsAdmins() {
   const { data } = await servico().from("admins").select("email");
-  return (data ?? []).map((a) => a.email as string);
+  // Quem é admin e conselheiro tem duas linhas (uma por conta): manda uma vez só, e nunca para endereço técnico.
+  return [...new Set((data ?? []).map((a) => (a.email as string).toLowerCase()))].filter((e) => !e.endsWith(".invalid"));
 }

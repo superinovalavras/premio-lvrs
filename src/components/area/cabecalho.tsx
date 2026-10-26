@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { LogOut, UserRound } from "lucide-react";
+import { LayoutDashboard, LogOut, UserRound } from "lucide-react";
 import { Arcos, Mais } from "@/components/marca";
 import { sair } from "@/lib/server/acoes-conta";
+import { ehAdmin, usuarioAtual } from "@/lib/server/sessao";
 
 // Topo verde-profundo das áreas com login (instituição e conselho), com a chamada da página.
-export function CabecalhoArea({
+export async function CabecalhoArea({
   nome,
   selo,
   titulo,
@@ -28,6 +29,9 @@ export function CabecalhoArea({
     .join("");
   // Na área do Conselho, nome e iniciais levam ao "Meu perfil" (nome de login, e-mail e senha).
   const perfil = inicio === "/avaliacao" ? "/avaliacao/perfil" : null;
+  // Conselheiro que também é da Secretaria (admin): atalho para o painel.
+  const u = perfil ? await usuarioAtual() : null;
+  const painel = u ? await ehAdmin(u.id) : false;
   const pessoa = (
     <>
       <span className="hidden text-white/85 sm:inline">{nome}</span>
@@ -47,6 +51,15 @@ export function CabecalhoArea({
           </span>
         </Link>
         <div className="ml-auto flex items-center gap-3 text-[13px]">
+          {painel && (
+            <Link
+              href="/admin"
+              title="Painel do Prêmio"
+              className="flex h-10 items-center gap-1 rounded-lg border border-amarelo/60 px-2.5 text-amarelo hover:bg-amarelo hover:text-fundo"
+            >
+              <LayoutDashboard className="size-3.5" /> Painel
+            </Link>
+          )}
           {perfil ? (
             <Link href={perfil} title="Meu perfil" className="group flex items-center gap-3 rounded-full hover:text-amarelo">
               {pessoa}
@@ -58,7 +71,11 @@ export function CabecalhoArea({
             pessoa
           )}
           <form action={sair}>
-            <button className="flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-lg px-2 text-white/75 hover:text-amarelo" title="Sair" aria-label="Sair">
+            <button
+              className="flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-lg px-2 text-white/75 hover:text-amarelo"
+              title="Sair"
+              aria-label="Sair"
+            >
               <LogOut className="size-4" /> <span className="hidden sm:inline">Sair</span>
             </button>
           </form>
