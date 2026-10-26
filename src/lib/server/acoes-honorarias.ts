@@ -8,14 +8,15 @@ import { janelaIndicacoes } from "./indicacoes-dados";
 import { avaliadorDoUsuario, exigirAdmin, exigirUsuario, servico } from "./sessao";
 import { CAMPOS_PROPOSTA, SO_PESSOA } from "@/lib/honorarias";
 import { dia, hora } from "@/lib/datas";
-import { PROPOSTAS_HONORARIAS } from "@/lib/edicao";
+import { HONORARIAS_COM_PROPOSTA, PROPOSTAS_HONORARIAS } from "@/lib/edicao";
 
 export type Resultado = { ok: true; msg?: string } | { ok: false; erro: string };
 
 // Proposta honorária (art. 13 e Anexo I): cada conselheiro apresenta uma por categoria honorária,
 // dentro do prazo de indicações. Pode editar até o fim do prazo.
 export async function salvarPropostaHonoraria(slug: string, fd: FormData): Promise<Resultado> {
-  if (!PROPOSTAS_HONORARIAS) return { ok: false, erro: "Nesta edição, as honorárias são decididas internamente pelo COCITIEIS." };
+  if (!PROPOSTAS_HONORARIAS || !HONORARIAS_COM_PROPOSTA.includes(slug))
+    return { ok: false, erro: "Nesta edição, esta categoria honorária é decidida internamente pelo COCITIEIS." };
   const user = await exigirUsuario();
   const av = await avaliadorDoUsuario(user.id);
   if (!av?.ativo) return { ok: false, erro: "Só conselheiros apresentam propostas honorárias (art. 13)." };
@@ -29,7 +30,8 @@ export async function salvarPropostaHonoraria(slug: string, fd: FormData): Promi
 
   const tipo = String(fd.get("indicado_tipo") ?? "");
   if (!["pf", "instituicao"].includes(tipo)) return { ok: false, erro: "Diga se é pessoa ou instituição." };
-  if (tipo !== "pf" && SO_PESSOA.includes(slug)) return { ok: false, erro: `${cat.name} reconhece só pessoa física (art. 6º, tabela de categorias).` };
+  if (tipo !== "pf" && SO_PESSOA.includes(slug))
+    return { ok: false, erro: `${cat.name} reconhece só pessoa física (art. 6º, tabela de categorias).` };
   const campos: Record<string, string | null> = {};
   for (const c of CAMPOS_PROPOSTA) {
     const v = String(fd.get(c.id) ?? "").trim();
@@ -48,12 +50,19 @@ export async function salvarPropostaHonoraria(slug: string, fd: FormData): Promi
   if (antes?.finalist_id) return { ok: false, erro: "A Secretaria já incluiu esta proposta na votação: ela não muda mais." };
 
   const agora = new Date().toISOString();
-  const { error } = await sb.from("propostas_honorarias").upsert(
-    { avaliador_id: av.id, category_id: cat.id, indicado_tipo: tipo, ...campos, atualizada_em: agora, is_test: av.is_test },
-    { onConflict: "avaliador_id,category_id" },
-  );
+  const { error } = await sb
+    .from("propostas_honorarias")
+    .upsert(
+      { avaliador_id: av.id, category_id: cat.id, indicado_tipo: tipo, ...campos, atualizada_em: agora, is_test: av.is_test },
+      { onConflict: "avaliador_id,category_id" },
+    );
   if (error) return { ok: false, erro: "Não foi possível salvar a proposta." };
-  await auditar(user, antes ? "proposta_honoraria_editada" : "proposta_honoraria_enviada", { tipo: "categoria", id: cat.id }, { indicado: campos.indicado_nome });
+  await auditar(
+    user,
+    antes ? "proposta_honoraria_editada" : "proposta_honoraria_enviada",
+    { tipo: "categoria", id: cat.id },
+    { indicado: campos.indicado_nome },
+  );
 
   if (!antes) {
     for (const para of await emailsAdmins()) {

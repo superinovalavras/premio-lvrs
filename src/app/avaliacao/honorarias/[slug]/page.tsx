@@ -8,15 +8,15 @@ import { exigirAvaliador, servico } from "@/lib/server/sessao";
 import { janelaIndicacoes } from "@/lib/server/indicacoes-dados";
 import { SELECT_PROPOSTA, type PropostaRow } from "@/lib/honorarias";
 import { dia, hora } from "@/lib/datas";
-import { PROPOSTAS_HONORARIAS } from "@/lib/edicao";
+import { HONORARIAS_COM_PROPOSTA, PROPOSTAS_HONORARIAS } from "@/lib/edicao";
 import { FormularioProposta } from "./formulario";
 
 export const metadata: Metadata = { title: "Proposta honorária · Prêmio Lavras de Inovação 2026" };
 
 // Art. 13: cada conselheiro apresenta uma proposta fundamentada em cada categoria honorária.
 export default async function PropostaHonoraria({ params }: PageProps<"/avaliacao/honorarias/[slug]">) {
-  if (!PROPOSTAS_HONORARIAS) notFound();
   const { slug } = await params;
+  if (!PROPOSTAS_HONORARIAS || !HONORARIAS_COM_PROPOSTA.includes(slug)) notFound();
   const { avaliador } = await exigirAvaliador();
   const sb = servico();
   const { data: cat } = await sb.from("categories").select("id, name, description, type").eq("slug", slug).maybeSingle();
