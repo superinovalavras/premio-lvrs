@@ -160,7 +160,7 @@ function Formulario(p: Props) {
             {...comuns}
             tipo="vinculo"
             titulo="Evidência do vínculo"
-            dica="Pelo menos uma: arquivo ou link."
+            dica="Opcional: arquivo ou link."
             aceitaLink
             max={MAX_EVIDENCIAS_VINCULO}
             docs={docs("vinculo")}
@@ -337,8 +337,8 @@ function PassoIndicado(p: Props & { onSubmit: (e: React.FormEvent<HTMLFormElemen
           {tipo === "pf" && (
             <Campo
               label="Data de nascimento"
-              opcional={!jovem}
-              dica={jovem ? "Obrigatória no Jovem Inovador: de 18 a 29 anos." : "Só podem ser indicadas pessoas com 18 anos ou mais (art. 7º)."}
+              opcional
+              dica={jovem ? "No Jovem Inovador, confere a faixa de 18 a 29 anos." : "Só podem ser indicadas pessoas com 18 anos ou mais (art. 7º)."}
             >
               <input name="indicado_nascimento" type="date" defaultValue={i.indicado_nascimento ?? ""} className={inputCls} />
             </Campo>
@@ -350,7 +350,7 @@ function PassoIndicado(p: Props & { onSubmit: (e: React.FormEvent<HTMLFormElemen
         <div className="mt-6">
           <p className="text-[13px] font-medium">Integrantes do conjunto</p>
           <p className="text-[12.5px] text-fundo/60">
-            {jovem ? "Nome e data de nascimento de cada pessoa (obrigatória no Jovem Inovador). CPF é opcional." : "Nome de cada pessoa. CPF e nascimento são opcionais."}
+            {jovem ? "Nome de cada pessoa. A data de nascimento, se informada, confere a faixa de 18 a 29 anos." : "Nome de cada pessoa. CPF e nascimento são opcionais."}
           </p>
           <input type="hidden" name="integrantes" value={JSON.stringify(integrantes)} />
           <div className="mt-3 grid gap-3">
@@ -362,7 +362,7 @@ function PassoIndicado(p: Props & { onSubmit: (e: React.FormEvent<HTMLFormElemen
                 <Campo label="CPF" opcional>
                   <input value={mascaraCpf(g.cpf)} onChange={(e) => setG(n, "cpf", somenteDigitos(e.target.value))} inputMode="numeric" className={inputCls} />
                 </Campo>
-                <Campo label="Nascimento" opcional={!jovem}>
+                <Campo label="Nascimento" opcional>
                   <input type="date" value={g.nascimento} onChange={(e) => setG(n, "nascimento", e.target.value)} className={inputCls} />
                 </Campo>
                 <button
@@ -649,7 +649,7 @@ function PassoContato({ indicacao: i, onSubmit }: { indicacao: IndicacaoRow; onS
     <form onSubmit={onSubmit}>
       <h2 className="text-xl font-semibold">Contato do indicado</h2>
       <p className="mt-1 text-sm font-light text-fundo/70">
-        O indicado é contatado antes de qualquer divulgação do nome (art. 10, § 1º). Sem contato válido, a indicação não se habilita.
+        Se puder, informe um contato: o indicado é contatado antes de qualquer divulgação do nome (art. 10, § 1º).
       </p>
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <Campo label="Nome da pessoa de contato" className="sm:col-span-2">
@@ -664,7 +664,7 @@ function PassoContato({ indicacao: i, onSubmit }: { indicacao: IndicacaoRow; onS
       </div>
 
       <h2 className="mt-9 text-xl font-semibold">Vínculos e conflitos</h2>
-      <p className="mt-1 text-sm font-light text-fundo/70">Nenhuma pode ficar em branco (art. 9º, VII, e art. 23).</p>
+      <p className="mt-1 text-sm font-light text-fundo/70">Responda se souber: ajuda a Secretaria a conferir impedimentos (art. 23).</p>
       <div className="mt-4 grid gap-3">
         {CONFLITOS.map((c) => (
           <div key={c.id} className="rounded-2xl border border-fundo/10 p-4">

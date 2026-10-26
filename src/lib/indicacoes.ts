@@ -129,34 +129,23 @@ const dataOk = (s: string | null | undefined) => !!s && /^\d{4}-\d{2}-\d{2}$/.te
 
 // O que falta para enviar (mesma regra na tela e no servidor). As travas que dependem do banco
 // (prazo, limites, autoindicação, habilitação) ficam no servidor.
-export function pendenciasIndicacao(i: IndicacaoRow, docs: IndDocRow[], ctx: Contexto, hoje = new Date()): Pendencia[] {
+// O que impede o envio. Desde 26/10/2026 só categoria e nome do indicado são obrigatórios (os demais campos
+// ficaram opcionais para facilitar a indicação). Continuam valendo as regras do regulamento sobre o que for
+// preenchido: CPF/CNPJ válidos, 18 anos ou mais (art. 7º) e a faixa de 18 a 29 anos no Jovem Inovador.
+export function pendenciasIndicacao(i: IndicacaoRow, _docs: IndDocRow[], ctx: Contexto): Pendencia[] {
   const p: Pendencia[] = [];
-  const conta = (tipo: string) => docs.filter((d) => d.tipo === tipo).length;
-
-  // 1. Indicado
   if (!i.category_id) p.push({ passo: 1, texto: "Escolher a categoria" });
   if (vazio(i.indicado_nome)) p.push({ passo: 1, texto: "Nome do indicado" });
-  if (!i.indicado_tipo) p.push({ passo: 1, texto: "Tipo do indicado" });
-  // CPF e CNPJ são opcionais (decisão de 26/10/2026); se informados, precisam ser válidos.
-  // Data de nascimento: obrigatória só no Jovem Inovador (faixa de 18 a 29 anos); nas demais, opcional.
-  const exigeNascimento = ctx.categoriaSlug === JOVEM.slug;
-  if (i.indicado_tipo === "pf") {
-    if (i.indicado_documento && !cpfValido(i.indicado_documento)) p.push({ passo: 1, texto: "CPF do indicado inválido" });
-    if (exigeNascimento && !dataOk(i.indicado_nascimento)) p.push({ passo: 1, texto: "Data de nascimento do indicado" });
+
+  if (i.indicado_documento) {
+    const d = i.indicado_documento;
+    if (i.indicado_tipo === "pf" && !cpfValido(d)) p.push({ passo: 1, texto: "CPF do indicado inválido" });
+    if (i.indicado_tipo === "instituicao" && !cnpjValido(d)) p.push({ passo: 1, texto: "CNPJ do indicado inválido" });
+    if (i.indicado_tipo === "conjunto" && !(cpfValido(d) || cnpjValido(d))) p.push({ passo: 1, texto: "CPF ou CNPJ do conjunto inválido" });
   }
-  if (i.indicado_tipo === "instituicao" && i.indicado_documento && !cnpjValido(i.indicado_documento))
-    p.push({ passo: 1, texto: "CNPJ do indicado inválido" });
   if (i.indicado_tipo === "conjunto") {
-    const doc = i.indicado_documento ?? "";
-    if (doc && !(cpfValido(doc) || cnpjValido(doc))) p.push({ passo: 1, texto: "CPF ou CNPJ do conjunto inválido" });
-    if ((i.integrantes ?? []).length < 2) p.push({ passo: 1, texto: "Pelo menos dois integrantes do conjunto" });
     (i.integrantes ?? []).forEach((g, n) => {
-      if (vazio(g.nome) || (exigeNascimento && !dataOk(g.nascimento)) || (g.cpf && !cpfValido(g.cpf))) {
-        p.push({
-          passo: 1,
-          texto: `Integrante ${n + 1}: nome${exigeNascimento ? " e data de nascimento" : ""} (CPF, se informado, válido)`,
-        });
-      }
+      if (g.cpf && !cpfValido(g.cpf)) p.push({ passo: 1, texto: `Integrante ${n + 1}: CPF inválido` });
     });
   }
   if (ctx.categoriaSlug === JOVEM.slug) {
@@ -172,41 +161,12 @@ export function pendenciasIndicacao(i: IndicacaoRow, docs: IndDocRow[], ctx: Con
       }
     }
   }
-  if (ctx.mesmoIndicadoEmOutra && (i.aspecto_distinto ?? "").trim().length < 20) {
-    p.push({ passo: 1, texto: "Aspecto distinto desta indicação (o mesmo indicado está em outra categoria)" });
-  }
-
-  // 2. Vínculo
-  if (!i.vinculo_condicao) p.push({ passo: 2, texto: "Condição de vínculo com Lavras" });
-  if ((i.vinculo_descricao ?? "").trim().length < 10) p.push({ passo: 2, texto: "Descrição do vínculo" });
-  if (!conta("vinculo")) p.push({ passo: 4, texto: "Evidência do vínculo (arquivo ou link)" });
-
-  // 3. Realização
-  if (vazio(i.titulo)) p.push({ passo: 3, texto: "Título da realização" });
-  if (vazio(i.resumo)) p.push({ passo: 3, texto: "Resumo executivo" });
-  if (vazio(i.problema)) p.push({ passo: 3, texto: "Problema ou oportunidade" });
-  if (vazio(i.solucao)) p.push({ passo: 3, texto: "Solução ou contribuição" });
-  if (vazio(i.resultados)) p.push({ passo: 3, texto: "Resultados e indicadores" });
-  if (!dataOk(i.periodo_inicio) || !dataOk(i.periodo_fim)) p.push({ passo: 3, texto: "Período de realização (início e fim)" });
-  else if (i.periodo_fim! < i.periodo_inicio!) p.push({ passo: 3, texto: "O fim do período vem antes do início" });
-  if (vazio(i.beneficiarios) || i.beneficiarios_qtd === null) p.push({ passo: 3, texto: "Beneficiários: quem e quantos" });
-
-  // Art. 7º: indicado pessoa física precisa ter 18 anos ou mais (não há mais autorização de responsável).
+  // Art. 7º: indicado pessoa física precisa ter 18 anos ou mais.
   for (const m of menores(i, new Date(ctx.fechamento))) {
     p.push({ passo: 1, texto: `${m.nome || "Indicado"}: só podem ser indicadas pessoas maiores de 18 anos (art. 7º)` });
   }
-
-  // 4. Evidências
-  if (!conta("evidencia")) p.push({ passo: 4, texto: "Pelo menos uma evidência (link ou arquivo)" });
-
-  // 5. Contato e conflitos
-  if (vazio(i.contato_nome) || vazio(i.contato_email) || vazio(i.contato_telefone)) {
-    p.push({ passo: 5, texto: "Contato do indicado: nome, e-mail e telefone" });
-  }
-  for (const c of CONFLITOS) {
-    const resp = i[`conflito_${c.id}` as const];
-    if (resp === null) p.push({ passo: 5, texto: `Responder: ${c.pergunta}` });
-    else if (resp && vazio(i[`conflito_${c.id}_desc` as const])) p.push({ passo: 5, texto: `Descrever: ${c.pergunta}` });
+  if (dataOk(i.periodo_inicio) && dataOk(i.periodo_fim) && i.periodo_fim! < i.periodo_inicio!) {
+    p.push({ passo: 3, texto: "O fim do período vem antes do início" });
   }
   return p;
 }
