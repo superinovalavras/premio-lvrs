@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 const quando = (iso: string) =>
   new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 
-// Art. 10: decisão preliminar (26 a 28/10), reconsideração (29/10 a 03/11) e passagem das aptas para a avaliação.
+// Art. 10: decisão preliminar (28/10, depois da reabertura extraordinária até 27/10), reconsideração (29/10 a 03/11) e passagem das aptas para a avaliação.
 export function AnaliseIndicacao({ id, an }: { id: string; an: Analise | null }) {
   const router = useRouter();
   const [pendente, iniciar] = useTransition();

@@ -158,22 +158,17 @@ export type Etapa = {
   destaque?: boolean;
 };
 
-// Art. 8º-A do Regulamento (versão final de 15/10/2026). Reserva: o site lê o cronograma do banco.
+// Cronograma de 2026 (com a reabertura extraordinária das indicações até 27/10). Reserva: o site lê o cronograma do banco.
 export const CRONOGRAMA: Etapa[] = [
   {
-    titulo: "Cadastro das instituições indicadoras",
-    data: "Aberto até 23/10/2026",
-    texto: "Instituições de Lavras pedem habilitação para indicar. A Secretaria Executiva analisa em até 1 dia útil.",
-  },
-  {
     titulo: "Indicações",
-    data: "12 a 23/10/2026",
-    texto: "Membros do COCITIEIS e instituições habilitadas indicam até 2 nomes por categoria e 6 no total.",
+    data: "12 a 27/10/2026",
+    texto: "Os 24 membros do COCITIEIS, titulares e suplentes, indicam até 2 nomes por categoria e 6 no total, cada um.",
     destaque: true,
   },
   {
     titulo: "Análise das indicações",
-    data: "26 a 28/10/2026",
+    data: "28/10/2026",
     texto: "A Secretaria Executiva confere completude e elegibilidade e comunica a decisão preliminar. Pedidos de reconsideração de 29/10 a 03/11.",
   },
   {

@@ -446,7 +446,7 @@ export async function enviarIndicacao(id: string, fd: FormData): Promise<Resulta
       titulo: "Indicação recebida",
       paragrafos: [
         `A indicação de ${ind.indicado_nome} na categoria ${cat?.name ?? ""} foi registrada em ${dia(agora)}, às ${hora(agora)}.`,
-        "A Secretaria Executiva analisa completude e elegibilidade de 26 a 28/10 e comunica a decisão preliminar.",
+        "A Secretaria Executiva analisa completude e elegibilidade em 28/10 e comunica a decisão preliminar.",
       ],
       botao: { texto: "Acompanhar", url: `${URL_SITE}${c.painel}` },
     });

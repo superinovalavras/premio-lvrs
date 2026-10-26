@@ -725,7 +725,7 @@ function PassoEnvio(
         <h2 className="mt-5 text-2xl font-semibold">Indicação enviada</h2>
         <p className="mx-auto mt-2 max-w-md font-light text-fundo/70">
           Registrada em {formatarData(i.submetido_em)}{i.versao > 1 ? ` · versão ${i.versao}` : ""}. A Secretaria Executiva analisa completude e
-          elegibilidade de 26 a 28/10 e comunica a decisão preliminar.
+          elegibilidade em 28/10 e comunica a decisão preliminar.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <Link href={painel} className={btnPrim}>
