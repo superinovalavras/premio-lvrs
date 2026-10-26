@@ -138,9 +138,11 @@ export function pendenciasIndicacao(i: IndicacaoRow, docs: IndDocRow[], ctx: Con
   if (vazio(i.indicado_nome)) p.push({ passo: 1, texto: "Nome do indicado" });
   if (!i.indicado_tipo) p.push({ passo: 1, texto: "Tipo do indicado" });
   // CPF e CNPJ são opcionais (decisão de 26/10/2026); se informados, precisam ser válidos.
+  // Data de nascimento: obrigatória só no Jovem Inovador (faixa de 18 a 29 anos); nas demais, opcional.
+  const exigeNascimento = ctx.categoriaSlug === JOVEM.slug;
   if (i.indicado_tipo === "pf") {
     if (i.indicado_documento && !cpfValido(i.indicado_documento)) p.push({ passo: 1, texto: "CPF do indicado inválido" });
-    if (!dataOk(i.indicado_nascimento)) p.push({ passo: 1, texto: "Data de nascimento do indicado" });
+    if (exigeNascimento && !dataOk(i.indicado_nascimento)) p.push({ passo: 1, texto: "Data de nascimento do indicado" });
   }
   if (i.indicado_tipo === "instituicao" && i.indicado_documento && !cnpjValido(i.indicado_documento))
     p.push({ passo: 1, texto: "CNPJ do indicado inválido" });
@@ -149,8 +151,11 @@ export function pendenciasIndicacao(i: IndicacaoRow, docs: IndDocRow[], ctx: Con
     if (doc && !(cpfValido(doc) || cnpjValido(doc))) p.push({ passo: 1, texto: "CPF ou CNPJ do conjunto inválido" });
     if ((i.integrantes ?? []).length < 2) p.push({ passo: 1, texto: "Pelo menos dois integrantes do conjunto" });
     (i.integrantes ?? []).forEach((g, n) => {
-      if (vazio(g.nome) || !dataOk(g.nascimento) || (g.cpf && !cpfValido(g.cpf))) {
-        p.push({ passo: 1, texto: `Integrante ${n + 1}: nome e data de nascimento (CPF, se informado, válido)` });
+      if (vazio(g.nome) || (exigeNascimento && !dataOk(g.nascimento)) || (g.cpf && !cpfValido(g.cpf))) {
+        p.push({
+          passo: 1,
+          texto: `Integrante ${n + 1}: nome${exigeNascimento ? " e data de nascimento" : ""} (CPF, se informado, válido)`,
+        });
       }
     });
   }

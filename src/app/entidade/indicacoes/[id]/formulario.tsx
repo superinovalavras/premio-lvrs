@@ -335,7 +335,11 @@ function PassoIndicado(p: Props & { onSubmit: (e: React.FormEvent<HTMLFormElemen
             />
           </Campo>
           {tipo === "pf" && (
-            <Campo label="Data de nascimento" dica="Obrigatória: só podem ser indicadas pessoas com 18 anos ou mais (art. 7º).">
+            <Campo
+              label="Data de nascimento"
+              opcional={!jovem}
+              dica={jovem ? "Obrigatória no Jovem Inovador: de 18 a 29 anos." : "Só podem ser indicadas pessoas com 18 anos ou mais (art. 7º)."}
+            >
               <input name="indicado_nascimento" type="date" defaultValue={i.indicado_nascimento ?? ""} className={inputCls} />
             </Campo>
           )}
@@ -345,7 +349,9 @@ function PassoIndicado(p: Props & { onSubmit: (e: React.FormEvent<HTMLFormElemen
       {tipo === "conjunto" && (
         <div className="mt-6">
           <p className="text-[13px] font-medium">Integrantes do conjunto</p>
-          <p className="text-[12.5px] text-fundo/60">Nome e data de nascimento de cada pessoa. CPF é opcional.</p>
+          <p className="text-[12.5px] text-fundo/60">
+            {jovem ? "Nome e data de nascimento de cada pessoa (obrigatória no Jovem Inovador). CPF é opcional." : "Nome de cada pessoa. CPF e nascimento são opcionais."}
+          </p>
           <input type="hidden" name="integrantes" value={JSON.stringify(integrantes)} />
           <div className="mt-3 grid gap-3">
             {integrantes.map((g, n) => (
@@ -356,7 +362,7 @@ function PassoIndicado(p: Props & { onSubmit: (e: React.FormEvent<HTMLFormElemen
                 <Campo label="CPF" opcional>
                   <input value={mascaraCpf(g.cpf)} onChange={(e) => setG(n, "cpf", somenteDigitos(e.target.value))} inputMode="numeric" className={inputCls} />
                 </Campo>
-                <Campo label="Nascimento">
+                <Campo label="Nascimento" opcional={!jovem}>
                   <input type="date" value={g.nascimento} onChange={(e) => setG(n, "nascimento", e.target.value)} className={inputCls} />
                 </Campo>
                 <button
