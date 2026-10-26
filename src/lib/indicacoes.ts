@@ -28,7 +28,11 @@ export const CONDICOES_VINCULO = [
 
 export const CONFLITOS = [
   { id: "indicador", pergunta: "Existe vínculo entre o indicador e o indicado?", dica: "Descreva a natureza e o grau." },
-  { id: "conselho", pergunta: "Existe vínculo entre o indicado e algum membro do COCITIEIS?", dica: "Descreva e identifique o conselheiro." },
+  {
+    id: "conselho",
+    pergunta: "Existe vínculo entre o indicado e algum membro do COCITIEIS?",
+    dica: "Descreva e identifique o conselheiro.",
+  },
   {
     id: "relacao",
     pergunta: "Existe relação societária, profissional, hierárquica ou econômica entre o indicado e o indicador?",
@@ -96,7 +100,9 @@ export type IndDocRow = {
 };
 
 // Pessoas físicas da indicação (o indicado PF ou cada integrante do conjunto).
-export function pessoasDaIndicacao(i: Pick<IndicacaoRow, "indicado_tipo" | "indicado_nome" | "indicado_documento" | "indicado_nascimento" | "integrantes">) {
+export function pessoasDaIndicacao(
+  i: Pick<IndicacaoRow, "indicado_tipo" | "indicado_nome" | "indicado_documento" | "indicado_nascimento" | "integrantes">,
+) {
   if (i.indicado_tipo === "pf") {
     return [{ nome: i.indicado_nome ?? "", cpf: i.indicado_documento ?? "", nascimento: i.indicado_nascimento ?? "" }];
   }
@@ -106,7 +112,9 @@ export function pessoasDaIndicacao(i: Pick<IndicacaoRow, "indicado_tipo" | "indi
 
 // Art. 7º: só pessoas físicas maiores de 18 anos podem ser indicadas, aferido no fim das indicações.
 export function menores(i: Parameters<typeof pessoasDaIndicacao>[0], quando = new Date()) {
-  return pessoasDaIndicacao(i).filter((p) => /^\d{4}-\d{2}-\d{2}$/.test(p.nascimento) && idadeEm(p.nascimento, quando) < IDADE_MINIMA_INDICADO);
+  return pessoasDaIndicacao(i).filter(
+    (p) => /^\d{4}-\d{2}-\d{2}$/.test(p.nascimento) && idadeEm(p.nascimento, quando) < IDADE_MINIMA_INDICADO,
+  );
 }
 
 export type Pendencia = { passo: number; texto: string };
@@ -129,18 +137,20 @@ export function pendenciasIndicacao(i: IndicacaoRow, docs: IndDocRow[], ctx: Con
   if (!i.category_id) p.push({ passo: 1, texto: "Escolher a categoria" });
   if (vazio(i.indicado_nome)) p.push({ passo: 1, texto: "Nome do indicado" });
   if (!i.indicado_tipo) p.push({ passo: 1, texto: "Tipo do indicado" });
+  // CPF e CNPJ são opcionais (decisão de 26/10/2026); se informados, precisam ser válidos.
   if (i.indicado_tipo === "pf") {
-    if (!cpfValido(i.indicado_documento ?? "")) p.push({ passo: 1, texto: "CPF do indicado" });
+    if (i.indicado_documento && !cpfValido(i.indicado_documento)) p.push({ passo: 1, texto: "CPF do indicado inválido" });
     if (!dataOk(i.indicado_nascimento)) p.push({ passo: 1, texto: "Data de nascimento do indicado" });
   }
-  if (i.indicado_tipo === "instituicao" && !cnpjValido(i.indicado_documento ?? "")) p.push({ passo: 1, texto: "CNPJ do indicado" });
+  if (i.indicado_tipo === "instituicao" && i.indicado_documento && !cnpjValido(i.indicado_documento))
+    p.push({ passo: 1, texto: "CNPJ do indicado inválido" });
   if (i.indicado_tipo === "conjunto") {
     const doc = i.indicado_documento ?? "";
     if (doc && !(cpfValido(doc) || cnpjValido(doc))) p.push({ passo: 1, texto: "CPF ou CNPJ do conjunto inválido" });
     if ((i.integrantes ?? []).length < 2) p.push({ passo: 1, texto: "Pelo menos dois integrantes do conjunto" });
     (i.integrantes ?? []).forEach((g, n) => {
-      if (vazio(g.nome) || !cpfValido(g.cpf) || !dataOk(g.nascimento)) {
-        p.push({ passo: 1, texto: `Integrante ${n + 1}: nome, CPF e data de nascimento` });
+      if (vazio(g.nome) || !dataOk(g.nascimento) || (g.cpf && !cpfValido(g.cpf))) {
+        p.push({ passo: 1, texto: `Integrante ${n + 1}: nome e data de nascimento (CPF, se informado, válido)` });
       }
     });
   }
@@ -150,7 +160,10 @@ export function pendenciasIndicacao(i: IndicacaoRow, docs: IndDocRow[], ctx: Con
       if (!dataOk(pessoa.nascimento)) continue;
       const idade = idadeEm(pessoa.nascimento, new Date(ctx.fechamento));
       if (idade < JOVEM.min || idade > JOVEM.max) {
-        p.push({ passo: 1, texto: `${pessoa.nome || "Indicado"}: precisa ter de ${JOVEM.min} a ${JOVEM.max} anos no fim das indicações (tem ${idade})` });
+        p.push({
+          passo: 1,
+          texto: `${pessoa.nome || "Indicado"}: precisa ter de ${JOVEM.min} a ${JOVEM.max} anos no fim das indicações (tem ${idade})`,
+        });
       }
     }
   }

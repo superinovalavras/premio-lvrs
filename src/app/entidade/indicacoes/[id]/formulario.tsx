@@ -322,8 +322,8 @@ function PassoIndicado(p: Props & { onSubmit: (e: React.FormEvent<HTMLFormElemen
           </Campo>
           <Campo
             label={tipo === "pf" ? "CPF" : tipo === "instituicao" ? "CNPJ" : "CPF ou CNPJ do responsável"}
-            opcional={tipo === "conjunto"}
-            dica="Base da checagem de autoindicação e de impedimento."
+            opcional
+            dica="Se informar, serve para checar autoindicação e impedimento."
           >
             <input
               name="indicado_documento"
@@ -345,7 +345,7 @@ function PassoIndicado(p: Props & { onSubmit: (e: React.FormEvent<HTMLFormElemen
       {tipo === "conjunto" && (
         <div className="mt-6">
           <p className="text-[13px] font-medium">Integrantes do conjunto</p>
-          <p className="text-[12.5px] text-fundo/60">Nome, CPF e data de nascimento de cada pessoa.</p>
+          <p className="text-[12.5px] text-fundo/60">Nome e data de nascimento de cada pessoa. CPF é opcional.</p>
           <input type="hidden" name="integrantes" value={JSON.stringify(integrantes)} />
           <div className="mt-3 grid gap-3">
             {integrantes.map((g, n) => (
@@ -353,7 +353,7 @@ function PassoIndicado(p: Props & { onSubmit: (e: React.FormEvent<HTMLFormElemen
                 <Campo label={`Integrante ${n + 1}`}>
                   <input value={g.nome} onChange={(e) => setG(n, "nome", e.target.value)} maxLength={160} className={inputCls} />
                 </Campo>
-                <Campo label="CPF">
+                <Campo label="CPF" opcional>
                   <input value={mascaraCpf(g.cpf)} onChange={(e) => setG(n, "cpf", somenteDigitos(e.target.value))} inputMode="numeric" className={inputCls} />
                 </Campo>
                 <Campo label="Nascimento">
