@@ -127,10 +127,12 @@ export default async function PainelAvaliador({ searchParams }: PageProps<"/aval
       />
       <ConteudoArea>
         {(proposta === "enviada" || proposta === "atualizada") && (
-          <Aviso tom="ok" className="mb-4 text-base">
-            <b className="font-semibold">Proposta {proposta === "enviada" ? "enviada" : "atualizada"} com sucesso.</b> Dá para editar até o fim do
-            prazo das indicações.
-          </Aviso>
+          <div className="relative mb-4 rounded-2xl bg-papel shadow-[0_12px_32px_-18px_rgba(1,41,40,.25)]">
+            <Aviso tom="ok" className="text-base">
+              <b className="font-semibold">Proposta {proposta === "enviada" ? "enviada" : "atualizada"} com sucesso.</b> Dá para editar até o fim do
+              prazo das indicações.
+            </Aviso>
+          </div>
         )}
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="grid min-w-0 content-start gap-4 [&>*]:min-w-0">
