@@ -19,7 +19,8 @@ type Situacao = { rotulo: string; tom: "ok" | "pendente" | "alerta" | "neutro"; 
 
 const prazo = (iso: string) => `${dia(iso).slice(0, 5)}, ${hora(iso)}`;
 
-export default async function PainelAvaliador() {
+export default async function PainelAvaliador({ searchParams }: PageProps<"/avaliacao">) {
+  const { proposta } = await searchParams;
   const { avaliador } = await exigirAvaliador();
   const sb = servico();
   const [par, { data: rodadas }, { data: cats }, { data: decl }, { data: fichas }, { data: votos }] = await Promise.all([
@@ -125,6 +126,12 @@ export default async function PainelAvaliador() {
         }
       />
       <ConteudoArea>
+        {(proposta === "enviada" || proposta === "atualizada") && (
+          <Aviso tom="ok" className="mb-4 text-base">
+            <b className="font-semibold">Proposta {proposta === "enviada" ? "enviada" : "atualizada"} com sucesso.</b> Dá para editar até o fim do
+            prazo das indicações.
+          </Aviso>
+        )}
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="grid min-w-0 content-start gap-4 [&>*]:min-w-0">
             <AjudaDestaque className="lg:hidden" />

@@ -20,8 +20,9 @@ export function FormularioProposta({ slug, proposta, editavel }: { slug: string;
     const fd = new FormData(e.currentTarget);
     iniciar(async () => {
       const r = await salvarPropostaHonoraria(slug, fd);
-      setMsg(r.ok ? { ok: true, texto: r.msg ?? "Proposta salva." } : { ok: false, texto: r.erro });
-      if (r.ok) router.refresh();
+      if (!r.ok) return setMsg({ ok: false, texto: r.erro });
+      // Deu certo: volta para a área do conselho, que mostra a confirmação no topo.
+      router.push(`/avaliacao?proposta=${r.msg === "Proposta atualizada." ? "atualizada" : "enviada"}`);
     });
   };
 
