@@ -80,16 +80,34 @@ export async function alternarAvaliador(avaliadorId: string, ativo: boolean): Pr
   return { ok: true, msg: ativo ? "Acesso reativado." : "Acesso desativado. As fichas já enviadas continuam valendo." };
 }
 
-// E-mail do perfil: opcional, serve para o "esqueci a senha" mandar o link.
-export async function definirEmailAvaliador(avaliadorId: string, email: string): Promise<ResultadoConvite> {
+// Dados do cadastro. O login usa um e-mail técnico (lib/server/conselho.ts), então nome e e-mail podem mudar
+// sem mexer na conta: a pessoa passa a entrar com o nome novo e a mesma senha.
+const edicaoSchema = novoSchema.omit({ teste: true });
+
+export async function editarAvaliador(avaliadorId: string, fd: FormData): Promise<ResultadoConvite> {
   const admin = await exigirAdmin();
-  const e = email.trim().toLowerCase();
-  if (e && !z.string().email().safeParse(e).success) return { ok: false, erro: "E-mail inválido." };
-  const { error } = await servico().from("avaliadores").update({ email: e || null }).eq("id", avaliadorId);
-  if (error) return { ok: false, erro: error.code === "23505" ? "Outro avaliador já usa este e-mail." : "Não foi possível salvar. A migração 0012 já rodou?" };
-  await auditar(admin, "avaliador_email", { tipo: "avaliador", id: avaliadorId });
+  const v = edicaoSchema.safeParse({
+    nome: fd.get("nome") ?? "",
+    email: fd.get("email") ?? "",
+    papel: fd.get("papel") ?? "titular",
+    instituicao: fd.get("instituicao") ?? "",
+  });
+  if (!v.success) return { ok: false, erro: v.error.issues[0].message };
+  const d = v.data;
+  if ((await conselheirosPorNome(d.nome)).some((a) => a.id !== avaliadorId)) {
+    return { ok: false, erro: "Já existe outro avaliador ativo com este nome. Diferencie (ex.: nome do meio)." };
+  }
+  const { data: antes } = await servico().from("avaliadores").select("nome, email, papel, instituicao").eq("id", avaliadorId).maybeSingle();
+  if (!antes) return { ok: false, erro: "Avaliador não encontrado." };
+  const { error } = await servico()
+    .from("avaliadores")
+    .update({ nome: d.nome, email: d.email || null, papel: d.papel, instituicao: d.instituicao || null })
+    .eq("id", avaliadorId);
+  if (error) return { ok: false, erro: error.code === "23505" ? "Outro avaliador já usa este e-mail." : "Não foi possível salvar." };
+  await auditar(admin, "avaliador_editado", { tipo: "avaliador", id: avaliadorId }, { antes });
   revalidatePath("/admin/avaliadores");
-  return { ok: true, msg: e ? "E-mail salvo: o “esqueci a senha” já funciona para esta pessoa." : "E-mail removido." };
+  const mudouNome = antes.nome !== d.nome;
+  return { ok: true, msg: mudouNome ? `Salvo. ${d.nome} passa a entrar com o nome novo e a mesma senha.` : "Dados salvos." };
 }
 
 // Art. 8º, § 7º: liga o conselheiro à instituição que ele representa, para somar as cotas de indicação.

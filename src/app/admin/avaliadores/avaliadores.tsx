@@ -2,13 +2,13 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Copy, KeyRound, Link2, Loader2, Mail, MessageCircle, Plus, Power, Trash2, X } from "lucide-react";
+import { Check, Copy, KeyRound, Link2, Loader2, Mail, MessageCircle, Pencil, Plus, Power, Trash2, X } from "lucide-react";
 import {
   alternarAvaliador,
   convidarAvaliador,
   excluirAvaliador,
   gerarNovoLink,
-  definirEmailAvaliador,
+  editarAvaliador,
   vincularEntidade,
   type ResultadoConvite,
 } from "@/lib/server/acoes-avaliadores";
@@ -91,6 +91,7 @@ function Linha({ a, entidades, mostrarLink }: { a: LinhaAvaliador; entidades: En
   const router = useRouter();
   const [msg, setMsg] = useState<string | null>(null);
   const [pendente, iniciar] = useTransition();
+  const [editando, setEditando] = useState(false);
   const ac = ACESSO[a.acesso];
 
   const rodar = (f: () => Promise<ResultadoConvite>, confirmar?: string) => {
@@ -162,16 +163,8 @@ function Linha({ a, entidades, mostrarLink }: { a: LinhaAvaliador; entidades: En
             <KeyRound className="size-4" /> Link de nova senha
           </button>
         )}
-        <button
-          type="button"
-          className={btnContorno}
-          disabled={pendente}
-          onClick={() => {
-            const e = prompt(`E-mail de ${a.nome} (para o “esqueci a senha”). Deixe vazio para remover:`, a.email ?? "");
-            if (e !== null) rodar(() => definirEmailAvaliador(a.id, e));
-          }}
-        >
-          <Mail className="size-4" /> E-mail
+        <button type="button" className={btnContorno} disabled={pendente} onClick={() => setEditando(true)}>
+          <Pencil className="size-4" /> Editar
         </button>
         <button
           type="button"
@@ -182,6 +175,16 @@ function Linha({ a, entidades, mostrarLink }: { a: LinhaAvaliador; entidades: En
         >
           <Power className="size-4" /> {a.ativo ? "Desativar" : "Reativar"}
         </button>
+        {editando && (
+          <EditarAvaliador
+            a={a}
+            fechar={() => setEditando(false)}
+            salvo={(m) => {
+              setEditando(false);
+              setMsg(m);
+            }}
+          />
+        )}
         {a.fichas === 0 && (
           <button
             type="button"
@@ -231,7 +234,6 @@ function NovoAvaliador({ fechar, criado }: { fechar: () => void; criado: (nome: 
           <label>
             <span className="mb-1.5 block text-[12.5px] font-medium text-white/85">E-mail (opcional: para o “esqueci a senha”)</span>
             <input name="email" type="email" className={inputEscuro} />
-            <span className="mt-1 block text-[11.5px] text-white/50">Vira o login. Não dá para trocar depois.</span>
           </label>
           <div className="grid grid-cols-2 gap-3">
             <label>
@@ -257,6 +259,64 @@ function NovoAvaliador({ fechar, criado }: { fechar: () => void; criado: (nome: 
         {erro && <p className="mt-4 rounded-xl border border-vermelho bg-vermelho/15 p-3 text-sm">{erro}</p>}
         <button className={`${btnAmarelo} mt-6`} disabled={pendente}>
           {pendente && <Loader2 className="size-4 animate-spin" />} Criar convite
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function EditarAvaliador({ a, fechar, salvo }: { a: LinhaAvaliador; fechar: () => void; salvo: (msg: string) => void }) {
+  const [erro, setErro] = useState<string | null>(null);
+  const [pendente, iniciar] = useTransition();
+  const router = useRouter();
+
+  const enviar = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    iniciar(async () => {
+      const r = await editarAvaliador(a.id, fd);
+      if (!r.ok) return setErro(r.erro);
+      router.refresh();
+      salvo(r.msg);
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/60" onClick={(e) => e.target === e.currentTarget && fechar()}>
+      <form onSubmit={enviar} className="h-full w-full max-w-[460px] overflow-y-auto border-l border-white/10 bg-fundo p-6" data-lenis-prevent>
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Editar avaliador</h2>
+          <button type="button" onClick={fechar} className="rounded-lg p-1.5 text-white/70 hover:bg-white/10" aria-label="Fechar">
+            <X className="size-5" />
+          </button>
+        </div>
+        <div className="grid gap-4">
+          <label>
+            <span className="mb-1.5 block text-[12.5px] font-medium text-white/85">Nome completo</span>
+            <input name="nome" required minLength={5} defaultValue={a.nome} className={inputEscuro} />
+            <span className="mt-1 block text-[11.5px] text-white/50">É com este nome que a pessoa entra. Se mudar, avise: a senha continua a mesma.</span>
+          </label>
+          <label>
+            <span className="mb-1.5 block text-[12.5px] font-medium text-white/85">E-mail (opcional: para o “esqueci a senha”)</span>
+            <input name="email" type="email" defaultValue={a.email ?? ""} className={inputEscuro} />
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <label>
+              <span className="mb-1.5 block text-[12.5px] font-medium text-white/85">Assento</span>
+              <select name="papel" defaultValue={a.papel} className={inputEscuro}>
+                <option value="titular">Titular</option>
+                <option value="suplente">Suplente</option>
+              </select>
+            </label>
+            <label>
+              <span className="mb-1.5 block text-[12.5px] font-medium text-white/85">Instituição</span>
+              <input name="instituicao" defaultValue={a.instituicao ?? ""} placeholder="Opcional" className={inputEscuro} />
+            </label>
+          </div>
+        </div>
+        {erro && <p className="mt-4 rounded-xl border border-vermelho bg-vermelho/15 p-3 text-sm">{erro}</p>}
+        <button className={`${btnAmarelo} mt-6`} disabled={pendente}>
+          {pendente && <Loader2 className="size-4 animate-spin" />} Salvar
         </button>
       </form>
     </div>
