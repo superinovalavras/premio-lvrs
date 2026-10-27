@@ -1,3 +1,4 @@
+import { cache } from "react";
 import "server-only";
 import { supabaseServico } from "./supabase";
 import {
@@ -46,7 +47,8 @@ export function urlPublica(caminho: string) {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/publico/${caminho}`;
 }
 
-export async function carregarParametros(): Promise<Parametros> {
+// Lida uma vez por requisição (várias partes da mesma tela pedem os parâmetros).
+export const carregarParametros = cache(async (): Promise<Parametros> => {
   const sb = supabaseServico();
   if (!sb) return PADRAO;
   try {
@@ -93,7 +95,7 @@ export async function carregarParametros(): Promise<Parametros> {
   } catch {
     return PADRAO;
   }
-}
+});
 
 // Data e hora de Brasília (UTC-3, sem horário de verão) ↔ ISO.
 export function paraBrasilia(iso: string) {

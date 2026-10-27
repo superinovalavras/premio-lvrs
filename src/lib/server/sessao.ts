@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
@@ -32,16 +33,18 @@ export function servico() {
   return sb;
 }
 
-export async function usuarioAtual(): Promise<User | null> {
+// As três consultas abaixo se repetem várias vezes numa mesma tela (proxy, página, cabeçalho, layout):
+// cache() guarda o resultado só durante a requisição, para não ir ao Supabase de novo.
+export const usuarioAtual = cache(async (): Promise<User | null> => {
   const sb = await supabaseSessao();
   const { data } = await sb.auth.getUser();
   return data.user ?? null;
-}
+});
 
-export async function ehAdmin(userId: string) {
+export const ehAdmin = cache(async (userId: string) => {
   const { data } = await servico().from("admins").select("user_id").eq("user_id", userId).maybeSingle();
   return !!data;
-}
+});
 
 // Senha provisória (pré-cadastro): troca obrigatória antes de qualquer ação; expira em 48h.
 export function precisaTrocarSenha(u: User) {
@@ -79,14 +82,14 @@ export async function exigirAdmin() {
 }
 
 // Conselheiro avaliador (convite aceito). Se a migração 0008 ainda não rodou, a consulta falha e volta null.
-export async function avaliadorDoUsuario(userId: string) {
+export const avaliadorDoUsuario = cache(async (userId: string) => {
   const { data } = await servico()
     .from("avaliadores")
     .select("id, nome, email, papel, instituicao, ativo, is_test")
     .eq("user_id", userId)
     .maybeSingle();
   return data;
-}
+});
 
 // Para onde cada perfil vai depois de entrar.
 export async function destinoDoUsuario(userId: string) {

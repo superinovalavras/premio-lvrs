@@ -22,15 +22,15 @@ const prazo = (iso: string) => `${dia(iso).slice(0, 5)}, ${hora(iso)}`;
 export default async function PainelAvaliador() {
   const { avaliador } = await exigirAvaliador();
   const sb = servico();
-  const par = await carregarParametros();
-  const regulamento = par.documentos.find((d) => /regulamento/i.test(d.titulo) && d.href)?.href ?? null;
-  const [{ data: rodadas }, { data: cats }, { data: decl }, { data: fichas }, { data: votos }] = await Promise.all([
+  const [par, { data: rodadas }, { data: cats }, { data: decl }, { data: fichas }, { data: votos }] = await Promise.all([
+    carregarParametros(),
     sb.from("rodadas").select(CAMPOS_RODADA).eq("is_test", avaliador.is_test).returns<Rodada[]>(),
     sb.from("categories").select("id, name, sort_order"),
     sb.from("declaracoes_avaliador").select("category_id, impedido").eq("avaliador_id", avaliador.id).eq("is_test", avaliador.is_test),
     sb.from("fichas").select("rodada_id, status, enviada_em").eq("avaliador_id", avaliador.id),
     sb.from("votos_honorarios").select("rodada_id, votado_em, invalidado_em").eq("avaliador_id", avaliador.id),
   ]);
+  const regulamento = par.documentos.find((d) => /regulamento/i.test(d.titulo) && d.href)?.href ?? null;
   const nomeCat = new Map((cats ?? []).map((c) => [c.id, c.name as string]));
   const ordemCat = new Map((cats ?? []).map((c) => [c.id, c.sort_order as number]));
   const impedido = new Set((decl ?? []).filter((d) => d.impedido).map((d) => d.category_id));
