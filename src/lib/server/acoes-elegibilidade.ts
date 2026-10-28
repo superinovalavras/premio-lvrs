@@ -36,9 +36,10 @@ async function emailDoIndicador(ind: { entidade_id: string | null; avaliador_id:
 }
 
 async function comunicar(ind: { entidade_id: string | null; avaliador_id: string | null; contato_email: string | null }, assunto: string, texto: string) {
-  const para = [await emailDoIndicador(ind), ind.contato_email].filter(Boolean) as string[];
-  for (const p of new Set(para)) {
-    await enviarEmail({
+  const para = [...new Set([await emailDoIndicador(ind), ind.contato_email].filter(Boolean) as string[])];
+  let enviados = 0;
+  for (const p of para) {
+    const r = await enviarEmail({
       para: p,
       assunto,
       tipo: "elegibilidade",
@@ -46,8 +47,9 @@ async function comunicar(ind: { entidade_id: string | null; avaliador_id: string
       titulo: assunto,
       paragrafos: texto.split("\n").filter(Boolean),
     });
+    if (r.ok) enviados++;
   }
-  return para.length;
+  return { para, enviados };
 }
 
 const atualizar = (id: string) => {
@@ -57,7 +59,7 @@ const atualizar = (id: string) => {
   revalidatePath("/avaliacao", "layout");
 };
 
-// Art. 10 e 8º-A, III: decisão preliminar, comunicada ao indicador e ao indicado.
+// Art. 10 e 8º-A, III: decisão preliminar. Só grava; o e-mail sai quando a Secretaria mandar (comunicarDecisao).
 export async function registrarAnalise(id: string, decisao: "apta" | "inapta", motivo: string): Promise<Resultado> {
   const admin = await exigirAdmin();
   const c = await carregar(id);
@@ -65,18 +67,42 @@ export async function registrarAnalise(id: string, decisao: "apta" | "inapta", m
   if (c.erro) return { ok: false, erro: c.erro };
   if (c.an?.finalist_id) return { ok: false, erro: "Esta indicação já é concorrente: a análise não muda mais." };
   const m = motivo.trim().slice(0, 1500);
-  if (decisao === "inapta" && m.length < 10) return { ok: false, erro: "Explique o motivo da inaptidão (é enviado ao indicador)." };
-  const agora = new Date().toISOString();
+  if (decisao === "inapta" && m.length < 10) return { ok: false, erro: "Explique o motivo da inaptidão (vai na mensagem ao indicador)." };
   const { error } = await servico()
     .from("indicacoes")
-    .update({ analise: decisao, analise_motivo: m || null, analisada_em: agora, analisada_por: admin.id, comunicada_em: agora })
+    .update({ analise: decisao, analise_motivo: m || null, analisada_em: new Date().toISOString(), analisada_por: admin.id, comunicada_em: null })
     .eq("id", id);
   if (error) return { ok: false, erro: MIGRACAO };
-  const mensagem = mensagemDecisao({ indicado: c.ind.indicado_nome ?? "", categoria: c.categoria ?? "", apta: decisao === "apta", motivo: m });
-  const n = await comunicar(c.ind, "Prêmio Lavras de Inovação — decisão preliminar da indicação", mensagem);
-  await auditar(admin, "indicacao_analisada", { tipo: "indicacao", id }, { decisao, motivo: m || null, comunicados: n });
+  await auditar(admin, "indicacao_analisada", { tipo: "indicacao", id }, { decisao, motivo: m || null });
   atualizar(id);
-  return { ok: true, msg: `Registrada como ${decisao}.`, mensagem };
+  return { ok: true, msg: `Registrada como ${decisao}. Nenhum e-mail foi enviado.` };
+}
+
+// Envio manual da decisão (preliminar ou da reconsideração) ao indicador e ao indicado.
+export async function comunicarDecisao(id: string, qual: "analise" | "reconsideracao"): Promise<Resultado> {
+  const admin = await exigirAdmin();
+  const c = await carregar(id);
+  if (!c) return { ok: false, erro: "Indicação não encontrada." };
+  if (c.erro || !c.an) return { ok: false, erro: c.erro ?? MIGRACAO };
+  const an = c.an;
+  const base = { indicado: c.ind.indicado_nome ?? "", categoria: c.categoria ?? "" };
+  let assunto: string, mensagem: string;
+  if (qual === "analise") {
+    if (!an.analise) return { ok: false, erro: "Registre a decisão antes." };
+    assunto = "Prêmio Lavras de Inovação — decisão preliminar da indicação";
+    mensagem = mensagemDecisao({ ...base, apta: an.analise === "apta", motivo: an.analise_motivo });
+  } else {
+    if (!an.reconsideracao_decisao) return { ok: false, erro: "O pedido ainda não foi decidido." };
+    assunto = "Prêmio Lavras de Inovação — pedido de reconsideração";
+    mensagem = mensagemReconsideracao({ ...base, deferida: an.reconsideracao_decisao === "deferida", motivo: an.reconsideracao_motivo });
+  }
+  const { para, enviados } = await comunicar(c.ind, assunto, mensagem);
+  if (!para.length) return { ok: false, erro: "Não há e-mail do indicador nem do indicado. Copie a mensagem e envie por outro canal." };
+  if (qual === "analise" && enviados) await servico().from("indicacoes").update({ comunicada_em: new Date().toISOString() }).eq("id", id);
+  await auditar(admin, qual === "analise" ? "decisao_comunicada" : "reconsideracao_comunicada", { tipo: "indicacao", id }, { para, enviados });
+  atualizar(id);
+  if (!enviados) return { ok: false, erro: "O e-mail não saiu (envio automático não configurado ou falhou). Copie a mensagem e envie à mão." };
+  return { ok: true, msg: `E-mail enviado para ${para.join(" e ")}${enviados < para.length ? ` (${para.length - enviados} falhou)` : ""}.` };
 }
 
 // Art. 10, §§ 2º e 3º: o pedido chega pelo canal oficial; a Secretaria registra e o COCITIEIS decide.
@@ -115,11 +141,9 @@ export async function decidirReconsideracao(id: string, decisao: "deferida" | "i
     })
     .eq("id", id);
   if (error) return { ok: false, erro: MIGRACAO };
-  const mensagem = mensagemReconsideracao({ indicado: c.ind.indicado_nome ?? "", categoria: c.categoria ?? "", deferida: decisao === "deferida", motivo: f });
-  await comunicar(c.ind, "Prêmio Lavras de Inovação — pedido de reconsideração", mensagem);
   await auditar(admin, "reconsideracao_decidida", { tipo: "indicacao", id }, { decisao });
   atualizar(id);
-  return { ok: true, msg: decisao === "deferida" ? "Deferido: a indicação passou a apta." : "Indeferido.", mensagem };
+  return { ok: true, msg: `${decisao === "deferida" ? "Deferido: a indicação passou a apta." : "Indeferido."} Nenhum e-mail foi enviado.` };
 }
 
 // Indicação apta vira concorrente ("indicado") da categoria, pronta para a pré-seleção ou para a avaliação.

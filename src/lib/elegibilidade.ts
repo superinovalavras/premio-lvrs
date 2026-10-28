@@ -24,7 +24,8 @@ export const CANAL_OFICIAL = "superinovalavras@gmail.com";
 export function mensagemDecisao(d: { indicado: string; categoria: string; apta: boolean; motivo: string | null }) {
   const base = `Prêmio Lavras de Inovação 2026 — decisão preliminar de elegibilidade.\n\nIndicação: ${d.indicado}, na categoria ${d.categoria}.\n`;
   if (d.apta) {
-    return `${base}Resultado: APTA. A indicação segue para a etapa de avaliação do COCITIEIS. Antes de qualquer divulgação do nome, a Secretaria Executiva entra em contato com o indicado (art. 10, § 1º).`;
+    const obs = d.motivo?.trim() ? `\nObservação da Secretaria Executiva: ${d.motivo.trim()}\nResponda pelo e-mail ${CANAL_OFICIAL}.\n` : "";
+    return `${base}Resultado: APTA. A indicação segue para a etapa de avaliação do COCITIEIS.${obs}\nAntes de qualquer divulgação do nome, a Secretaria Executiva entra em contato com o indicado (art. 10, § 1º).`;
   }
   return `${base}Resultado: INAPTA.\nMotivo: ${d.motivo ?? ""}\n\nCabe pedido de reconsideração por erro material ou descumprimento objetivo do Regulamento, em até dois dias úteis, pelo e-mail ${CANAL_OFICIAL} (art. 10, § 2º).`;
 }

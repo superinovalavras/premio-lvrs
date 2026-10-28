@@ -11,6 +11,7 @@ import { CONDICOES_VINCULO, CONFLITOS, STATUS_INDICACAO, TIPOS_INDICADO, menores
 import { formatarCnpj, formatarData } from "@/lib/entidades";
 import { idadeEm, mascaraCelular, mascaraCpf } from "@/lib/voto";
 import { AbrirDoc } from "./abrir";
+import { EditarIndicacao } from "./editar";
 
 export const metadata: Metadata = { title: "Indicação · Painel do Prêmio" };
 
@@ -31,12 +32,13 @@ export default async function DetalheIndicacao({ params }: PageProps<"/admin/ind
   if (!r) notFound();
   const { indicacao: i, documentos } = r;
   const sb = servico();
-  const [{ data: cat }, { data: ent }, { data: av }, { data: versoes }, analise] = await Promise.all([
+  const [{ data: cat }, { data: ent }, { data: av }, { data: versoes }, analise, { data: categorias }] = await Promise.all([
     i.category_id ? sb.from("categories").select("name").eq("id", i.category_id).maybeSingle() : Promise.resolve({ data: null }),
     i.entidade_id ? sb.from("entidades").select("id, razao_social, cnpj").eq("id", i.entidade_id).maybeSingle() : Promise.resolve({ data: null }),
     i.avaliador_id ? sb.from("avaliadores").select("nome, instituicao").eq("id", i.avaliador_id).maybeSingle() : Promise.resolve({ data: null }),
     sb.from("indicacao_versoes").select("versao, criado_em, ip").eq("indicacao_id", id).order("versao"),
     sb.from("indicacoes").select(CAMPOS_ANALISE).eq("id", id).maybeSingle<Analise>(),
+    sb.from("categories").select("id, name").neq("type", "honorary").order("sort_order"),
   ]);
   const tipo = TIPOS_INDICADO.find((t) => t.id === i.indicado_tipo)?.rotulo;
   const docsDe = (t: string) => documentos.filter((d) => d.tipo === t);
@@ -76,7 +78,8 @@ export default async function DetalheIndicacao({ params }: PageProps<"/admin/ind
           </>
         }
       />
-      {i.status === "enviada" && <AnaliseIndicacao id={i.id} an={analise.error ? null : analise.data} />}
+      {i.status === "enviada" && <AnaliseIndicacao id={i.id} an={analise.error ? null : analise.data} indicado={i.indicado_nome ?? ""} categoria={(cat as { name: string } | null)?.name ?? ""} />}
+      {i.status === "enviada" && <EditarIndicacao i={i} documentos={documentos} categorias={(categorias ?? []) as { id: string; name: string }[]} />}
       <div className="grid gap-6 xl:grid-cols-2">
         <CartaoAdmin>
           <h2 className="mb-2 font-semibold">Indicado</h2>

@@ -5,25 +5,58 @@ import { useRouter } from "next/navigation";
 import { Check, Copy, Loader2 } from "lucide-react";
 import { CartaoAdmin, btnAmarelo, btnContorno, inputEscuro } from "@/components/admin/ui";
 import {
+  comunicarDecisao,
   decidirReconsideracao,
   incluirComoConcorrente,
   registrarAnalise,
   registrarReconsideracao,
   type Resultado,
 } from "@/lib/server/acoes-elegibilidade";
-import type { Analise } from "@/lib/elegibilidade";
+import { mensagemDecisao, mensagemReconsideracao, type Analise } from "@/lib/elegibilidade";
 import { cn } from "@/lib/utils";
 
 const quando = (iso: string) =>
   new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 
-// Art. 10: decisão preliminar (28/10, depois da reabertura extraordinária até 27/10), reconsideração (29/10 a 03/11) e passagem das aptas para a avaliação.
-export function AnaliseIndicacao({ id, an }: { id: string; an: Analise | null }) {
+// Mensagem pronta para revisar: só sai por e-mail quando a Secretaria clicar em enviar.
+function Comunicacao({ titulo, mensagem, enviadaEm, pendente, enviar }: { titulo: string; mensagem: string; enviadaEm: string | null; pendente: boolean; enviar: () => void }) {
+  const [copiado, setCopiado] = useState(false);
+  return (
+    <div className="grid gap-2 rounded-xl border border-white/15 p-3">
+      <p className="text-[12.5px] text-white/60">
+        {titulo} · {enviadaEm ? <span className="text-[#8ff0bd]">e-mail enviado em {quando(enviadaEm)}</span> : <span className="text-amarelo">ainda não comunicada</span>}
+      </p>
+      <p className="whitespace-pre-line text-white/85">{mensagem}</p>
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          disabled={pendente}
+          className={btnAmarelo}
+          onClick={() => confirm(enviadaEm ? "Este e-mail já foi enviado. Enviar de novo?" : "Enviar este e-mail ao indicador e ao indicado?") && enviar()}
+        >
+          {pendente && <Loader2 className="size-4 animate-spin" />} {enviadaEm ? "Enviar de novo" : "Enviar e-mail"}
+        </button>
+        <button
+          type="button"
+          className={btnContorno}
+          onClick={() => {
+            navigator.clipboard.writeText(mensagem);
+            setCopiado(true);
+            setTimeout(() => setCopiado(false), 2000);
+          }}
+        >
+          {copiado ? <Check className="size-4" /> : <Copy className="size-4" />} {copiado ? "Copiada" : "Copiar mensagem"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Art. 10: decisão preliminar, reconsideração (29/10 a 03/11) e passagem das aptas para a avaliação.
+export function AnaliseIndicacao({ id, an, indicado, categoria }: { id: string; an: Analise | null; indicado: string; categoria: string }) {
   const router = useRouter();
   const [pendente, iniciar] = useTransition();
   const [msg, setMsg] = useState<{ ok: boolean; texto: string } | null>(null);
-  const [mensagem, setMensagem] = useState<string | null>(null);
-  const [copiado, setCopiado] = useState(false);
   const [decisao, setDecisao] = useState<"apta" | "inapta" | "">("");
   const [texto, setTexto] = useState("");
 
@@ -32,11 +65,10 @@ export function AnaliseIndicacao({ id, an }: { id: string; an: Analise | null })
       const r = await f();
       setMsg(r.ok ? { ok: true, texto: r.msg ?? "Pronto." } : { ok: false, texto: r.erro });
       if (r.ok) {
-        setMensagem(r.mensagem ?? null);
         setTexto("");
         setDecisao("");
-        router.refresh();
       }
+      router.refresh();
     });
 
   const decidido = an?.analise;
@@ -63,8 +95,17 @@ export function AnaliseIndicacao({ id, an }: { id: string; an: Analise | null })
           {an.analisada_em && (
             <p className="text-white/75">
               Decisão preliminar em {quando(an.analisada_em)}
-              {an.analise_motivo ? ` · ${an.analise_motivo}` : ""}. Comunicada ao indicador e ao indicado.
+              {an.analise_motivo ? ` · ${an.analise_motivo}` : ""}.
             </p>
+          )}
+          {an.analise && (
+            <Comunicacao
+              titulo="Decisão preliminar"
+              mensagem={mensagemDecisao({ indicado, categoria, apta: an.analise === "apta", motivo: an.analise_motivo })}
+              enviadaEm={an.comunicada_em}
+              pendente={pendente}
+              enviar={() => rodar(() => comunicarDecisao(id, "analise"))}
+            />
           )}
 
           {/* 1. Decisão preliminar */}
@@ -89,7 +130,7 @@ export function AnaliseIndicacao({ id, an }: { id: string; an: Analise | null })
                     className={inputEscuro}
                   />
                   <button type="button" disabled={pendente} className={cn(btnAmarelo, "justify-self-start")} onClick={() => rodar(() => registrarAnalise(id, decisao, texto))}>
-                    {pendente && <Loader2 className="size-4 animate-spin" />} {an.analise ? "Corrigir a decisão" : "Registrar e comunicar"}
+                    {pendente && <Loader2 className="size-4 animate-spin" />} {an.analise ? "Corrigir a decisão" : "Registrar decisão"}
                   </button>
                 </>
               )}
@@ -116,6 +157,15 @@ export function AnaliseIndicacao({ id, an }: { id: string; an: Analise | null })
                   {an.reconsideracao_decisao === "deferida" ? "Deferido" : "Indeferido"}
                   {an.reconsideracao_decidida_em ? ` em ${quando(an.reconsideracao_decidida_em)}` : ""}: {an.reconsideracao_motivo}
                 </p>
+              ) : null}
+              {an.reconsideracao_decisao ? (
+                <Comunicacao
+                  titulo="Decisão da reconsideração"
+                  mensagem={mensagemReconsideracao({ indicado, categoria, deferida: an.reconsideracao_decisao === "deferida", motivo: an.reconsideracao_motivo })}
+                  enviadaEm={null}
+                  pendente={pendente}
+                  enviar={() => rodar(() => comunicarDecisao(id, "reconsideracao"))}
+                />
               ) : (
                 <>
                   <p className="text-white/65">Decisão do COCITIEIS ou de comissão designada, em até dois dias úteis (art. 10, § 3º).</p>
@@ -147,25 +197,6 @@ export function AnaliseIndicacao({ id, an }: { id: string; an: Analise | null })
           )}
 
           {msg && <p className={msg.ok ? "text-[#8ff0bd]" : "text-[#ff8a8f]"}>{msg.texto}</p>}
-          {mensagem && (
-            <div className="rounded-xl border border-white/15 p-3">
-              <p className="text-[12px] text-white/60">
-                Mensagem registrada. Se o e-mail automático ainda não estiver configurado, copie e envie ao indicador e ao indicado:
-              </p>
-              <p className="mt-2 whitespace-pre-line text-white/85">{mensagem}</p>
-              <button
-                type="button"
-                className={cn(btnContorno, "mt-2")}
-                onClick={() => {
-                  navigator.clipboard.writeText(mensagem);
-                  setCopiado(true);
-                  setTimeout(() => setCopiado(false), 2000);
-                }}
-              >
-                {copiado ? <Check className="size-4" /> : <Copy className="size-4" />} {copiado ? "Copiada" : "Copiar mensagem"}
-              </button>
-            </div>
-          )}
         </div>
       )}
     </CartaoAdmin>
