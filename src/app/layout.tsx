@@ -1,3 +1,4 @@
+import { EDICAO_ADIADA } from "@/lib/edicao";
 import type { Metadata, Viewport } from "next";
 import { Kaushan_Script, Poppins } from "next/font/google";
 import { SmoothScroll } from "@/components/smooth-scroll";
@@ -19,11 +20,12 @@ const kaushan = Kaushan_Script({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://premio.lvrs.com.br"),
-  title: "Prêmio Lavras de Inovação 2026",
-  description:
-    "Lavras reconhece quem transforma ideias em impacto. Conheça as 11 categorias, vote na Agro e/ou Food e/ou Tech do Ano e acompanhe a cerimônia de 17 de novembro.",
+  title: EDICAO_ADIADA ? "Prêmio Lavras de Inovação" : "Prêmio Lavras de Inovação 2026",
+  description: EDICAO_ADIADA
+    ? "Lavras reconhece quem transforma ideias em impacto. A edição do Prêmio foi adiada para 2027; as novas datas serão divulgadas neste site."
+    : "Lavras reconhece quem transforma ideias em impacto. Conheça as 11 categorias, vote na Agro e/ou Food e/ou Tech do Ano e acompanhe a cerimônia de 17 de novembro.",
   openGraph: {
-    title: "Prêmio Lavras de Inovação 2026",
+    title: EDICAO_ADIADA ? "Prêmio Lavras de Inovação" : "Prêmio Lavras de Inovação 2026",
     description: "Lavras, Capital do Futuro do Alimento, reconhece quem transforma ideias em impacto.",
     locale: "pt_BR",
     type: "website",

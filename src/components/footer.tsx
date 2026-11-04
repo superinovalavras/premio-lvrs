@@ -39,7 +39,7 @@ export function Footer() {
           </Link>
         </div>
         <p className="mt-6 text-center text-xs text-white/70">
-          Prêmio Lavras de Inovação 2026 · Superintendência de Inovação de Lavras · Lavras, Capital do Futuro do
+          Prêmio Lavras de Inovação · Superintendência de Inovação de Lavras · Lavras, Capital do Futuro do
           Alimento
         </p>
       </div>

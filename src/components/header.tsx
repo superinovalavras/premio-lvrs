@@ -6,8 +6,9 @@ import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVoto } from "./voto-context";
+import { EDICAO_ADIADA } from "@/lib/edicao";
 
-const LINKS = [
+const TODOS = [
   { href: "#eixos", label: "Eixos" },
   { href: "#categorias", label: "Categorias" },
   { href: "#indicar", label: "Indicar" },
@@ -15,6 +16,8 @@ const LINKS = [
   { href: "#cronograma", label: "Cronograma" },
   { href: "#transparencia", label: "Transparência" },
 ];
+// Edição adiada: as seções de indicação, votação e cronograma saem da página.
+const LINKS = EDICAO_ADIADA ? TODOS.filter((l) => !["#indicar", "#votacao", "#cronograma"].includes(l.href)) : TODOS;
 
 export function Header() {
   const [rolou, setRolou] = useState(false);
@@ -45,7 +48,7 @@ export function Header() {
           <span className="hidden border-l border-white/20 pl-3 text-[0.68rem] font-medium uppercase leading-tight tracking-[0.2em] text-white/85 sm:block">
             Prêmio Lavras
             <br />
-            de Inovação <span className="text-amarelo">2026</span>
+            de Inovação <span className="text-amarelo">{EDICAO_ADIADA ? "2027" : "2026"}</span>
           </span>
         </a>
 
@@ -63,12 +66,14 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <button
-            onClick={abrir}
-            className="rounded-xl bg-amarelo px-4 py-2 text-sm font-semibold text-fundo transition-shadow hover:shadow-[0_8px_28px_-6px_var(--amarelo)]"
-          >
-            Votar
-          </button>
+          {!EDICAO_ADIADA && (
+            <button
+              onClick={abrir}
+              className="rounded-xl bg-amarelo px-4 py-2 text-sm font-semibold text-fundo transition-shadow hover:shadow-[0_8px_28px_-6px_var(--amarelo)]"
+            >
+              Votar
+            </button>
+          )}
           <button
             className="rounded-xl p-2 text-white lg:hidden"
             onClick={() => setMenu((m) => !m)}

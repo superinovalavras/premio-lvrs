@@ -10,6 +10,7 @@ import { useVoto } from "@/components/voto-context";
 import { PUBLICOS } from "@/lib/data";
 import { useParametros } from "@/components/parametros-context";
 import { extenso, hora } from "@/lib/datas";
+import { EDICAO_ADIADA } from "@/lib/edicao";
 
 function restante(alvo: Date) {
   const ms = Math.max(0, alvo.getTime() - Date.now());
@@ -101,7 +102,7 @@ export function Hero() {
           custom={0}
           className="mb-7 inline-flex items-center gap-2 text-[0.7rem] font-medium uppercase tracking-[0.25em] text-white/80"
         >
-          <Mais className="size-4 text-amarelo" /> Prêmio Lavras de Inovação · Edição 2026
+          <Mais className="size-4 text-amarelo" /> Prêmio Lavras de Inovação · {EDICAO_ADIADA ? "Edição 2027" : "Edição 2026"}
         </motion.p>
 
         <motion.h1
@@ -124,17 +125,24 @@ export function Hero() {
           A Capital do Futuro do Alimento
         </motion.p>
 
-        <motion.div variants={entrada} initial="hidden" animate="show" custom={3} className="mt-10">
-          <Contagem />
-        </motion.div>
+        {/* Edição adiada: sem contagem; o aviso é a faixa amarela acima do hero. */}
+        {!EDICAO_ADIADA && (
+          <motion.div variants={entrada} initial="hidden" animate="show" custom={3} className="mt-10">
+            <Contagem />
+          </motion.div>
+        )}
 
         <motion.div variants={entrada} initial="hidden" animate="show" custom={4} className="mt-10 flex flex-wrap gap-3">
-          <Button size="lg" onClick={abrir}>
-            <Vote className="size-5" /> Votar Agora
-          </Button>
-          <Link href="/como-votar" className={buttonVariants({ variant: "ajuda", size: "lg" })}>
-            <CircleHelp className="size-5" /> Como votar?
-          </Link>
+          {!EDICAO_ADIADA && (
+            <>
+              <Button size="lg" onClick={abrir}>
+                <Vote className="size-5" /> Votar Agora
+              </Button>
+              <Link href="/como-votar" className={buttonVariants({ variant: "ajuda", size: "lg" })}>
+                <CircleHelp className="size-5" /> Como votar?
+              </Link>
+            </>
+          )}
           <a href="#categorias" className={buttonVariants({ variant: "outline", size: "lg" })}>
             Ver Categorias <ArrowDown className="size-4" />
           </a>

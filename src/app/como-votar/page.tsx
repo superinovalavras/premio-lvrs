@@ -5,6 +5,8 @@ import { ArrowLeft } from "lucide-react";
 import { Mais } from "@/components/marca";
 import { Tutorial, type Topico } from "@/components/tutorial-visual";
 import topicos from "@/lib/tutoriais/como-votar.json";
+import { EDICAO_ADIADA } from "@/lib/edicao";
+import { Adiado } from "@/app/adiado";
 
 export const metadata: Metadata = {
   title: "Como votar · Prêmio Lavras de Inovação 2026",
@@ -13,6 +15,7 @@ export const metadata: Metadata = {
 
 // Prints do próprio site, gerados por script de captura (fora do repositório).
 export default function ComoVotar() {
+  if (EDICAO_ADIADA) return <Adiado />;
   return (
     <main className="min-h-[100svh] bg-fundo text-white">
       <header className="border-b border-white/10">

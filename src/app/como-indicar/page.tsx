@@ -7,7 +7,8 @@ import { Tutorial, type Topico } from "@/components/tutorial-visual";
 import { carregarParametros } from "@/lib/server/parametros";
 import { diaCurto } from "@/lib/datas";
 import topicos from "@/lib/tutoriais/como-indicar.json";
-import { INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
+import { EDICAO_ADIADA, INDICACAO_POR_INSTITUICAO } from "@/lib/edicao";
+import { Adiado } from "@/app/adiado";
 import { Fechado } from "@/app/cadastro/fechado";
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 
 // Pública: a instituição vê o caminho antes de criar o acesso. Prints gerados por script de captura.
 export default async function ComoIndicar() {
+  if (EDICAO_ADIADA) return <Adiado />;
   if (!INDICACAO_POR_INSTITUICAO) return <Fechado />;
   const par = await carregarParametros();
   return (

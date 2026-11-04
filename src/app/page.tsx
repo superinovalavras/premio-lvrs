@@ -12,6 +12,8 @@ import { carregarFinalistas } from "@/lib/server/finalistas";
 import { FaixaTeste } from "@/components/faixa-teste";
 import { ParametrosProvider } from "@/components/parametros-context";
 import { carregarParametros } from "@/lib/server/parametros";
+import { EDICAO_ADIADA } from "@/lib/edicao";
+import { FaixaAdiamento } from "@/components/faixa-adiamento";
 
 // Finalistas vêm do Supabase; revalida a cada 5 min para refletir o cadastro sem novo deploy.
 export const revalidate = 300;
@@ -24,12 +26,18 @@ export default async function Home() {
     <VotoProvider finalistas={finalistas} exemplo={exemplo}>
       <Header />
       <main>
+        <FaixaAdiamento />
         <Hero />
         <Eixos />
         <Categorias />
-        <Indicar />
-        <Votacao />
-        <Cronograma />
+        {/* Edição adiada: sem indicação, votação e cronograma até sair a nova data. */}
+        {!EDICAO_ADIADA && (
+          <>
+            <Indicar />
+            <Votacao />
+            <Cronograma />
+          </>
+        )}
         <Transparencia />
       </main>
       <Footer />

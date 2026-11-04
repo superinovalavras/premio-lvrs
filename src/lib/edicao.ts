@@ -11,3 +11,12 @@ export const VOTACAO_HONORARIA_NO_SITE = false;
 
 export const AVISO_INSTITUICOES =
   "Nesta edição, as indicações são feitas pelos membros do COCITIEIS. A indicação por instituições volta na próxima edição.";
+
+// Edição 2026 adiada para 2027 (sem comunicado oficial: o site diz só isso). Com true, o site público tira
+// votação, indicação e cronograma, mostra o aviso e a API de voto recusa tudo. Volta a false na próxima edição.
+export const EDICAO_ADIADA = true;
+export const AVISO_ADIAMENTO = {
+  selo: "Edição adiada",
+  titulo: "O Prêmio Lavras de Inovação foi adiado para 2027",
+  texto: "A edição prevista para 2026 foi adiada para o próximo ano. As novas datas serão divulgadas neste site.",
+};

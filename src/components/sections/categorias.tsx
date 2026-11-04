@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { Titulo } from "@/components/titulo";
 import { Arcos, TagVertical } from "@/components/marca";
 import { useVoto } from "@/components/voto-context";
+import { EDICAO_ADIADA } from "@/lib/edicao";
 
 type Filtro = "todas" | TipoCategoria;
 
@@ -107,12 +108,14 @@ function Card({ c, indice }: { c: Categoria; indice: number }) {
               <p className="text-white/75">voto popular normalizado</p>
             </div>
           </div>
-          <button
-            onClick={abrir}
-            className="inline-flex items-center gap-2 rounded-xl bg-fundo px-5 py-3 text-sm font-semibold text-amarelo transition-transform hover:-translate-y-0.5"
-          >
-            <Vote className="size-4" /> Votar nesta categoria
-          </button>
+          {!EDICAO_ADIADA && (
+            <button
+              onClick={abrir}
+              className="inline-flex items-center gap-2 rounded-xl bg-fundo px-5 py-3 text-sm font-semibold text-amarelo transition-transform hover:-translate-y-0.5"
+            >
+              <Vote className="size-4" /> Votar nesta categoria
+            </button>
+          )}
         </div>
       )}
     </motion.article>
